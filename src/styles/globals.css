@@ -1,26 +1,59 @@
 @import "tailwindcss";
 
+
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-primary: #80CBC4;
+  --color-secondary: #FFB433;
+  --color-third: #B4EBE6;
+  --color-gray-1: #FBF8EF;
+  --color-text-hover: #262525;
+  --color-white: #fff;
+  --color-border: #F1F2F6;
+  --color-placeholder: #DFE4EA;
+  --color-dander: #FF4757;
+  --color-text-secondary: #9E9E9E;
+  --color-text-primary: #000000;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
 
-@media (prefers-color-scheme: dark) {
+
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --color-primary :#80CBC4;
+    --color-secondary : #FFB433;
+    --color-third : #B4EBE6;
+    --color-gray-1 : #FBF8EF;
+    --color-text-hover : #262525;
+    --color-white :  #fff;
+    --color-border :  #F1F2F6;
+    --color-placeholder :  #DFE4EA;
+    --color-dander: #FF4757;
+    --color-text-secondary: #9E9E9E;
+    --color-text-primary: #000000;
+  }
+
+  * {
+    @apply transition-colors duration-500 ease-in-out;
   }
 }
 
+.theme-dark {
+    --color-primary :#ededed  ;
+    --color-secondary : #989494;
+    --color-text-base : #ffffff;
+    --color-text-unselected : #797777;
+    --color-text-hover : #262525;
+    --color-bg-primary :  #3c3c3c;
+    --color-border :  #323538;
+    --color-bg-secondary :  #000000;
+    --color-bg-form: #202426;
+    --color-bg-text-input: #363636;
+    --color-text-input: #ececeb;
+
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-bg-secondary);
 }
