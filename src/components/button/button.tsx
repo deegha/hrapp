@@ -15,7 +15,7 @@ export const Button: React.FC<IButtonProps> = ({
   ...props
 }) => {
   const baseStyles =
-    "w-full text-white font-bold py-3 rounded-lg transition-all duration-300 cursor-pointer";
+    "w-full text-white font-bold p-3 rounded-lg transition-all duration-300 cursor-pointer text-xs";
   const variants = {
     primary: "bg-[#80CBC4] hover:bg-[#66AFA9]",
     secondary: "bg-[#FFB433] hover:bg-[#E69E2E]",

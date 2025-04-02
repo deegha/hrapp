@@ -26,7 +26,7 @@ export const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
             ref={ref}
             type={type === "password" && !showPassword ? "password" : "text"}
             placeholder={placeholder}
-            className={`w-full p-3 border text-sm rounded-md bg-gray-100 text-gray-500 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all pl-${icon ? "10" : "3"} ${
+            className={`w-full p-3 border border-border text-sm rounded-md bg-gray-100 text-gray-500 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all pl-${icon ? "10" : "3"} ${
               error ? "text-danger" : "border-gray-200"
             }`}
             {...rest}
