@@ -1,11 +1,10 @@
 import { Layout } from "@/components";
-import { UserHome } from "@/views";
+import { ApplyLeave } from "@/views";
 
 export default function Home() {
   return (
     <Layout>
-      <div className="bg-secondary w-20">dfdsa</div>
-      <UserHome />
+      <ApplyLeave />
     </Layout>
   );
 }

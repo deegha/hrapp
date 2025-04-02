@@ -1,12 +1,17 @@
 import { PageLayout, Button } from "@/components";
+import { useRouter } from "next/navigation";
 
 export function UserLeave() {
+  const router = useRouter();
+
+  function handleApplyLeave() {
+    router.push("./leave-management/apply");
+  }
+
   return (
     <PageLayout
       pageName="Leave Management"
-      actionButton={
-        <Button onClick={() => console.log("here we are")}>Apply Leave</Button>
-      }
+      actionButton={<Button onClick={handleApplyLeave}>Apply Leave</Button>}
     >
       <div className=""></div>
     </PageLayout>

@@ -17,13 +17,16 @@ export function Layout({ children }: IPrps) {
     const handleAuth = async () => {
       const res = await checkAuthServiceCall();
 
-      if (res.error) router.push("./login");
+      if (res.error) {
+        logout();
+        router.push("./login");
+      }
 
       return;
     };
 
     handleAuth();
-  }, []);
+  }, [logout, router]);
 
   async function doLogout() {
     await logOutServiceCall();
@@ -35,15 +38,15 @@ export function Layout({ children }: IPrps) {
   return (
     <div className="flex w-full h-[100hv]">
       <div className="w-[207px] flex flex-col gap-10 border-r border-border h-[100vh] justify-between">
-        <div className="flex items-center h-[88px] justify-center border-b border-border flex-1">
+        <div className="flex items-center h-[88px] justify-center border-b border-border font-semibold">
           Macro HR
         </div>
-        <div className="flex items-start justify-center flex-[70%]">
+        <div className="flex items-start justify-center flex-[70%] ">
           <Navigation />
         </div>
-        <div className="flex items-center h-[88px] justify-center border-t border-border flex-1">
+        <div className="flex items-center h-[88px] justify-center border-t border-border ">
           <div
-            className="uppercase font-semibold hover:text-tHovertext-sm cursor-pointer flex items-center gap-2 text-danger hover:font-medium"
+            className="uppercase text-sm font-semibold cursor-pointer flex items-center gap-2 text-danger hover:font-bold"
             onClick={doLogout}
           >
             <LogOut size={15} />
