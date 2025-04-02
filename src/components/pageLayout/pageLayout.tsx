@@ -20,7 +20,7 @@ export function PageLayout({
   }
 
   return (
-    <div className="flex w-full flex-col gap-[40px] p-[25px]">
+    <div className="flex w-full flex-col gap-[40px] p-[25px] animate-appear">
       <div className="w-full flex justify-between items-center h-[40px]">
         <div className="flex items-center gap-2 ">
           {enableBack && (

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 
 interface DateRange {
   start: Date | null;
@@ -8,16 +8,14 @@ interface DateRange {
 interface DateListProps {
   selectedRange: DateRange;
   onDateSelect: (dates: { date: Date; half: "AM" | "PM" | null }[]) => void;
+  dateList: { date: Date; half: "AM" | "PM" | null }[];
 }
 
 export const DateList: React.FC<DateListProps> = ({
   selectedRange,
   onDateSelect,
+  dateList,
 }) => {
-  const [dateList, setDateList] = useState<
-    { date: Date; half: "AM" | "PM" | null }[]
-  >([]);
-
   useEffect(() => {
     if (selectedRange.start && selectedRange.end) {
       const startDate = new Date(selectedRange.start);
@@ -30,25 +28,24 @@ export const DateList: React.FC<DateListProps> = ({
         currentDate.setDate(currentDate.getDate() + 1);
       }
 
-      setDateList(dates);
       onDateSelect(dates);
     } else {
-      setDateList([]);
       onDateSelect([]);
     }
-  }, [selectedRange, onDateSelect]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedRange]);
 
   const handleCheckboxChange = (index: number, half: "AM" | "PM") => {
     const updatedList = dateList.map((item, i) =>
       i === index ? { ...item, half: item.half === half ? null : half } : item
     );
-    setDateList(updatedList);
+
     onDateSelect(updatedList);
   };
 
   return (
     <div className="flex flex-col gap-5 animate-appear">
-      <h3 className="font-semibold text-lg">Half Days</h3>
+      <h3 className="font-semibold text-lg">Set Your Half Days</h3>
       <ul className="flex flex-col gap-2">
         {dateList.map((item, index) => (
           <li key={index} className="flex gap-2">

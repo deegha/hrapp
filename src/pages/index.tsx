@@ -4,7 +4,6 @@ import { UserHome } from "@/views";
 export default function Home() {
   return (
     <Layout>
-      <div className="bg-secondary w-20">dfdsa</div>
       <UserHome />
     </Layout>
   );

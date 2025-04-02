@@ -13,18 +13,18 @@ type TApplyLeave = {
   to: Date;
 };
 
+type TLeaves = {
+  date: Date;
+  half: "AM" | "PM" | null;
+};
+
 export function ApplyLeave() {
   const { handleSubmit } = useForm<TApplyLeave>();
   const [selectedRange, setSelectedRange] = useState<{
     start: Date | null;
     end: Date | null;
   }>({ start: null, end: null });
-  const [leaves, setLeaves] = useState<
-    {
-      date: Date;
-      half: "AM" | "PM" | null;
-    }[]
-  >();
+  const [leaves, setLeaves] = useState<TLeaves[]>([]);
 
   const onSubmit: SubmitHandler<TApplyLeave> = async (data) => {
     try {
@@ -33,6 +33,8 @@ export function ApplyLeave() {
       console.log("here we are");
     }
   };
+
+  console.log(leaves, "leaves");
 
   return (
     <PageLayout pageName="Leave Management - Request timeout" enableBack>
@@ -43,20 +45,12 @@ export function ApplyLeave() {
             className="flex flex-col gap-[41px] "
           >
             <DatePicker onRangeChange={(range) => setSelectedRange(range)} />
-            {selectedRange.start && selectedRange.end && (
-              <div className="flex flex-col gap-5">
-                <p className="text-sm font-semibold">
-                  FROM : {selectedRange.start?.toDateString()}
-                </p>
-                <p className="text-sm font-semibold">
-                  TO :{selectedRange.end?.toDateString()}
-                </p>
-              </div>
-            )}
+
             {selectedRange.start && selectedRange.end && (
               <DateList
+                dateList={leaves}
                 selectedRange={selectedRange}
-                onDateSelect={(dates) => console.log(dates)}
+                onDateSelect={(dates) => setLeaves(dates)}
               />
             )}
             <div className="w-full flex justify-end">
@@ -71,7 +65,7 @@ export function ApplyLeave() {
           <div className=" border border-border flex flex-col items-start justify-center p-10 ">
             <p className="text-sm">Days</p>
             <p className="text-lg font-semibold">20</p>
-            <p className="text-sm text-primary">+3</p>
+            <p className="text-sm text-primary font-semibold">+3</p>
           </div>
           <p>
             You have 20 days of remaining leave. Use them wisely for
