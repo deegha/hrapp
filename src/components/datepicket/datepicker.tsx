@@ -69,8 +69,8 @@ export const DatePicker: React.FC<IDatePickerProps> = ({ onRangeChange }) => {
     const { prevMonthDays, monthDays } = generateMonthDays(month);
 
     return (
-      <div className="">
-        <h2 className="text-lg font-semibold text-center mb-2">
+      <div className="flex flex-col gap-10">
+        <h2 className="text-sm font-semibold text-center mb-2">
           {format(month, "MMMM yyyy")}
         </h2>
         <div className="grid grid-cols-7 gap-4 text-center text-gray-700">
@@ -94,12 +94,12 @@ export const DatePicker: React.FC<IDatePickerProps> = ({ onRangeChange }) => {
             return (
               <button
                 key={day}
-                className={`w-8 h-8 flex items-center justify-center rounded-full transition-colors ${
+                className={`w-10 h-10 flex items-center justify-center rounded-full transition-colors text-md ${
                   isSelected
                     ? "bg-[#80CBC4] text-white"
                     : isInRange(date)
-                      ? "bg-gray-200"
-                      : "hover:bg-gray-200"
+                      ? "bg-border"
+                      : "hover:bg-border"
                 }`}
                 onClick={(e: React.SyntheticEvent) => {
                   e.preventDefault();
@@ -116,8 +116,8 @@ export const DatePicker: React.FC<IDatePickerProps> = ({ onRangeChange }) => {
   };
 
   return (
-    <div className="mx-auto bg-white rounded-lg shadow-md p-4 flex flex-col items-center">
-      <div className="flex justify-between w-full mb-4 relative top-[48px]">
+    <div className=" bg-white rounded-lg shadow-md p-4 flex flex-col items-center">
+      <div className="flex justify-between w-full mb-4 relative top-[38px]">
         <button onClick={handlePrevMonth}>
           <ChevronLeft className="text-gray-600" />
         </button>
@@ -125,7 +125,7 @@ export const DatePicker: React.FC<IDatePickerProps> = ({ onRangeChange }) => {
           <ChevronRight className="text-gray-600" />
         </button>
       </div>
-      <div className="flex gap-10 w-full">
+      <div className="flex justify-between w-full">
         {renderCalendar(0)}
         {renderCalendar(1)}
       </div>

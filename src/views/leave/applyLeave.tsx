@@ -44,6 +44,7 @@ export function ApplyLeave() {
             onSubmit={handleSubmit(onSubmit)}
             className="flex flex-col gap-[41px] "
           >
+            <h3 className="font-semibold text-lg">Select Dates</h3>
             <DatePicker onRangeChange={(range) => setSelectedRange(range)} />
 
             {selectedRange.start && selectedRange.end && (
@@ -62,7 +63,7 @@ export function ApplyLeave() {
         </div>
 
         <div className="flex flex-col w-1/4 gap-10 ">
-          <div className=" border border-border flex flex-col items-start justify-center p-10 ">
+          <div className=" border border-border flex flex-col items-start justify-center p-10 rounded-md ">
             <p className="text-sm">Days</p>
             <p className="text-lg font-semibold">20</p>
             <p className="text-sm text-primary font-semibold">+3</p>
