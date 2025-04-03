@@ -30,6 +30,8 @@ export const Navigation = () => {
     isLoading,
   } = useSWR("/navigation", getNavigationItems);
 
+  if ((!navItems && !isLoading) || error) return null;
+
   return (
     <div className="flex flex-col gap-2">
       {isLoading

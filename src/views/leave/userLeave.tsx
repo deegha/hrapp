@@ -11,7 +11,9 @@ export function UserLeave() {
   return (
     <PageLayout
       pageName="Leave Management"
-      actionButton={<Button onClick={handleApplyLeave}>Apply Leave</Button>}
+      actionButton={
+        <Button onClick={handleApplyLeave}>Request time out</Button>
+      }
     >
       <div className=""></div>
     </PageLayout>

@@ -73,7 +73,7 @@ export const DatePicker: React.FC<IDatePickerProps> = ({ onRangeChange }) => {
         <h2 className="text-sm font-semibold text-center mb-2">
           {format(month, "MMMM yyyy")}
         </h2>
-        <div className="grid grid-cols-7 gap-4 text-center text-gray-700">
+        <div className="grid grid-cols-7 gap-3 text-center text-gray-700">
           {["S", "M", "T", "W", "T", "F", "S"].map((day, index) => (
             <div key={index} className="font-semibold">
               {day}
@@ -94,7 +94,7 @@ export const DatePicker: React.FC<IDatePickerProps> = ({ onRangeChange }) => {
             return (
               <button
                 key={day}
-                className={`w-10 h-10 flex items-center justify-center rounded-full transition-colors text-md ${
+                className={`w-7 h-7 lg:w-10 lg:h-10  flex items-center justify-center rounded-full transition-colors text-sm  ${
                   isSelected
                     ? "bg-[#80CBC4] text-white"
                     : isInRange(date)

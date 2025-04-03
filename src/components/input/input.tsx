@@ -2,19 +2,23 @@ import React, { useState } from "react";
 import { Eye, EyeOff } from "react-feather";
 
 interface InputFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  label: string;
+  label?: string;
   type?: "text" | "email" | "password";
   placeholder?: string;
   error?: string;
   icon?: React.ReactNode;
+  className?: string;
 }
 
 export const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
-  ({ label, type = "text", placeholder, error, icon, ...rest }, ref) => {
+  (
+    { label, type = "text", placeholder, error, icon, className, ...rest },
+    ref
+  ) => {
     const [showPassword, setShowPassword] = useState(false);
 
     return (
-      <div className="flex flex-col w-full ">
+      <div className={`flex flex-col w-full`}>
         <label className="text-black  font-medium mb-1 text-sm">{label}</label>
         <div className="relative w-full">
           {icon && (
@@ -26,7 +30,7 @@ export const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
             ref={ref}
             type={type === "password" && !showPassword ? "password" : "text"}
             placeholder={placeholder}
-            className={`w-full p-3 border border-border text-sm rounded-md bg-gray-100 text-gray-500 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all pl-${icon ? "10" : "3"} ${
+            className={`${className} w-full p-3 border border-border text-sm rounded-md bg-gray-100 text-gray-500 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all pl-${icon ? "10" : "3"} ${
               error ? "text-danger" : "border-gray-200"
             }`}
             {...rest}
