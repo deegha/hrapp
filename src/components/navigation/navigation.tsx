@@ -8,6 +8,7 @@ import {
   Icon,
   User,
   UserMinus,
+  Paperclip,
 } from "react-feather";
 import useSWR from "swr";
 import { getNavigationItems } from "@/services/uiService";
@@ -19,6 +20,7 @@ const iconMap: Record<string, Icon> = {
   User,
   FileText,
   CheckSquare,
+  Paperclip,
 };
 
 export const Navigation = () => {
@@ -29,8 +31,7 @@ export const Navigation = () => {
     error,
     isLoading,
   } = useSWR("/navigation", getNavigationItems);
-
-  if ((!navItems && !isLoading) || error) return null;
+  if ((!navItems && !isLoading) || error || navItems?.error) return null;
 
   return (
     <div className="flex flex-col gap-2">

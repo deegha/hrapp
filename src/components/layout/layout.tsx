@@ -37,14 +37,14 @@ export function Layout({ children }: IPrps) {
 
   return (
     <div className="flex w-full h-[100hv]">
-      <div className="w-[207px] flex flex-col gap-10 border-r border-border h-[100vh] justify-between">
+      <div className="w-[207px] flex flex-col gap-10 border-r border-border h-[100vh] justify-between fixed">
         <div className="flex items-center h-[88px] justify-center border-b border-border font-semibold">
-          Macro HR
+          Macro Work
         </div>
         <div className="flex items-start justify-center flex-[70%] ">
           <Navigation />
         </div>
-        <div className="flex items-center h-[88px] justify-center border-t border-border ">
+        <div className="flex items-center h-[88px] justify-center border-t border-border  ">
           <div
             className="uppercase text-sm font-semibold cursor-pointer flex items-center gap-2 text-danger hover:font-bold"
             onClick={doLogout}
@@ -54,7 +54,7 @@ export function Layout({ children }: IPrps) {
           </div>
         </div>
       </div>
-      <div className="w-full">{children}</div>
+      <div className="w-full ml-[207px]">{children}</div>
     </div>
   );
 }
