@@ -4,6 +4,7 @@ import {
   InputField,
   DatePicker,
   DateList,
+  DocumentUploader,
 } from "@/components";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useState } from "react";
@@ -25,6 +26,10 @@ export function ApplyLeave() {
     end: Date | null;
   }>({ start: null, end: null });
   const [leaves, setLeaves] = useState<TLeaves[]>([]);
+
+  const handleDocumentUpload = (url: string) => {
+    console.log(url);
+  };
 
   const onSubmit: SubmitHandler<TApplyLeave> = async (data) => {
     try {
@@ -54,6 +59,8 @@ export function ApplyLeave() {
                 onDateSelect={(dates) => setLeaves(dates)}
               />
             )}
+
+            <DocumentUploader onUploadComplete={handleDocumentUpload} />
             <div className="w-full flex justify-end">
               <div className="w-[150px]">
                 <Button type="submit">Request leave</Button>

@@ -6,3 +6,4 @@ export { PageLayout } from "./pageLayout/pageLayout";
 export { DatePicker } from "./datepicket/datepicker";
 export { DateList } from "./dateList/dateList";
 export { PolicySection } from "./policySection/policySection";
+export { DocumentUploader } from "./documentUpload/documentUpload";
