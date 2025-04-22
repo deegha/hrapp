@@ -11,15 +11,12 @@ import {
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useState } from "react";
 import { useNotificationStore } from "@/store/notificationStore";
+import { TLeaves } from "@/types/leave";
+import { createLeaveRequest } from "@/services";
 
 type TApplyLeave = {
   from: Date;
   to: Date;
-};
-
-type TLeaves = {
-  date: Date;
-  half: "AM" | "PM" | null;
 };
 
 const options = [
@@ -34,7 +31,7 @@ export function ApplyLeave() {
     start: Date | null;
     end: Date | null;
   }>({ start: null, end: null });
-  const [selected, setSelected] = useState(options[0]);
+  const [leaveType, setSelectedLeaveType] = useState(options[0]);
   const [notes, setNotes] = useState("");
   const [leaves, setLeaves] = useState<TLeaves[]>([]);
   const [documents, setDocuments] = useState<Array<string>>();
@@ -55,11 +52,17 @@ export function ApplyLeave() {
 
   const onSubmit: SubmitHandler<TApplyLeave> = async (data) => {
     try {
+      await createLeaveRequest({
+        leaves,
+        leaveType: leaveType.value,
+        documents,
+        additionalNotes: notes,
+      });
+
       showNotification({
         message: "Uploaded successfully!",
         type: "success",
       });
-      console.log("dafd");
     } catch {
       console.log("here we are");
       showNotification({
@@ -95,8 +98,8 @@ export function ApplyLeave() {
               <div className="w-[100px]">
                 <Dropdown
                   options={options}
-                  value={selected}
-                  onChange={setSelected}
+                  value={leaveType}
+                  onChange={setSelectedLeaveType}
                   placeholder="Pick a fruit"
                 />
               </div>
@@ -131,7 +134,7 @@ export function ApplyLeave() {
           </div>
           <p>
             You have 20 days of remaining leave. Use them wisely for
-            rejuvenation and personal pursuits. You've earned them!
+            rejuvenation and personal pursuits. You&apos;ve earned them!
           </p>
         </div>
       </div>

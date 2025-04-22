@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { PageSubHeading } from "@/components";
 
 interface DateRange {
   start: Date | null;
@@ -45,7 +46,7 @@ export const DateList: React.FC<DateListProps> = ({
 
   return (
     <div className="flex flex-col gap-5 animate-appear">
-      <h3 className="font-semibold text-lg">Set Your Half Days</h3>
+      <PageSubHeading heading="Set Your Half Days if any" />
       <ul className="flex flex-col gap-2">
         {dateList.map((item, index) => (
           <li key={index} className="flex gap-2">
