@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { checkAuthServiceCall, logOutServiceCall } from "@/services/";
 import { useAuthStore } from "@/store/authstore";
 import { LogOut } from "react-feather";
+import { Notification } from "@/components";
 
 interface IPrps {
   children: React.ReactNode;
@@ -37,6 +38,7 @@ export function Layout({ children }: IPrps) {
 
   return (
     <div className="flex w-full h-[100hv]">
+      <Notification />
       <div className="w-[207px] flex flex-col gap-10 border-r border-border h-[100vh] justify-between fixed">
         <div className="flex items-center h-[88px] justify-center border-b border-border font-semibold">
           Macro Work

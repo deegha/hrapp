@@ -7,3 +7,7 @@ export { DatePicker } from "./datepicket/datepicker";
 export { DateList } from "./dateList/dateList";
 export { PolicySection } from "./policySection/policySection";
 export { DocumentUploader } from "./documentUpload/documentUpload";
+export { Notification } from "./notification/notifications";
+export { PageSubHeading } from "./headings/headings";
+export { Dropdown } from "./dropdown/dropdown";
+export { TextArea } from "./textArea/textArea";

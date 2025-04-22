@@ -22,7 +22,7 @@ export const DocumentUploader = ({
       <div
         {...getRootProps()}
         className={cn(
-          "border-2 border-dashed border-border rounded-2xl p-8 text-center cursor-pointer hover:border-gray-400 transition relative",
+          "border-2 border-dashed border-border rounded-md p-8 text-center cursor-pointer hover:border-gray-400 transition relative",
           isUploading && "opacity-50 pointer-events-none"
         )}
       >

@@ -1,13 +1,16 @@
 import {
   PageLayout,
   Button,
-  InputField,
   DatePicker,
   DateList,
   DocumentUploader,
+  PageSubHeading,
+  Dropdown,
+  TextArea,
 } from "@/components";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useState } from "react";
+import { useNotificationStore } from "@/store/notificationStore";
 
 type TApplyLeave = {
   from: Date;
@@ -19,27 +22,52 @@ type TLeaves = {
   half: "AM" | "PM" | null;
 };
 
+const options = [
+  { label: "Annual", value: "1" },
+  { label: "Casual", value: "2" },
+  { label: "Medical", value: "3" },
+];
+
 export function ApplyLeave() {
   const { handleSubmit } = useForm<TApplyLeave>();
   const [selectedRange, setSelectedRange] = useState<{
     start: Date | null;
     end: Date | null;
   }>({ start: null, end: null });
+  const [selected, setSelected] = useState(options[0]);
+  const [notes, setNotes] = useState("");
   const [leaves, setLeaves] = useState<TLeaves[]>([]);
+  const [documents, setDocuments] = useState<Array<string>>();
+  const { showNotification } = useNotificationStore();
 
   const handleDocumentUpload = (url: string) => {
-    console.log(url);
+    if (!url) {
+      showNotification({
+        message: "Something went wrong when uploading image",
+        type: "error",
+      });
+    }
+
+    const newDocs = documents;
+    newDocs?.push(url);
+    setDocuments(newDocs);
   };
 
   const onSubmit: SubmitHandler<TApplyLeave> = async (data) => {
     try {
+      showNotification({
+        message: "Uploaded successfully!",
+        type: "success",
+      });
       console.log("dafd");
     } catch {
       console.log("here we are");
+      showNotification({
+        message: "Something went wrong when submitting request",
+        type: "error",
+      });
     }
   };
-
-  console.log(leaves, "leaves");
 
   return (
     <PageLayout pageName="Leave Management - Request timeout" enableBack>
@@ -49,18 +77,44 @@ export function ApplyLeave() {
             onSubmit={handleSubmit(onSubmit)}
             className="flex flex-col gap-[41px] "
           >
-            <h3 className="font-semibold text-lg">Select Dates</h3>
-            <DatePicker onRangeChange={(range) => setSelectedRange(range)} />
+            <div className="flex flex-col gap-5">
+              <PageSubHeading heading="Select Dates" />
+              <DatePicker onRangeChange={(range) => setSelectedRange(range)} />
 
-            {selectedRange.start && selectedRange.end && (
-              <DateList
-                dateList={leaves}
-                selectedRange={selectedRange}
-                onDateSelect={(dates) => setLeaves(dates)}
+              {selectedRange.start && selectedRange.end && (
+                <DateList
+                  dateList={leaves}
+                  selectedRange={selectedRange}
+                  onDateSelect={(dates) => setLeaves(dates)}
+                />
+              )}
+            </div>
+
+            <div className="flex flex-col gap-5">
+              <PageSubHeading heading="Leave type" />
+              <div className="w-[100px]">
+                <Dropdown
+                  options={options}
+                  value={selected}
+                  onChange={setSelected}
+                  placeholder="Pick a fruit"
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-5">
+              <PageSubHeading heading="Upload supporting documents" />
+              <DocumentUploader onUploadComplete={handleDocumentUpload} />
+            </div>
+
+            <div className="flex flex-col gap-5">
+              <PageSubHeading heading="Any additional notes" />
+              <TextArea
+                value={notes}
+                onChange={setNotes}
+                placeholder="Write your thoughts here..."
               />
-            )}
-
-            <DocumentUploader onUploadComplete={handleDocumentUpload} />
+            </div>
             <div className="w-full flex justify-end">
               <div className="w-[150px]">
                 <Button type="submit">Request leave</Button>
