@@ -49,13 +49,16 @@ export const Navigation = () => {
         : // Actual Navigation Items
           navItems?.data.map((item) => {
             const IconComponent = iconMap[item.icon] || null;
+            const isSelected =
+              router.pathname === item.url ||
+              router.pathname.startsWith(item.url + "/");
             return (
               <Link
                 href={item.url}
                 key={item.url}
                 className={` ${
-                  router.pathname === item.url
-                    ? "bg-primary rounded-md text-black animate-appear"
+                  isSelected
+                    ? "bg-primary rounded-md text-black "
                     : "text-textSecondary"
                 } text-xs uppercase hover:text-tHover p-2 flex gap-2 font-semibold`}
               >
