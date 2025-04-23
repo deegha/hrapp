@@ -48,7 +48,7 @@ export function Layout({ children }: IPrps) {
         </div>
         <div className="flex items-center h-[88px] justify-center border-t border-border  ">
           <div
-            className="uppercase text-sm font-semibold cursor-pointer flex items-center gap-2 text-danger hover:font-bold"
+            className="uppercase text-sm font-semibold cursor-pointer flex items-center gap-2  hover:font-bold"
             onClick={doLogout}
           >
             <LogOut size={15} />

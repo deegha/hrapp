@@ -8,16 +8,10 @@ import {
   Dropdown,
   TextArea,
 } from "@/components";
-import { useForm, SubmitHandler } from "react-hook-form";
+
 import { useState } from "react";
 import { useNotificationStore } from "@/store/notificationStore";
-import { TLeaves } from "@/types/leave";
 import { createLeaveRequest } from "@/services";
-
-type TApplyLeave = {
-  from: Date;
-  to: Date;
-};
 
 const options = [
   { label: "Annual", value: "1" },
@@ -26,44 +20,58 @@ const options = [
 ];
 
 export function ApplyLeave() {
-  const { handleSubmit } = useForm<TApplyLeave>();
   const [selectedRange, setSelectedRange] = useState<{
     start: Date | null;
     end: Date | null;
   }>({ start: null, end: null });
   const [leaveType, setSelectedLeaveType] = useState(options[0]);
   const [notes, setNotes] = useState("");
-  const [leaves, setLeaves] = useState<TLeaves[]>([]);
+  const [selectedDates, setSelectedDates] = useState<
+    Array<{
+      date: Date;
+      half: "AM" | "PM" | null;
+    }>
+  >([]);
   const [documents, setDocuments] = useState<Array<string>>();
   const { showNotification } = useNotificationStore();
+  const [loading, setLoading] = useState(false);
 
   const handleDocumentUpload = (url: string) => {
     if (!url) {
       showNotification({
-        message: "Something went wrong when uploading image",
+        message: "Something went wrong when uploading image please try again",
         type: "error",
       });
     }
 
-    const newDocs = documents;
+    const newDocs = documents ? [...documents] : [];
     newDocs?.push(url);
+
     setDocuments(newDocs);
   };
 
-  const onSubmit: SubmitHandler<TApplyLeave> = async (data) => {
+  const onSubmit = async () => {
+    setLoading(true);
     try {
+      const leaves = selectedDates.map((date) => ({
+        ...date,
+        leaveType: parseInt(leaveType.value),
+      }));
+
       await createLeaveRequest({
         leaves,
-        leaveType: leaveType.value,
         documents,
-        additionalNotes: notes,
+        note: notes,
       });
 
+      cleanForm();
+      setLoading(false);
       showNotification({
         message: "Uploaded successfully!",
         type: "success",
       });
     } catch {
+      setLoading(false);
       console.log("here we are");
       showNotification({
         message: "Something went wrong when submitting request",
@@ -72,23 +80,29 @@ export function ApplyLeave() {
     }
   };
 
+  const cleanForm = () => {
+    setDocuments([]);
+    setSelectedDates([]);
+    setSelectedLeaveType(options[0]);
+    setSelectedRange({ start: null, end: null });
+  };
+
+  const isFormDisabled = selectedDates.length === 0;
+
   return (
     <PageLayout pageName="Leave Management - Request timeout" enableBack>
       <div className="flex items-start  gap-10">
         <div className="w-full">
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="flex flex-col gap-[41px] "
-          >
+          <div className="flex flex-col gap-[41px] ">
             <div className="flex flex-col gap-5">
               <PageSubHeading heading="Select Dates" />
               <DatePicker onRangeChange={(range) => setSelectedRange(range)} />
 
               {selectedRange.start && selectedRange.end && (
                 <DateList
-                  dateList={leaves}
+                  dateList={selectedDates}
                   selectedRange={selectedRange}
-                  onDateSelect={(dates) => setLeaves(dates)}
+                  onDateSelect={(dates) => setSelectedDates(dates)}
                 />
               )}
             </div>
@@ -120,10 +134,17 @@ export function ApplyLeave() {
             </div>
             <div className="w-full flex justify-end">
               <div className="w-[150px]">
-                <Button type="submit">Request leave</Button>
+                <Button
+                  loading={loading}
+                  type="submit"
+                  onClick={() => onSubmit()}
+                  disabled={isFormDisabled}
+                >
+                  Request leave
+                </Button>
               </div>
             </div>
-          </form>
+          </div>
         </div>
 
         <div className="flex flex-col w-1/4 gap-10 ">

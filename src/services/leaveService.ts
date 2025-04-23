@@ -8,9 +8,8 @@ type TCreateLeaveRequestResponse = {
 
 type TCreateLeaveRequestPayload = {
   leaves: Array<TLeaves>;
-  leaveType: string;
   documents?: Array<string>;
-  additionalNotes?: string;
+  note?: string;
 };
 
 export async function createLeaveRequest(payload: TCreateLeaveRequestPayload) {
@@ -21,6 +20,6 @@ export async function createLeaveRequest(payload: TCreateLeaveRequestPayload) {
     method: "POST",
     body: payload,
     baseURL: process.env.NEXT_PUBLIC_API as string,
-    resource: "navigation",
+    resource: "leave",
   });
 }
