@@ -8,85 +8,23 @@ import {
   Dropdown,
   TextArea,
 } from "@/components";
-
-import { useState } from "react";
-import { useNotificationStore } from "@/store/notificationStore";
-import { createLeaveRequest } from "@/services";
-
-const options = [
-  { label: "Annual", value: "1" },
-  { label: "Casual", value: "2" },
-  { label: "Medical", value: "3" },
-];
+import { useLeave } from "./useLeave";
+import { leaveTypes } from "@/utils/staticValues";
 
 export function ApplyLeave() {
-  const [selectedRange, setSelectedRange] = useState<{
-    start: Date | null;
-    end: Date | null;
-  }>({ start: null, end: null });
-  const [leaveType, setSelectedLeaveType] = useState(options[0]);
-  const [notes, setNotes] = useState("");
-  const [selectedDates, setSelectedDates] = useState<
-    Array<{
-      date: Date;
-      half: "AM" | "PM" | null;
-    }>
-  >([]);
-  const [documents, setDocuments] = useState<Array<string>>();
-  const { showNotification } = useNotificationStore();
-  const [loading, setLoading] = useState(false);
-
-  const handleDocumentUpload = (url: string) => {
-    if (!url) {
-      showNotification({
-        message: "Something went wrong when uploading image please try again",
-        type: "error",
-      });
-    }
-
-    const newDocs = documents ? [...documents] : [];
-    newDocs?.push(url);
-
-    setDocuments(newDocs);
-  };
-
-  const onSubmit = async () => {
-    setLoading(true);
-    try {
-      const leaves = selectedDates.map((date) => ({
-        ...date,
-        leaveType: parseInt(leaveType.value),
-      }));
-
-      await createLeaveRequest({
-        leaves,
-        documents,
-        note: notes,
-      });
-
-      cleanForm();
-      setLoading(false);
-      showNotification({
-        message: "Uploaded successfully!",
-        type: "success",
-      });
-    } catch {
-      setLoading(false);
-      console.log("here we are");
-      showNotification({
-        message: "Something went wrong when submitting request",
-        type: "error",
-      });
-    }
-  };
-
-  const cleanForm = () => {
-    setDocuments([]);
-    setSelectedDates([]);
-    setSelectedLeaveType(options[0]);
-    setSelectedRange({ start: null, end: null });
-  };
-
+  const {
+    handleDocumentUpload,
+    onSubmit,
+    selectedRange,
+    setNotes,
+    loading,
+    selectedDates,
+    setSelectedRange,
+    setSelectedDates,
+    notes,
+    leaveType,
+    setSelectedLeaveType,
+  } = useLeave();
   const isFormDisabled = selectedDates.length === 0;
 
   return (
@@ -111,7 +49,7 @@ export function ApplyLeave() {
               <PageSubHeading heading="Leave type" />
               <div className="w-[100px]">
                 <Dropdown
-                  options={options}
+                  options={leaveTypes}
                   value={leaveType}
                   onChange={setSelectedLeaveType}
                   placeholder="Pick a fruit"

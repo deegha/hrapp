@@ -11,3 +11,4 @@ export { Notification } from "./notification/notifications";
 export { PageSubHeading } from "./headings/headings";
 export { Dropdown } from "./dropdown/dropdown";
 export { TextArea } from "./textArea/textArea";
+export { Card, CardContent } from "./card/card";

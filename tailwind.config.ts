@@ -9,7 +9,7 @@ export default {
   theme: {
     colors: {
       primary: "var(--color-primary)",
-      secondary: "#80CBC4",
+      secondary: "--color-secondary",
       accent: "var(--color-third)",
       background: "var(--color-gray-1)",
       textPrimary: "var(--color-text-primary)",
