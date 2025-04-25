@@ -28,7 +28,7 @@ export function ApplyLeave() {
   const isFormDisabled = selectedDates.length === 0;
 
   return (
-    <PageLayout pageName="Leave Management - Request timeout" enableBack>
+    <PageLayout pageName="Leave Management - Request timeout">
       <div className="flex items-start  gap-10">
         <div className="w-full">
           <div className="flex flex-col gap-[41px] ">

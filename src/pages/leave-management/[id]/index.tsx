@@ -35,7 +35,7 @@ export default function LeaveRequestDetails() {
 
   return (
     <Layout>
-      <PageLayout pageName="Leave Details" enableBack>
+      <PageLayout pageName="Leave Details">
         <div className="space-y-6">
           <div>
             <div className="text-sm font-medium text-textPrimary">

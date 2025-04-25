@@ -18,7 +18,7 @@ export function UserLeave() {
     <PageLayout
       pageName="Leave Management"
       actionButton={
-        <Button onClick={handleApplyLeave}>Request time out</Button>
+        <Button onClick={handleApplyLeave}>REQUEST TIME OUT</Button>
       }
     >
       <div className="flex flex-col gap-2">
