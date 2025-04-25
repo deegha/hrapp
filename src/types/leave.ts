@@ -5,14 +5,12 @@ export type TLeaves = {
 };
 
 export type LeaveResponse = {
-  data: {
-    data: LeaveRequest[];
-    currentPage: number;
-    page: number;
-    totalPages: number;
-    total: number;
-    pageSize: number;
-  };
+  data: LeaveRequest[];
+  currentPage: number;
+  page: number;
+  totalPages: number;
+  total: number;
+  pageSize: number;
 };
 
 export type LeaveRequest = {

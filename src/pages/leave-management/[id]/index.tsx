@@ -2,41 +2,28 @@
 
 import { useParams } from "next/navigation";
 import useSWR from "swr";
-import { fetchLeaveRequest } from "@/services"; // implement this in your services
+import { fetchLeaveRequest } from "@/services";
 import { format } from "date-fns";
 import {
   Button,
   Layout,
   PageLayout,
-  Card,
-  CardContent,
   PageSubHeading,
+  NoDataFound,
 } from "@/components";
-
-const leaveTypeLabels: Record<number, string> = {
-  1: "Annual",
-  2: "Casual",
-  3: "Medical",
-  4: "Special",
-};
-
-const statusColors: Record<string, string> = {
-  PENDING: "text-secondary",
-  APPROVED: "text-primary",
-  REJECTED: "text-danger",
-  CANCELLED: "text-gray",
-};
+import { leaveTypes, statusColors } from "@/utils/staticValues";
+import LeaveDetailsSkeleton from "@/utils/skeletons/LeaveDetailsSkeleton";
 
 export default function LeaveRequestDetails() {
-  const { id } = useParams();
+  const { id = null } = useParams() || {};
   const { data, isLoading } = useSWR(id ? `leaveRequest-${id}` : null, () =>
     fetchLeaveRequest(id as string)
   );
 
-  if (isLoading) return <div>Loading...</div>;
-  if (!data) return <div>Leave request not found.</div>;
+  if (isLoading) return <LeaveDetailsSkeleton />;
+  if (!data || data?.error) return <NoDataFound pageName="Leave Details" />;
 
-  const request = data;
+  const request = data?.data;
   const sortedLeaves = [...request.leaves].sort(
     (a, b) => new Date(a.leaveDate).getTime() - new Date(b.leaveDate).getTime()
   );
@@ -69,7 +56,7 @@ export default function LeaveRequestDetails() {
               {sortedLeaves.map((leave) => (
                 <li key={leave.id}>
                   {format(new Date(leave.leaveDate), "dd MMM yyyy")} -{" "}
-                  {leaveTypeLabels[leave.leaveType] || "Unknown"}{" "}
+                  {leaveTypes[leave.leaveType].label || "Unknown"}{" "}
                   {leave.halfDay &&
                     `(Half Day: ${leave.halfDay === "AM" ? "Morning" : "Evening"})`}
                 </li>

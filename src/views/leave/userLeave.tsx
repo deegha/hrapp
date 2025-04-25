@@ -4,20 +4,7 @@ import useSWR from "swr";
 import { fetchLeave } from "@/services/";
 import { format } from "date-fns";
 import Link from "next/link";
-
-const leaveTypeLabels: Record<number, string> = {
-  1: "Annual",
-  2: "Casual",
-  3: "Medical",
-  4: "Special",
-};
-
-const statusColors: Record<string, string> = {
-  PENDING: "text-secondary",
-  APPROVED: "text-primary",
-  REJECTED: "text-danger",
-  CANCELLED: "text-gray",
-};
+import { leaveTypes, statusColors } from "@/utils/staticValues";
 
 export function UserLeave() {
   const router = useRouter();
@@ -59,7 +46,7 @@ export function UserLeave() {
                     </div>
                     <div className="text-xs text-textPrimary">
                       Type:{" "}
-                      {leaveTypeLabels[firstLeave?.leaveType] || "Unknown"}
+                      {leaveTypes[firstLeave?.leaveType].label || "Unknown"}
                     </div>
                     <div className="text-xs text-textSecondary">
                       {firstLeave?.halfDay

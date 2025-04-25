@@ -1,5 +1,5 @@
 import { serviceHandler } from "@/utils/serviceHandler";
-import { TLeaves, LeaveResponse, LeaveRequest } from "@/types/leave";
+import { TLeaves, LeaveResponse, LeaveRequest, TResponse } from "@/types";
 
 type TCreateLeaveRequestResponse = {
   error: boolean;
@@ -25,7 +25,7 @@ export async function createLeaveRequest(payload: TCreateLeaveRequestPayload) {
 }
 
 export async function fetchLeave() {
-  return await serviceHandler<LeaveResponse>({
+  return await serviceHandler<TResponse<LeaveResponse>>({
     method: "GET",
     baseURL: process.env.NEXT_PUBLIC_API as string,
     resource: `leave`,
@@ -33,7 +33,7 @@ export async function fetchLeave() {
 }
 
 export async function fetchLeaveRequest(id: string) {
-  return await serviceHandler<LeaveRequest>({
+  return await serviceHandler<TResponse<LeaveRequest>>({
     method: "GET",
     baseURL: process.env.NEXT_PUBLIC_API as string,
     resource: `leave/${id}`,
