@@ -46,7 +46,7 @@ export const DateList: React.FC<DateListProps> = ({
 
   return (
     <div className="flex flex-col gap-5 animate-appear">
-      <PageSubHeading heading="Set Your Half Days if any" />
+      <PageSubHeading heading="Half day requests (If any)" />
       <ul className="flex flex-col gap-2">
         {dateList.map((item, index) => (
           <li key={index} className="flex gap-2">

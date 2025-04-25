@@ -23,8 +23,6 @@ export function UserLeave() {
   const router = useRouter();
   const { data } = useSWR("fetchLeave", fetchLeave);
 
-  console.log(data, "===");
-
   function handleApplyLeave() {
     router.push("./leave-management/apply");
   }
@@ -71,20 +69,9 @@ export function UserLeave() {
 
                     {request.documents?.length > 0 && (
                       <div className="mt-1">
-                        <div className="text-xs font-medium text-textPrimary mb-1">
-                          Documents:
-                        </div>
                         <ul className="text-xs text-blue-600 underline">
                           {request.documents.map((doc) => (
-                            <li key={doc.id}>
-                              <a
-                                href={doc.fileUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                Document {doc.id}
-                              </a>
-                            </li>
+                            <li key={doc.id}>Document {doc.id}</li>
                           ))}
                         </ul>
                       </div>
