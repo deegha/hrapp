@@ -9,3 +9,13 @@ export type User = {
   updatedAt: string;
   userStatusId: number;
 };
+
+export type UserStatus = {
+  id: number;
+  statusLabel: string;
+};
+
+export type UserPermission = {
+  id: number;
+  permission: string;
+};

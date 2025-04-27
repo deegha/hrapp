@@ -20,7 +20,7 @@ export function Layout({ children }: IPrps) {
 
       if (res.error) {
         logout();
-        router.push("./login");
+        router.push("/login");
       }
 
       return;

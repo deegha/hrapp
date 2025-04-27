@@ -19,7 +19,7 @@ export const Button: React.FC<IButtonProps> = ({
   ...props
 }) => {
   const baseStyles =
-    "w-full font-bold p-3 rounded-lg transition-all duration-300 cursor-pointer text-xs flex items-center justify-center";
+    "w-full font-bold p-3 rounded-md transition-all duration-300 cursor-pointer text-xs flex items-center justify-center";
 
   const variants = {
     primary: "bg-[#80CBC4] hover:bg-[#66AFA9]",

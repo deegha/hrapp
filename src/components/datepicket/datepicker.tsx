@@ -116,7 +116,7 @@ export const DatePicker: React.FC<IDatePickerProps> = ({ onRangeChange }) => {
   };
 
   return (
-    <div className=" bg-white rounded-lg shadow-md p-4 flex flex-col items-center">
+    <div className=" bg-white rounded-md shadow-md p-4 flex flex-col items-center">
       <div className="flex justify-between w-full mb-4 relative top-[38px]">
         <button onClick={handlePrevMonth}>
           <ChevronLeft className="text-gray-600" />

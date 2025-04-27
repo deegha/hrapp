@@ -48,7 +48,7 @@ export const Dropdown = ({
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <Listbox.Options className="absolute mt-2 max-h-60 w-full overflow-auto rounded-2xl bg-white py-1 text-sm shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
+            <Listbox.Options className="absolute mt-2 max-h-60 w-full overflow-auto rounded-2xl bg-white py-1 text-sm shadow-md ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
               {options.map((option) => (
                 <Listbox.Option
                   key={option.value}

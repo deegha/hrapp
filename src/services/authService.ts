@@ -12,7 +12,5 @@ export function checkAuthServiceCall() {
     resource: "checkAuth",
   });
 
-  console.log(response);
-
   return response;
 }

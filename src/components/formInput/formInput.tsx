@@ -24,7 +24,7 @@ export function FormInput({ name, label, ...rest }: FormInputProps) {
         {...rest}
       />
       {errors[name] && (
-        <span className="text-xs text-dander">{`${errors[name]?.message}`}</span>
+        <span className="text-xs text-danger font-semibold">{`${errors[name]?.message}`}</span>
       )}
     </div>
   );
