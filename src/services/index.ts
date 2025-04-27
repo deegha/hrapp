@@ -4,6 +4,7 @@ export {
   loginServiceCall,
   fetchUserStatus,
   fetchPermission,
+  createUserService,
 } from "./userService";
 export { getNavigationItems } from "./uiService";
 export {

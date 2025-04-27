@@ -16,11 +16,11 @@ export function UserStatus() {
   }
 
   const options = data.data.map((status) => ({
-    label: status.statusLabel
+    label: status?.statusLabel
       .toLowerCase()
       .replace(/^\w/, (c) => c.toUpperCase()),
     value: status.id,
   }));
 
-  return <FormSelect name="userStatus" label="User Status" options={options} />;
+  return <FormSelect name="statusId" label="User Status" options={options} />;
 }

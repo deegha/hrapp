@@ -13,7 +13,7 @@ export const Notification = () => {
     if (notification) {
       const timer = setTimeout(() => {
         clearNotification();
-      }, 3000); // hide after 3s
+      }, 4000);
 
       return () => clearTimeout(timer);
     }

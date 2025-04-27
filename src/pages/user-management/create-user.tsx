@@ -1,16 +1,47 @@
 import { Layout, PageLayout, Button } from "@/components";
 import { useForm, FormProvider } from "react-hook-form";
-import { FormInput, FormMultiSelect } from "@/components";
+import { FormInput } from "@/components";
 import { userSchema } from "@/utils/formvalidations/userSchema";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { UserStatus, UserRole } from "@/views/";
+import { TCreateUser } from "@/types/";
+import { createUserService } from "@/services";
+import { useNotificationStore } from "@/store/notificationStore";
+import { useState } from "react";
 
 export default function CreateUser() {
-  const methods = useForm({ resolver: yupResolver(userSchema) });
+  const { showNotification } = useNotificationStore();
+  const methods = useForm<TCreateUser>({ resolver: yupResolver(userSchema) });
+  const [isLoading, setIsLoading] = useState(false);
 
-  const onSubmit = (data: any) => {
-    console.log("User Submitted:", data);
-    // send to API
+  const onSubmit = async (data: TCreateUser) => {
+    try {
+      setIsLoading(true);
+      const response = await createUserService(data);
+
+      if (response.error) {
+        console.log(response.data);
+        showNotification({
+          message: "Something went wrong, couldn't create the user",
+          type: "error",
+        });
+      }
+
+      methods.reset();
+      showNotification({
+        message: "Successfully created the user",
+        type: "success",
+      });
+
+      setIsLoading(false);
+    } catch (e) {
+      console.log(e);
+      setIsLoading(false);
+      showNotification({
+        message: "Something went wrong, couldn't create the user",
+        type: "error",
+      });
+    }
   };
 
   return (
@@ -28,18 +59,9 @@ export default function CreateUser() {
             <UserStatus />
             <UserRole />
 
-            <FormMultiSelect
-              name="userTeams"
-              label="User Teams"
-              options={[
-                { label: "Engineering", value: 1 },
-                { label: "HR", value: 2 },
-              ]}
-            />
-
-            <FormInput name="salary" label="Salary" type="number" />
-
-            <Button type="submit">Create User</Button>
+            <Button loading={isLoading} type="submit">
+              Create User
+            </Button>
           </form>
         </FormProvider>
       </PageLayout>

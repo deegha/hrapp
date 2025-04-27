@@ -1,11 +1,11 @@
 import { serviceHandler } from "@/utils/serviceHandler";
-import { User, UserStatus, UserPermission } from "@/types/user";
+import { TUser, TUserStatus, TUserPermission, TCreateUser } from "@/types/user";
 import { TResponse } from "@/types";
 
 export type TLoginApiResponse = {
   error: boolean;
   data: {
-    user: User;
+    user: TUser;
     token: string;
   };
 };
@@ -48,7 +48,7 @@ export async function logOutServiceCall() {
 }
 
 export async function fetchUserStatus() {
-  return serviceHandler<TResponse<UserStatus[]>>({
+  return serviceHandler<TResponse<TUserStatus[]>>({
     method: "GET",
     baseURL: process.env.NEXT_PUBLIC_API as string,
     resource: "userStatus",
@@ -56,9 +56,20 @@ export async function fetchUserStatus() {
 }
 
 export async function fetchPermission() {
-  return serviceHandler<TResponse<UserPermission[]>>({
+  return serviceHandler<TResponse<TUserPermission[]>>({
     method: "GET",
     baseURL: process.env.NEXT_PUBLIC_API as string,
     resource: "permission",
   });
+}
+
+export async function createUserService(user: TCreateUser) {
+  const response = await serviceHandler<TResponse<TUser>, TCreateUser>({
+    method: "POST",
+    body: user,
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: "user",
+  });
+
+  return response;
 }

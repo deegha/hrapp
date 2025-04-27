@@ -33,6 +33,7 @@ export const Navigation = () => {
     error,
     isLoading,
   } = useSWR("/navigation", getNavigationItems);
+
   if ((!navItems && !isLoading) || error || navItems?.error) return null;
 
   return (
