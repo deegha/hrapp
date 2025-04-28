@@ -15,12 +15,14 @@ export function UserStatus() {
     return <div>Loading...</div>;
   }
 
-  const options = data.data.map((status) => ({
+  const options = data?.data?.map((status) => ({
     label: status?.statusLabel
       .toLowerCase()
       .replace(/^\w/, (c) => c.toUpperCase()),
     value: status.id,
   }));
 
-  return <FormSelect name="statusId" label="User Status" options={options} />;
+  return (
+    <FormSelect name="userStatusId" label="User Status" options={options} />
+  );
 }

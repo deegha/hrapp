@@ -23,6 +23,6 @@ export type TCreateUser = {
   firstName: string;
   lastName: string;
   email: string;
-  statusId: number;
+  userStatusId: number;
   userRole: string;
 };

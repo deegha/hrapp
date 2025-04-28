@@ -20,11 +20,12 @@ export default function CreateUser() {
       const response = await createUserService(data);
 
       if (response.error) {
-        console.log(response.data);
         showNotification({
           message: "Something went wrong, couldn't create the user",
           type: "error",
         });
+        setIsLoading(false);
+        return;
       }
 
       methods.reset();

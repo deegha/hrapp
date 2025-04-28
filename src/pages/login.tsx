@@ -3,8 +3,10 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { loginServiceCall } from "@/services/userService";
 import { useAuthStore } from "@/store/authstore";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { checkAuthServiceCall } from "@/services";
+
+import { useNotificationStore } from "@/store/notificationStore";
 
 type TLogin = {
   email: string;
@@ -15,6 +17,8 @@ export default function Login() {
   const router = useRouter();
   const { register, handleSubmit } = useForm<TLogin>();
   const { login } = useAuthStore();
+  const { showNotification } = useNotificationStore();
+  const [loading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const handleAuth = async () => {
@@ -29,13 +33,33 @@ export default function Login() {
   }, [router]);
 
   const onSubmit: SubmitHandler<TLogin> = async (data) => {
+    setIsLoading(true);
     try {
       const loginRes = await loginServiceCall(data.email, data.password);
-      if (!loginRes.error) {
-        login(loginRes.data.user, loginRes.data.token);
-        router.push("./");
+
+      if (loginRes.error) {
+        setIsLoading(false);
+        showNotification({
+          message: "Login failed",
+          type: "error",
+        });
+        return;
       }
+
+      showNotification({
+        message: "Login Successful",
+        type: "success",
+      });
+
+      setIsLoading(false);
+      login(loginRes.data.user, loginRes.data.token);
+      router.push("./");
     } catch {
+      setIsLoading(false);
+      showNotification({
+        message: "Login failed",
+        type: "error",
+      });
       console.log("here we are");
     }
   };
@@ -63,7 +87,9 @@ export default function Login() {
               {...register("password")}
               type="password"
             />
-            <Button type="submit">Login</Button>
+            <Button loading={loading} type="submit">
+              Login
+            </Button>
           </div>
           <div className="w-full flex justify-center text-primary">
             <a>Forgot your password ?</a>
