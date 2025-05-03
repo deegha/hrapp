@@ -7,3 +7,4 @@ export { LeavePolicies } from "./leave/leavePolicy";
 export { UserStatus } from "./user/userStatus";
 export { UserRole } from "./user/userRole";
 export { Users } from "./user/users";
+export { UserDetails } from "./user/userDetails";

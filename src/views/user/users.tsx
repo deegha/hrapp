@@ -1,16 +1,19 @@
 import { StatusTag } from "@/components";
 import { TUser } from "@/types/user";
+import { useUserStore } from "@/store/useUserStore";
 
 interface IUsers {
   users: TUser[];
 }
 export function Users({ users }: IUsers) {
+  const { setActiveUser } = useUserStore();
   return (
     <div>
       {users.map((user) => (
         <div
           key={user.employeeId}
-          className="border-border border-t py-3 flex justify-between"
+          className="border-border border-t py-3 flex justify-between cursor-pointer"
+          onClick={() => setActiveUser(user.employeeId.toString())}
         >
           <div>
             <p className="text-sm">
