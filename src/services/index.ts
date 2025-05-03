@@ -5,6 +5,8 @@ export {
   fetchUserStatus,
   fetchPermission,
   createUserService,
+  fetchUsers,
+  fetchUser,
 } from "./userService";
 export { getNavigationItems } from "./uiService";
 export {

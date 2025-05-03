@@ -1,6 +1,13 @@
 import { serviceHandler } from "@/utils/serviceHandler";
-import { TUser, TUserStatus, TUserPermission, TCreateUser } from "@/types/user";
-import { TResponse } from "@/types";
+import {
+  TUser,
+  TUserStatus,
+  TUserPermission,
+  TCreateUser,
+  TAllUserDetails,
+} from "@/types/user";
+import { TResponse, TGenericFilters } from "@/types";
+import { TResponseWithPagination } from "@/types/api";
 
 export type TLoginApiResponse = {
   error: boolean;
@@ -72,4 +79,20 @@ export async function createUserService(user: TCreateUser) {
   });
 
   return response;
+}
+
+export async function fetchUsers({ page, limit }: TGenericFilters) {
+  return serviceHandler<TResponseWithPagination<TUser[]>>({
+    method: "GET",
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: `user?page=${page}&limit=${limit}`,
+  });
+}
+
+export async function fetchUser(empId: string) {
+  return serviceHandler<TResponse<TAllUserDetails>>({
+    method: "GET",
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: `user/${empId}`,
+  });
 }

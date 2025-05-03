@@ -16,3 +16,5 @@ export { NoDataFound, NoDataFoundComponent } from "./noData/noData";
 export { FormInput } from "./formInput/formInput";
 export { FormSelect } from "./formSelect/formSelect";
 export { FormMultiSelect } from "./formMultiSelect/formMultiSelect";
+export { StatusTag } from "./statusTag/statusTag";
+export { Pagination } from "./pagination/pagination";

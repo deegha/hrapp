@@ -3,10 +3,12 @@ export type TUser = {
   firstName: string;
   lastName: string;
   email: string;
+  employeeId: number;
   organizationId: number;
   createdAt: string;
   updatedAt: string;
   userStatusId: number;
+  UserStatus: TUserStatus;
 };
 
 export type TUserStatus = {
@@ -25,4 +27,21 @@ export type TCreateUser = {
   email: string;
   userStatusId: number;
   userRole: string;
+};
+
+export type TAllUserDetails = TUser & {
+  userInformation: {
+    id: number;
+    salary: number;
+    userId: number;
+  } | null;
+  skills: {
+    id: number;
+    skillName: number;
+  }[];
+  teams: {
+    id: number;
+    teamName: string;
+    division: number;
+  }[];
 };
