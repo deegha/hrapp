@@ -32,7 +32,7 @@ function Detail({ label, value }: { label: string; value: string | number }) {
   return (
     <div className="grid grid-cols-2  text-sm">
       <span className="text-textSecondary">{label}</span>
-      <span className="font-semibold">{value}</span>
+      <span className="font-semibold capitalize">{value}</span>
     </div>
   );
 }
@@ -52,6 +52,7 @@ export function UserDetails({ user }: IUserDetails) {
         <Detail label={"Last Name"} value={user.lastName} />
         <Detail label={"Email"} value={user.email} />
       </div>
+
       <div className="flex flex-col gap-3">
         <h2>Most Recent User Logs</h2>
         {logs.map((log, i) => (
@@ -68,6 +69,7 @@ export function UserDetails({ user }: IUserDetails) {
       </div>
       <div className="flex gap-3  w-full">
         <Button>Edit</Button>
+        <Button variant="secondary">Deactivate</Button>
         <Button variant="danger">Button</Button>
       </div>
     </div>

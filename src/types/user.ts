@@ -13,7 +13,7 @@ export type TUser = {
 
 export type TUserStatus = {
   id: number;
-  statusLabel: string;
+  statusLabel: "CONFIRMED" | "DEACTIVATED" | "DELETED" | "CREATED" | "APPROVED";
 };
 
 export type TUserPermission = {
