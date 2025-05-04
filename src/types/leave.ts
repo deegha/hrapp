@@ -1,3 +1,5 @@
+import { TGenericStatus } from "./api";
+
 export type TLeaves = {
   date: Date;
   half: "AM" | "PM" | null;
@@ -37,8 +39,8 @@ export type Leave = {
   leaveTypeId: number | null;
   LeaveStatus: {
     id: number;
-    statusLabel: string;
-  } | null;
+    statusLabel: TGenericStatus;
+  };
 };
 
 export type Document = {

@@ -1,9 +1,10 @@
 import { useApprovalStore } from "@/store/approvalStore";
 import { fetchLeaveRequest } from "@/services";
 import useSWR from "swr";
-import { StatusTag } from "@/components";
+import { Button, StatusTag } from "@/components";
 import moment from "moment";
 import { leaveTypes } from "@/utils/staticValues";
+import { CheckCircle, Trash, Paperclip } from "react-feather";
 
 export function ApprovalDetails() {
   const { approval } = useApprovalStore();
@@ -12,8 +13,6 @@ export function ApprovalDetails() {
     `fetch-leave-${approval.id}`,
     async () => await fetchLeaveRequest(approval.targetId.toString())
   );
-
-  console.log(isLoading, "isLoading");
 
   if (!data) <div>No data found</div>;
 
@@ -24,7 +23,7 @@ export function ApprovalDetails() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-[32px] font-semibold uppercase">
-            {approval?.title})
+            {approval?.title}
           </h1>
           <p className="text-xxs text-textSecondary">
             Created on{" "}
@@ -44,7 +43,7 @@ export function ApprovalDetails() {
 
       <div className="flex flex-col gap-3">
         <h2>Leave dates</h2>
-        {leaveRequest?.leaves.map((leave) => (
+        {leaveRequest?.leaves?.map((leave) => (
           <div key={leave.leaveDate} className="text-sm text-textSecondary">
             {
               leaveTypes.filter(
@@ -52,12 +51,16 @@ export function ApprovalDetails() {
               )[0].label
             }{" "}
             - {moment(leave.leaveDate).format("YYYY-DD-MM")}
+            {leave.halfDay && `- Half day ${leave.halfDay}`}
           </div>
         ))}
       </div>
-      {leaveRequest?.documents.length && leaveRequest?.documents.length > 0 && (
+      {leaveRequest?.documents?.length &&
+      leaveRequest?.documents?.length > 0 ? (
         <div className="flex flex-col gap-3">
-          <h2>Supporting Documents</h2>
+          <h2 className="flex items-center gap-2">
+            <Paperclip size={12} /> Supporting Documents
+          </h2>
           {leaveRequest?.documents.map((doc) => (
             <>
               <div
@@ -79,7 +82,24 @@ export function ApprovalDetails() {
             </>
           ))}
         </div>
+      ) : (
+        <></>
       )}
+
+      <div className="flex gap-3  w-full">
+        <Button>
+          <div className="flex gap-1 items-center">
+            <CheckCircle size={14} /> Approve
+          </div>
+        </Button>
+
+        <Button variant="danger">
+          <div className="flex gap-1 items-center">
+            <Trash size={14} />
+            Reject
+          </div>
+        </Button>
+      </div>
     </div>
   );
 }

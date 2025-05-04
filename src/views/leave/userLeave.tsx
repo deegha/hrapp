@@ -1,14 +1,20 @@
-import { PageLayout, Button, Card, CardContent } from "@/components";
+import { PageLayout, Button, Pagination, ItemsList } from "@/components";
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
 import { fetchLeave } from "@/services/";
 import { format } from "date-fns";
-import Link from "next/link";
-import { leaveTypes, statusColors } from "@/utils/staticValues";
+
+import { leaveTypes } from "@/utils/staticValues";
+import { usePagination } from "@/hooks/usePagination";
+import moment from "moment";
 
 export function UserLeave() {
+  const { activePage } = usePagination();
   const router = useRouter();
-  const { data } = useSWR("fetchLeave", fetchLeave);
+  const { data } = useSWR(
+    `fetch-leaves-${activePage}`,
+    async () => await fetchLeave({ page: parseInt(activePage), limit: 6 })
+  );
 
   function handleApplyLeave() {
     router.push("./leave-management/apply");
@@ -31,51 +37,37 @@ export function UserLeave() {
           const fromDate = sortedLeaves[0]?.leaveDate;
           const toDate = sortedLeaves[sortedLeaves.length - 1]?.leaveDate;
           const firstLeave = sortedLeaves[0];
-          const statusLabel = firstLeave?.LeaveStatus?.statusLabel;
-          const statusColor =
-            statusColors[statusLabel as string] || "text-gray-500";
 
           return (
-            <Link href={`/leave-management/${request.id}`} key={request.id}>
-              <Card className="w-full">
-                <CardContent className="flex justify-between">
-                  <div className="flex flex-col gap-1">
-                    <div className="text-sm font-medium text-textPrimary">
-                      From: {format(new Date(fromDate), "dd MMM yyyy")} — To:{" "}
-                      {format(new Date(toDate), "dd MMM yyyy")}
-                    </div>
-                    <div className="text-xs text-textPrimary">
-                      Type:{" "}
-                      {leaveTypes[firstLeave?.leaveType].label || "Unknown"}
-                    </div>
-                    <div className="text-xs text-textSecondary">
-                      {firstLeave?.halfDay
-                        ? `First Day: Half Day (${firstLeave?.halfDay === "AM" ? "Morning" : "Evening"})`
-                        : "Full Days"}
-                    </div>
-
-                    {request.documents?.length > 0 && (
-                      <div className="mt-1">
-                        <ul className="text-xs text-blue-600 underline">
-                          {request.documents.map((doc) => (
-                            <li key={doc.id}>Document {doc.id}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
+            <ItemsList
+              status={firstLeave?.LeaveStatus?.statusLabel}
+              onClick={() => console.log("d")}
+              key={request.id}
+              title={`Leave From: ${format(new Date(fromDate), "dd MMM yyyy")} — To : 
+                       ${format(new Date(toDate), "dd MMM yyyy")}`}
+              content={
+                <div>
+                  <div className="text-xs text-textPrimary">
+                    Type:{" "}
+                    {leaveTypes.filter(
+                      (type) => parseInt(type.value) === firstLeave.leaveType
+                    )[0].label || "Unknown"}
+                  </div>
+                  <div className="text-xs text-textSecondary">
+                    {firstLeave?.halfDay
+                      ? `First Day: Half Day (${firstLeave?.halfDay === "AM" ? "Morning" : "Evening"})`
+                      : "Full Days"}
                   </div>
                   <div>
-                    {statusLabel && (
-                      <div className={`text-xs font-semibold ${statusColor}`}>
-                        {statusLabel}
-                      </div>
-                    )}
+                    Applied on{" "}
+                    {moment(request.createdAt).format("yyyy-Do-MM : hh:mm a")}
                   </div>
-                </CardContent>
-              </Card>
-            </Link>
+                </div>
+              }
+            />
           );
         })}
+        <Pagination numberOfPage={data?.data.totalPages as number} />
       </div>
     </PageLayout>
   );

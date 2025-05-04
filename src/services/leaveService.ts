@@ -1,5 +1,11 @@
 import { serviceHandler } from "@/utils/serviceHandler";
-import { TLeaves, LeaveResponse, LeaveRequest, TResponse } from "@/types";
+import {
+  TLeaves,
+  LeaveRequest,
+  TResponse,
+  TGenericFilters,
+  TResponseWithPagination,
+} from "@/types";
 
 type TCreateLeaveRequestResponse = {
   error: boolean;
@@ -24,11 +30,11 @@ export async function createLeaveRequest(payload: TCreateLeaveRequestPayload) {
   });
 }
 
-export async function fetchLeave() {
-  return await serviceHandler<TResponse<LeaveResponse>>({
+export async function fetchLeave({ page, limit }: TGenericFilters) {
+  return await serviceHandler<TResponseWithPagination<LeaveRequest[]>>({
     method: "GET",
     baseURL: process.env.NEXT_PUBLIC_API as string,
-    resource: `leave`,
+    resource: `leave?page=${page}&limit=${limit}`,
   });
 }
 
@@ -36,6 +42,6 @@ export async function fetchLeaveRequest(id: string) {
   return await serviceHandler<TResponse<LeaveRequest>>({
     method: "GET",
     baseURL: process.env.NEXT_PUBLIC_API as string,
-    resource: `leave/${id}`,
+    resource: `orgLeave/${id}`,
   });
 }

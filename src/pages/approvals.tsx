@@ -29,11 +29,9 @@ export default function Home() {
   return (
     <Layout>
       <PageLayout pageName="Approvals">
-        {approval.id && (
-          <Drawer open={approval?.id ? true : false} close={unsetApproval}>
-            <ApprovalDetails />
-          </Drawer>
-        )}
+        <Drawer open={approval?.id ? true : false} close={unsetApproval}>
+          <ApprovalDetails />
+        </Drawer>
 
         {approvalResponse?.data.data.map((app) => (
           <ItemsList
