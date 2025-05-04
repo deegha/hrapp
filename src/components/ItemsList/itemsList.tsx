@@ -15,7 +15,7 @@ export function ItemsList(props: IListItems) {
       className="border-border border-t py-3 flex justify-between cursor-pointer"
     >
       <div>
-        <p className="text-sm">{props.title}</p>
+        <p className="text-sm font-semibold">{props.title}</p>
         <div className="text-sm text-textSecondary flex gap-2">
           {props.content}
         </div>

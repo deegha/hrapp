@@ -69,7 +69,7 @@ export function UserDetails({ user }: IUserDetails) {
         ))}
       </div>
       <div className="flex gap-3  w-full">
-        {user.UserStatus?.statusLabel === "CREATED" && (
+        {user.UserStatus?.statusLabel === "PENDING" && (
           <Button>
             <div className="flex gap-1 items-center">
               <CheckCircle size={14} /> Approve

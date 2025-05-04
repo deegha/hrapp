@@ -1,0 +1,1 @@
+export { ApprovalDetails } from "./approvalDetailsLeave";
