@@ -1,6 +1,6 @@
 import { TAllUserDetails } from "@/types/user";
 import { StatusTag, Button } from "@/components";
-import { Trash, CheckCircle, EyeOff, Edit } from "react-feather";
+import { Trash, CheckCircle, Edit } from "react-feather";
 
 interface IUserDetails {
   user: TAllUserDetails;

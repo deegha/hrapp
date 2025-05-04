@@ -1,3 +1,9 @@
-export type { TResponse, TGenericFilters } from "./api";
+export type {
+  TResponse,
+  TGenericFilters,
+  TResponseWithPagination,
+  TGenericStatus,
+} from "./api";
 export type { TLeaves, LeaveResponse, LeaveRequest } from "./leave";
 export type { TCreateUser } from "./user";
+export type { TApproval } from "./approval";

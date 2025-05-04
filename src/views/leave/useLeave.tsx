@@ -41,16 +41,27 @@ export function useLeave() {
         leaveType: parseInt(leaveType.value),
       }));
 
-      await createLeaveRequest({
+      const response = await createLeaveRequest({
         leaves,
         documents,
         note: notes,
       });
 
+      if (response.error) {
+        cleanForm();
+        setLoading(false);
+        showNotification({
+          message: "Leave request unsuccessful!",
+          type: "error",
+        });
+
+        return;
+      }
+
       cleanForm();
       setLoading(false);
       showNotification({
-        message: "Uploaded successfully!",
+        message: "Leave requested successfully!",
         type: "success",
       });
     } catch {

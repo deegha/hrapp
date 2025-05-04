@@ -1,19 +1,19 @@
+import { TGenericStatus } from "@/types/";
 interface IProps {
-  status: "CONFIRMED" | "DEACTIVATED" | "DELETED" | "CREATED" | "APPROVED";
+  status: TGenericStatus;
 }
 
 export function StatusTag({ status }: IProps) {
   const typeStyles: Record<IProps["status"], string> = {
-    CREATED: "bg-accent text-textPrimary border-border",
-    CONFIRMED: "bg-primary text-textPrimary border-border",
-    APPROVED: "bg-primary text-textPrimary border-border",
-    DEACTIVATED: "bg-secondary text-white border-border",
-    DELETED: "bg-danger text-white border-border",
+    PENDING: "bg-secondary text-white",
+    APPROVED: "bg-primary text-textPrimary",
+    DEACTIVATED: "bg-secondary text-white ",
+    DELETED: "bg-danger text-white",
   };
 
   return (
     <div
-      className={`inline-block px-[5px] py-[2px] text-xs  font-medium rounded-lg border ${typeStyles[status]}`}
+      className={`inline-block px-[5px] py-[2px] text-xxs  font-medium rounded-lg  ${typeStyles[status]}`}
     >
       {status}
     </div>

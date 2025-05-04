@@ -18,3 +18,5 @@ export type TGenericFilters = {
   limit?: number;
   page?: number;
 };
+
+export type TGenericStatus = "PENDING" | "DEACTIVATED" | "DELETED" | "APPROVED";
