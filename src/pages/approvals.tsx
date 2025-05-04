@@ -21,8 +21,6 @@ export default function Home() {
     () => approvalService({ page: parseInt(activePage), limit: 10 })
   );
 
-  console.log(approval, "app");
-
   if (!approvalResponse || approvalResponse?.data.data.length === 0)
     return <NoDataFound pageName="Approvals" />;
 
@@ -33,25 +31,29 @@ export default function Home() {
           <ApprovalDetails />
         </Drawer>
 
-        {approvalResponse?.data.data.map((app) => (
-          <ItemsList
-            key={`${app.createdAt}-p`}
-            title={app.title}
-            status={app.status}
-            content={
-              <div>
-                Created on{" "}
-                {moment(app.createdAt).format("YYYY-Do-MMMM : hh:MM A")}
-              </div>
-            }
-            onClick={() => setActiveApproval(app)}
-          />
-        ))}
-        {approvalResponse?.data?.totalPages > 1 && (
-          <Pagination
-            numberOfPage={approvalResponse?.data.totalPages as number}
-          />
-        )}
+        <div className="flex flex-col gap-5">
+          <div>
+            {approvalResponse?.data.data.map((app) => (
+              <ItemsList
+                key={`${app.createdAt}-p`}
+                title={app.title}
+                status={app.status}
+                content={
+                  <div>
+                    Created on{" "}
+                    {moment(app.createdAt).format("YYYY-Do-MMMM : hh:MM A")}
+                  </div>
+                }
+                onClick={() => setActiveApproval(app)}
+              />
+            ))}
+          </div>
+          {approvalResponse?.data?.totalPages > 1 && (
+            <Pagination
+              numberOfPage={approvalResponse?.data.totalPages as number}
+            />
+          )}
+        </div>
       </PageLayout>
     </Layout>
   );

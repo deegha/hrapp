@@ -44,7 +44,7 @@ export function PageLayout({ pageName, actionButton, children }: IProps) {
         </div>
         <div>{actionButton}</div>
       </div>
-      <div className="w-full">{children}</div>
+      <div className="w-full flex flex-col ">{children}</div>
     </div>
   );
 }

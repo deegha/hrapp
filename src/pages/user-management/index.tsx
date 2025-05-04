@@ -33,9 +33,6 @@ export default function UserManagement() {
     router.push("./user-management/create-user");
   }
 
-  if (users.data.data.length === 0)
-    return <NoDataFound pageName="User Management" />;
-
   return (
     <Layout>
       <Drawer open={user?.employeeId ? true : false} close={unsetUser}>
