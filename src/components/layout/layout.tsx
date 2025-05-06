@@ -31,7 +31,7 @@ export function Layout({ children }: IPrps) {
     await logOutServiceCall();
     logout();
 
-    router.push("./login");
+    router.push("/login");
   }
 
   return (

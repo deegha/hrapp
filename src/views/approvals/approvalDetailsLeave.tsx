@@ -13,7 +13,7 @@ import { usePagination } from "@/hooks/usePagination";
 export function ApprovalDetails() {
   const { activePage } = usePagination();
   const { showNotification } = useNotificationStore();
-  const { approval } = useApprovalStore();
+  const { approval, unsetApproval } = useApprovalStore();
   const [loading, setLoading] = useState(false);
 
   const { data, isLoading } = useSWR(
@@ -28,16 +28,27 @@ export function ApprovalDetails() {
   async function handlerApproveRequest() {
     try {
       setLoading(true);
-      await approveRequest(approval.type, {
+      const response = await approveRequest(approval.type, {
         approvalRequestId: approval.id,
         itemId: leaveRequest?.id as number,
       });
+
+      if (response.error) {
+        showNotification({
+          message: "Couldn't approve the leave request",
+          type: "error",
+        });
+        setLoading(false);
+
+        return;
+      }
       showNotification({
         message: "Leave approved successfully",
         type: "success",
       });
       setLoading(false);
       mutate(`approval-service-${activePage}`);
+      unsetApproval();
     } catch (e) {
       console.log(e);
       showNotification({
@@ -116,20 +127,22 @@ export function ApprovalDetails() {
         <></>
       )}
 
-      <div className="flex gap-3  w-full">
-        <Button onClick={handlerApproveRequest} loading={loading}>
-          <div className="flex gap-1 items-center">
-            <Check size={14} /> Approve
-          </div>
-        </Button>
+      {approval.status === "PENDING" && (
+        <div className="flex gap-3  w-full">
+          <Button onClick={handlerApproveRequest} loading={loading}>
+            <div className="flex gap-1 items-center">
+              <Check size={14} /> Approve
+            </div>
+          </Button>
 
-        <Button variant="danger">
-          <div className="flex gap-1 items-center">
-            <Trash size={14} />
-            Reject
-          </div>
-        </Button>
-      </div>
+          <Button variant="danger">
+            <div className="flex gap-1 items-center">
+              <Trash size={14} />
+              Reject
+            </div>
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

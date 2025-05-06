@@ -4,6 +4,7 @@ import {
   Pagination,
   ItemsList,
   Drawer,
+  NoDataFound,
 } from "@/components";
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
@@ -32,6 +33,10 @@ export function UserLeave() {
 
   function handleActiveLeave(leaveRequest: LeaveRequest) {
     setActiveLeaveRequest(leaveRequest);
+  }
+
+  if (!data) {
+    return <NoDataFound pageName="Leave Management" />;
   }
 
   return (
@@ -91,7 +96,9 @@ export function UserLeave() {
           })}
         </div>
 
-        <Pagination numberOfPage={data?.data.totalPages as number} />
+        {data?.data?.totalPages > 1 && (
+          <Pagination numberOfPage={data?.data.totalPages as number} />
+        )}
       </div>
     </PageLayout>
   );

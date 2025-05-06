@@ -6,7 +6,7 @@ interface IProps {
 export function StatusTag({ status }: IProps) {
   const typeStyles: Record<IProps["status"], string> = {
     PENDING: "bg-secondary text-white",
-    APPROVED: "bg-primary text-textPrimary",
+    APPROVED: "bg-primary text-white",
     DEACTIVATED: "bg-secondary text-white ",
     DELETED: "bg-danger text-white",
   };
