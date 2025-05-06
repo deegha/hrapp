@@ -31,7 +31,7 @@ export const Notification = () => {
   };
 
   return (
-    <div className="fixed top-6 right-6 z-50 overflow-hidden">
+    <div className="fixed top-6 right-6 z-60 overflow-hidden">
       <div
         className={cn(
           "flex items-center gap-3 px-6 py-4 rounded-xl shadow-lg transform transition-all duration-300 ease-out",

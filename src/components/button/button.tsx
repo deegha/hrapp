@@ -27,7 +27,7 @@ export const Button: React.FC<IButtonProps> = ({
     danger: "bg-[#FF4757] hover:bg-[#D63A49]",
   };
 
-  const disabledStyles = "bg-border cursor-not-allowed hover:bg-gray-400";
+  const disabledStyles = `${variants[variant]} cursor-not-allowed `;
 
   const buttonClasses = `${baseStyles} ${disabled || loading ? disabledStyles : variants[variant]} text-white`;
 

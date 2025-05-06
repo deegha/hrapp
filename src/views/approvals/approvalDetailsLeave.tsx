@@ -1,13 +1,20 @@
 import { useApprovalStore } from "@/store/approvalStore";
 import { fetchLeaveRequest } from "@/services";
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 import { Button, StatusTag } from "@/components";
 import moment from "moment";
 import { leaveTypes } from "@/utils/staticValues";
 import { CheckCircle, Trash, Paperclip } from "react-feather";
+import { approveRequest } from "@/services/approvalService";
+import { useState } from "react";
+import { useNotificationStore } from "@/store/notificationStore";
+import { usePagination } from "@/hooks/usePagination";
 
 export function ApprovalDetails() {
+  const { activePage } = usePagination();
+  const { showNotification } = useNotificationStore();
   const { approval } = useApprovalStore();
+  const [loading, setLoading] = useState(false);
 
   const { data, isLoading } = useSWR(
     `fetch-leave-${approval.id}`,
@@ -17,6 +24,29 @@ export function ApprovalDetails() {
   if (!data) <div>No data found</div>;
 
   const leaveRequest = data?.data;
+
+  async function handlerApproveRequest() {
+    try {
+      setLoading(true);
+      await approveRequest(approval.type, {
+        approvalRequestId: approval.id,
+        itemId: leaveRequest?.id as number,
+      });
+      showNotification({
+        message: "Leave approved successfully",
+        type: "success",
+      });
+      setLoading(false);
+      mutate(`approval-service-${activePage}`);
+    } catch (e) {
+      console.log(e);
+      showNotification({
+        message: "Could not approve the leave",
+        type: "error",
+      });
+      setLoading(false);
+    }
+  }
 
   return (
     <div className="flex flex-col gap-10">
@@ -87,7 +117,7 @@ export function ApprovalDetails() {
       )}
 
       <div className="flex gap-3  w-full">
-        <Button>
+        <Button onClick={handlerApproveRequest} loading={loading}>
           <div className="flex gap-1 items-center">
             <CheckCircle size={14} /> Approve
           </div>

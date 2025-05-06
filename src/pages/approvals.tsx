@@ -21,7 +21,7 @@ export default function Home() {
     () => approvalService({ page: parseInt(activePage), limit: 10 })
   );
 
-  if (!approvalResponse || approvalResponse?.data.data.length === 0)
+  if (!approvalResponse || approvalResponse?.data?.data?.length === 0)
     return <NoDataFound pageName="Approvals" />;
 
   return (
@@ -33,7 +33,7 @@ export default function Home() {
 
         <div className="flex flex-col gap-5">
           <div>
-            {approvalResponse?.data.data.map((app) => (
+            {approvalResponse?.data?.data?.map((app) => (
               <ItemsList
                 key={`${app.createdAt}-p`}
                 title={app.title}
