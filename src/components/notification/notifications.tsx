@@ -31,10 +31,10 @@ export const Notification = () => {
   };
 
   return (
-    <div className="fixed top-6 right-6 z-60 overflow-hidden">
+    <div className="relative  z-60 overflow-hidden">
       <div
         className={cn(
-          "flex items-center gap-3 px-6 py-4 rounded-xl shadow-lg transform transition-all duration-300 ease-out",
+          "flex items-center gap-3 px-6 py-4 rounded-xl shadow-lg transform transition-all duration-300 ease-out fixed top-6 right-6 z-[100]",
           show ? "translate-x-0 opacity-100" : "translate-x-full opacity-0",
           type === "success" && "bg-primary border border-primary",
           type === "error" && "bg-danger border border-danger",

@@ -4,7 +4,7 @@ import useSWR, { mutate } from "swr";
 import { Button, StatusTag } from "@/components";
 import moment from "moment";
 import { leaveTypes } from "@/utils/staticValues";
-import { CheckCircle, Trash, Paperclip } from "react-feather";
+import { Check, Trash, Paperclip } from "react-feather";
 import { approveRequest } from "@/services/approvalService";
 import { useState } from "react";
 import { useNotificationStore } from "@/store/notificationStore";
@@ -119,7 +119,7 @@ export function ApprovalDetails() {
       <div className="flex gap-3  w-full">
         <Button onClick={handlerApproveRequest} loading={loading}>
           <div className="flex gap-1 items-center">
-            <CheckCircle size={14} /> Approve
+            <Check size={14} /> Approve
           </div>
         </Button>
 
