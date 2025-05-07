@@ -1,20 +1,16 @@
 import { useApprovalStore } from "@/store/approvalStore";
 import { fetchLeaveRequest } from "@/services";
-import useSWR, { mutate } from "swr";
+import useSWR from "swr";
 import { Button, StatusTag } from "@/components";
 import moment from "moment";
 import { leaveTypes } from "@/utils/staticValues";
 import { Check, Trash, Paperclip } from "react-feather";
-import { approveRequest } from "@/services/approvalService";
-import { useState } from "react";
-import { useNotificationStore } from "@/store/notificationStore";
-import { usePagination } from "@/hooks/usePagination";
 
+import { useApproval } from "./useApprove";
 export function ApprovalDetails() {
-  const { activePage } = usePagination();
-  const { showNotification } = useNotificationStore();
-  const { approval, unsetApproval } = useApprovalStore();
-  const [loading, setLoading] = useState(false);
+  const { approval } = useApprovalStore();
+
+  const { handleApproval, loading, handleConfirmation } = useApproval();
 
   const { data, isLoading } = useSWR(
     `fetch-leave-${approval.id}`,
@@ -24,40 +20,6 @@ export function ApprovalDetails() {
   if (!data) <div>No data found</div>;
 
   const leaveRequest = data?.data;
-
-  async function handlerApproveRequest() {
-    try {
-      setLoading(true);
-      const response = await approveRequest(approval.type, {
-        approvalRequestId: approval.id,
-        itemId: leaveRequest?.id as number,
-      });
-
-      if (response.error) {
-        showNotification({
-          message: "Couldn't approve the leave request",
-          type: "error",
-        });
-        setLoading(false);
-
-        return;
-      }
-      showNotification({
-        message: "Leave approved successfully",
-        type: "success",
-      });
-      setLoading(false);
-      mutate(`approval-service-${activePage}`);
-      unsetApproval();
-    } catch (e) {
-      console.log(e);
-      showNotification({
-        message: "Could not approve the leave",
-        type: "error",
-      });
-      setLoading(false);
-    }
-  }
 
   return (
     <div className="flex flex-col gap-10">
@@ -129,13 +91,25 @@ export function ApprovalDetails() {
 
       {approval.status === "PENDING" && (
         <div className="flex gap-3  w-full">
-          <Button onClick={handlerApproveRequest} loading={loading}>
+          <Button
+            onClick={() =>
+              handleApproval({
+                itemId: leaveRequest?.id as number,
+                action: "APPROVED",
+              })
+            }
+            loading={loading === "APPROVED" ? true : false}
+          >
             <div className="flex gap-1 items-center">
               <Check size={14} /> Approve
             </div>
           </Button>
 
-          <Button variant="danger">
+          <Button
+            loading={loading === "REJECTED" ? true : false}
+            variant="danger"
+            onClick={() => handleConfirmation(leaveRequest?.id as number)}
+          >
             <div className="flex gap-1 items-center">
               <Trash size={14} />
               Reject

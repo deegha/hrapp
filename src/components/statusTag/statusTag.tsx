@@ -9,6 +9,7 @@ export function StatusTag({ status }: IProps) {
     APPROVED: "bg-primary text-white",
     DEACTIVATED: "bg-secondary text-white ",
     DELETED: "bg-danger text-white",
+    REJECTED: "bg-danger text-white",
   };
 
   return (

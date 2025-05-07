@@ -23,11 +23,13 @@ export function approvalService(filters: TGenericFilters) {
 type TApprove = {
   approvalRequestId: number;
   itemId: number;
+  approveReject: "APPROVED" | "REJECTED";
+  rejectedReason?: string;
 };
 
 export function approveRequest(
   type: "USER" | "LEAVEREQUEST",
-  { approvalRequestId, itemId }: TApprove
+  { approvalRequestId, itemId, approveReject, rejectedReason }: TApprove
 ) {
   const resource = type === "LEAVEREQUEST" ? `leave-approval` : `user-approval`;
 
@@ -37,6 +39,8 @@ export function approveRequest(
     body: {
       approvalRequestId,
       itemId,
+      approveReject,
+      rejectedReason,
     },
     resource: resource,
   });

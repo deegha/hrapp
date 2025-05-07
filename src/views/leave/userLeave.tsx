@@ -54,7 +54,7 @@ export function UserLeave() {
       </Drawer>
       <div className="flex flex-col gap-5">
         <div className="flex flex-col ">
-          {data?.data.data.map((request) => {
+          {data?.data?.data?.map((request) => {
             const sortedLeaves = [...request.leaves].sort(
               (a, b) =>
                 new Date(a.leaveDate).getTime() -
