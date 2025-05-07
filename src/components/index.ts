@@ -21,3 +21,4 @@ export { Pagination } from "./pagination/pagination";
 export { Drawer } from "./drawer/drawer";
 export { ItemsList } from "./ItemsList/itemsList";
 export { ConfirmationsModal } from "./confirmationsModal/confirmationsModal";
+export { Detail } from "./userDetail/userDetail";

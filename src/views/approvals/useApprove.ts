@@ -9,6 +9,39 @@ import { useConfirmationModalStore } from "@/store/useConfirmationModalStore";
 
 type ApprovalAction = "APPROVED" | "REJECTED";
 
+function getComs(type: "USER" | "LEAVEREQUEST") {
+  if (type === "USER")
+    return {
+      REJECTED: {
+        CONFIRMATION_MODAL: {
+          TITLE: "Reject user request?",
+          DESCRIPTION: "Are you sure you want to reject this user request?",
+        },
+        ERROR: "Couldn't reject the user request",
+        SUCCESS: "User creation rejected successfully",
+      },
+      APPROVED: {
+        ERROR: "Couldn't approve the user request",
+        SUCCESS: "User approved successfully",
+      },
+    };
+
+  return {
+    REJECTED: {
+      CONFIRMATION_MODAL: {
+        TITLE: "Reject leave request?",
+        DESCRIPTION: "Are you sure you want to reject this leave request?",
+      },
+      ERROR: "Couldn't reject the leave request",
+      SUCCESS: "Leave request rejected successfully",
+    },
+    APPROVED: {
+      ERROR: "Couldn't approve the leave request",
+      SUCCESS: "Leave request approved successfully",
+    },
+  };
+}
+
 interface ApprovalHandlerPayload {
   itemId: number;
   action: ApprovalAction;
@@ -21,11 +54,12 @@ export function useApproval() {
   const { activePage } = usePagination();
   const [loading, setLoading] = useState<ApprovalAction>();
   const { openModal } = useConfirmationModalStore();
+  const comms = getComs(approval.type);
 
   const handleConfirmation = (itemId: number) => {
     openModal({
-      title: "Reject leave request?",
-      description: "Are you sure you want to reject this leave request?",
+      title: comms.REJECTED.CONFIRMATION_MODAL?.TITLE,
+      description: comms.REJECTED.CONFIRMATION_MODAL?.DESCRIPTION,
       onConfirm: () => {
         handleApproval({
           itemId,
@@ -50,16 +84,17 @@ export function useApproval() {
       });
 
       if (response.error) {
+        console.log(response.error);
         setLoading(undefined);
         showNotification({
-          message: `Couldn't ${action.toLowerCase()} the leave request`,
+          message: comms[action].ERROR,
           type: "error",
         });
         return;
       }
 
       showNotification({
-        message: `Leave ${action.toLowerCase()} successfully`,
+        message: comms[action].SUCCESS,
         type: "success",
       });
 
@@ -70,7 +105,7 @@ export function useApproval() {
     } catch (error) {
       console.error(error);
       showNotification({
-        message: `Could not ${action.toLowerCase()} the leave`,
+        message: comms[action].ERROR,
         type: "error",
       });
     } finally {

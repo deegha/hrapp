@@ -7,7 +7,7 @@ import { leaveTypes } from "@/utils/staticValues";
 import { Check, Trash, Paperclip } from "react-feather";
 
 import { useApproval } from "./useApprove";
-export function ApprovalDetails() {
+export function ApprovalDetailsLeave() {
   const { approval } = useApprovalStore();
 
   const { handleApproval, loading, handleConfirmation } = useApproval();
