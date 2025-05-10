@@ -17,6 +17,8 @@ import moment from "moment";
 import { useLeaveRequestStore } from "@/store/leaveStore";
 import { LeaveRequest } from "@/types";
 
+import { LeaveRequestDetails } from "./leaveRequestDetail";
+
 export function UserLeave() {
   const { setActiveLeaveRequest, leaveRequest, unsetActiveLeaveRequest } =
     useLeaveRequestStore();
@@ -50,11 +52,11 @@ export function UserLeave() {
         open={leaveRequest.id ? true : false}
         close={unsetActiveLeaveRequest}
       >
-        <div></div>
+        <LeaveRequestDetails leaveRequestId={leaveRequest.id} />
       </Drawer>
       <div className="flex flex-col gap-5">
         <div className="flex flex-col ">
-          {data?.data?.data?.map((request) => {
+          {data?.data?.data?.map((request, i) => {
             const sortedLeaves = [...request.leaves].sort(
               (a, b) =>
                 new Date(a.leaveDate).getTime() -
