@@ -1,6 +1,6 @@
 import { TAllUserDetails } from "@/types/user";
 import { StatusTag, Button, Detail } from "@/components";
-import { Trash, CheckCircle, Edit } from "react-feather";
+import { Trash, Edit } from "react-feather";
 
 interface IUserDetails {
   user: TAllUserDetails;
@@ -60,13 +60,6 @@ export function UserDetails({ user }: IUserDetails) {
         ))}
       </div>
       <div className="flex gap-3  w-full">
-        {user.UserStatus?.statusLabel === "PENDING" && (
-          <Button>
-            <div className="flex gap-1 items-center">
-              <CheckCircle size={14} /> Approve
-            </div>
-          </Button>
-        )}
         <Button variant="secondary">
           <div className="flex gap-1 items-center">
             <Edit size={14} /> Edit

@@ -37,8 +37,8 @@ export function Layout({ children }: IPrps) {
   return (
     <div className="flex w-full h-[100hv]">
       <div className="w-[207px] flex flex-col gap-10 border-r border-border h-[100vh] justify-between fixed">
-        <div className="flex items-center h-[88px] justify-center border-b border-border font-semibold">
-          Macro Work
+        <div className="flex items-center h-[88px] justify-center border-b border-border font-semibold ">
+          PODTALENT.net
         </div>
         <div className="flex items-start justify-center flex-[70%] ">
           <Navigation />

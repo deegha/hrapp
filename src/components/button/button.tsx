@@ -27,11 +27,11 @@ export const Button: React.FC<IButtonProps> = ({
     danger: "bg-[#FF4757] hover:bg-[#D63A49]",
   };
 
-  const disabledStyles = `${variants[variant]} cursor-not-allowed `;
+  const disabledStyles = `${variants[variant]} cursor-not-allowed bg-border`;
 
-  const buttonClasses = `${baseStyles} ${disabled || loading ? disabledStyles : variants[variant]} text-white`;
+  const buttonClasses = `${baseStyles} ${disabled ? disabledStyles : variants[variant]} text-white`;
 
-  const isDisabled = disabled || loading;
+  const isDisabled = disabled;
 
   if (href && !isDisabled) {
     return (
@@ -46,7 +46,7 @@ export const Button: React.FC<IButtonProps> = ({
       className={buttonClasses}
       onClick={isDisabled ? undefined : onClick}
       type={type}
-      disabled={isDisabled}
+      disabled={isDisabled || loading}
       {...props}
     >
       {loading ? (
