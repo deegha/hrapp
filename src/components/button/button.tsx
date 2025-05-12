@@ -19,15 +19,15 @@ export const Button: React.FC<IButtonProps> = ({
   ...props
 }) => {
   const baseStyles =
-    "w-full font-bold p-3 rounded-md transition-all duration-300 cursor-pointer text-xs flex items-center justify-center";
+    "w-full font-bold p-3 rounded-md transition-all duration-300  text-xs flex items-center justify-center";
 
   const variants = {
-    primary: "bg-[#80CBC4] hover:bg-[#66AFA9]",
-    secondary: "bg-[#FFB433] hover:bg-[#E69E2E]",
-    danger: "bg-[#FF4757] hover:bg-[#D63A49]",
+    primary: "bg-[#80CBC4] hover:bg-[#66AFA9] cursor-pointer",
+    secondary: "bg-[#FFB433] hover:bg-[#E69E2E] cursor-pointer",
+    danger: "bg-[#FF4757] hover:bg-[#D63A49] cursor-pointer",
   };
 
-  const disabledStyles = `${variants[variant]} cursor-not-allowed bg-border`;
+  const disabledStyles = `cursor-not-allowed bg-border`;
 
   const buttonClasses = `${baseStyles} ${disabled ? disabledStyles : variants[variant]} text-white`;
 

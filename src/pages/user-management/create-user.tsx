@@ -3,7 +3,7 @@ import { useForm, FormProvider } from "react-hook-form";
 import { FormInput } from "@/components";
 import { userSchema } from "@/utils/formvalidations/userSchema";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { UserStatus, UserRole } from "@/views/";
+import { UserRole } from "@/views/";
 import { TCreateUser } from "@/types/";
 import { createUserService } from "@/services";
 import { useNotificationStore } from "@/store/notificationStore";
@@ -17,7 +17,10 @@ export default function CreateUser() {
   const onSubmit = async (data: TCreateUser) => {
     try {
       setIsLoading(true);
-      const response = await createUserService(data);
+      const response = await createUserService({
+        ...data,
+        userStatusId: 7,
+      });
 
       if (response.error) {
         showNotification({
@@ -57,10 +60,14 @@ export default function CreateUser() {
             <FormInput name="lastName" label="Last Name" />
             <FormInput name="email" label="Email" type="email" />
 
-            <UserStatus />
+            {/* <UserStatus /> */}
             <UserRole />
 
-            <Button loading={isLoading} type="submit">
+            <Button
+              loading={isLoading}
+              type="submit"
+              disabled={!methods.formState.isValid}
+            >
               Create User
             </Button>
           </form>

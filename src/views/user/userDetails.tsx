@@ -97,18 +97,20 @@ export function UserDetails() {
         ))}
       </div>
       <div className="flex gap-3  w-full">
-        <Button variant="secondary">
+        {/* <Button variant="secondary">
           <div className="flex gap-1 items-center">
             <Edit size={14} /> Edit
           </div>
-        </Button>
+        </Button> */}
 
-        <Button variant="danger" onClick={handleDeleteUser}>
-          <div className="flex gap-1 items-center">
-            <Trash size={14} />
-            Delete
-          </div>
-        </Button>
+        {user.UserStatus?.statusLabel !== "DELETED" && (
+          <Button variant="danger" onClick={handleDeleteUser}>
+            <div className="flex gap-1 items-center">
+              <Trash size={14} />
+              Delete
+            </div>
+          </Button>
+        )}
       </div>
     </div>
   );
