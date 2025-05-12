@@ -40,7 +40,7 @@ export default function Login() {
       if (loginRes.error) {
         setIsLoading(false);
         showNotification({
-          message: "Login failed",
+          message: `Login failed`,
           type: "error",
         });
         return;

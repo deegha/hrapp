@@ -1,10 +1,11 @@
-import { TAllUserDetails } from "@/types/user";
 import { StatusTag, Button, Detail } from "@/components";
+import { useConfirmationModalStore } from "@/store/useConfirmationModalStore";
 import { Trash, Edit } from "react-feather";
-
-interface IUserDetails {
-  user: TAllUserDetails;
-}
+import { deleteUser } from "@/services/userService";
+import { usePagination } from "@/hooks/usePagination";
+import { useNotificationStore } from "@/store/notificationStore";
+import { mutate } from "swr";
+import { useUserStore } from "@/store/useUserStore";
 
 const logs = [
   {
@@ -29,7 +30,43 @@ const logs = [
   },
 ];
 
-export function UserDetails({ user }: IUserDetails) {
+export function UserDetails() {
+  const { openModal } = useConfirmationModalStore();
+  const { activePage } = usePagination();
+  const { showNotification } = useNotificationStore();
+  const { unsetUser, user } = useUserStore();
+
+  const handleDeleteUser = () => {
+    openModal({
+      title: "Delete user ?",
+      description: "Are you sure you want to delete this user",
+      onConfirm: async () => {
+        try {
+          const response = await deleteUser(user.employeeId);
+          if (response.error) {
+            showNotification({
+              type: "error",
+              message: "Something went wrong when deleting user",
+            });
+            return;
+          }
+
+          mutate(`fetch-users${activePage}`);
+          showNotification({
+            type: "success",
+            message: "Successfully deleted user",
+          });
+          unsetUser();
+        } catch {
+          showNotification({
+            type: "error",
+            message: "Something went wrong when deleting user",
+          });
+        }
+      },
+    });
+  };
+
   return (
     <div className="flex flex-col gap-10">
       <div className="flex items-center justify-between">
@@ -66,7 +103,7 @@ export function UserDetails({ user }: IUserDetails) {
           </div>
         </Button>
 
-        <Button variant="danger">
+        <Button variant="danger" onClick={handleDeleteUser}>
           <div className="flex gap-1 items-center">
             <Trash size={14} />
             Delete

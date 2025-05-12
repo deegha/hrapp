@@ -96,3 +96,14 @@ export async function fetchUser(empId: string) {
     resource: `user/${empId}`,
   });
 }
+
+export async function deleteUser(empId: number) {
+  return serviceHandler<TResponse<TAllUserDetails>, { userId: number }>({
+    method: "DELETE",
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: `user`,
+    body: {
+      userId: empId,
+    },
+  });
+}

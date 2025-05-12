@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { checkAuthServiceCall, logOutServiceCall } from "@/services/";
 import { useAuthStore } from "@/store/authstore";
 import { LogOut } from "react-feather";
+import { useNotificationStore } from "@/store/notificationStore";
 interface IPrps {
   children: React.ReactNode;
 }
@@ -11,12 +12,16 @@ interface IPrps {
 export function Layout({ children }: IPrps) {
   const router = useRouter();
   const { logout } = useAuthStore();
-
+  const { showNotification } = useNotificationStore();
   useEffect(() => {
     const handleAuth = async () => {
       const res = await checkAuthServiceCall();
 
       if (res.error) {
+        showNotification({
+          type: "error",
+          message: res.data,
+        });
         logout();
         router.push("/login");
       }
@@ -25,7 +30,7 @@ export function Layout({ children }: IPrps) {
     };
 
     handleAuth();
-  }, [logout, router]);
+  }, [logout, router, showNotification]);
 
   async function doLogout() {
     await logOutServiceCall();

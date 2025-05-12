@@ -1,7 +1,7 @@
 import { getAuthToken } from "@/utils/getAuthToken";
 
 interface IFetchApi<TBody> {
-  method: "POST" | "GET" | "PUT";
+  method: "POST" | "GET" | "PUT" | "DELETE";
   baseURL: string;
   resource: string;
   body?: TBody;

@@ -36,7 +36,7 @@ export default function UserManagement() {
   return (
     <Layout>
       <Drawer open={user?.employeeId ? true : false} close={unsetUser}>
-        <UserDetails user={user} />
+        <UserDetails />
       </Drawer>
       <PageLayout
         actionButton={<Button onClick={handleApplyLeave}>CREATE USER</Button>}
