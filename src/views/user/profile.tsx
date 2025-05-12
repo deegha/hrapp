@@ -21,7 +21,7 @@ export function UserProfile() {
     <PageLayout
       pageName="My Profile"
       actionButton={
-        <Link href="/my-profile/edit-profile">
+        <Link href="/my-profile/edit">
           <Button>Edit Profile</Button>
         </Link>
       }
