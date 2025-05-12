@@ -1,48 +1,65 @@
-import { PageLayout, Button, StatusTag } from "@/components";
+import { PageLayout, Button, StatusTag, Shimmer } from "@/components";
 import { fetchUser } from "@/services";
 import { getAuthUser } from "@/utils/getAuthUser";
 import useSWR from "swr";
+import Link from "next/link";
 
 export function UserProfile() {
   const { data: userData } = useSWR(`fetch-auth-user`, async () => {
-    const userSummary = JSON.parse((await getAuthUser()) as string);
+    const userSummary = await getAuthUser();
+
     if (!userSummary) return;
 
-    return fetchUser(userSummary.employeeId);
+    return fetchUser(userSummary.employeeId.toString());
   });
 
-  if (!userData) return <div></div>;
+  if (!userData) return <Shimmer />;
 
   const user = userData?.data;
 
   return (
-    <PageLayout pageName="My Profile">
-      <div>
-        <ProfileRow label="Name" value={`${user.firstName} ${user.lastName}`} />
-        <ProfileRow label="Email" value={user.email} />
-        <ProfileRow label="User Level" value={user.userStatusId.toString()} />
-        <ProfileRow
-          label="Status"
-          value={
-            user.UserStatus?.statusLabel ? (
-              <StatusTag status={user.UserStatus?.statusLabel} />
-            ) : (
-              "N/A"
-            )
-          }
-        />
-        <ProfileRow
-          label="Employee ID"
-          value={user.employeeId?.toString() ?? "N/A"}
-        />
+    <PageLayout
+      pageName="My Profile"
+      actionButton={
+        <Link href="/my-profile/edit-profile">
+          <Button>Edit Profile</Button>
+        </Link>
+      }
+    >
+      <div className="flex flex-col gap-10">
+        <div className="flex flex-col gap-5">
+          <h2 className="text-md font-bold">Personal Information</h2>
+          <div>
+            <ProfileRow
+              label="Name"
+              value={`${user.firstName} ${user.lastName}`}
+            />
+            <ProfileRow label="Email" value={user.email} />
+            <ProfileRow
+              label="User Level"
+              value={user.userStatusId.toString()}
+            />
+            <ProfileRow
+              label="Status"
+              value={
+                user.UserStatus?.statusLabel ? (
+                  <StatusTag status={user.UserStatus?.statusLabel} />
+                ) : (
+                  "N/A"
+                )
+              }
+            />
+            <ProfileRow
+              label="Employee ID"
+              value={user.employeeId?.toString() ?? "N/A"}
+            />
 
-        <ProfileRow
-          label="Joined At"
-          value={new Date(user.createdAt).toLocaleDateString()}
-        />
-      </div>
-      <div className="w-[200px]">
-        <Button>Edit</Button>
+            <ProfileRow
+              label="Joined At"
+              value={new Date(user.createdAt).toLocaleDateString()}
+            />
+          </div>
+        </div>
       </div>
     </PageLayout>
   );

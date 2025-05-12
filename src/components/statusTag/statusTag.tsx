@@ -14,7 +14,7 @@ export function StatusTag({ status }: IProps) {
 
   return (
     <div
-      className={`inline-block px-[5px] py-[2px] text-xxs  font-medium rounded-lg  ${typeStyles[status]}`}
+      className={`inline-block px-[6px] py-[2px] text-xxs  font-medium rounded-md  ${typeStyles[status]}`}
     >
       {status}
     </div>

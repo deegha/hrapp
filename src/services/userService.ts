@@ -5,6 +5,7 @@ import {
   TUserPermission,
   TCreateUser,
   TAllUserDetails,
+  TUpdateUser,
 } from "@/types/user";
 import { TResponse, TGenericFilters } from "@/types";
 import { TResponseWithPagination } from "@/types/api";
@@ -105,5 +106,14 @@ export async function deleteUser(empId: number) {
     body: {
       userId: empId,
     },
+  });
+}
+
+export async function updateUser(empId: number, user: TUpdateUser) {
+  return serviceHandler<TResponse<TAllUserDetails>, TUpdateUser>({
+    method: "PUT",
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: `user/${empId}`,
+    body: user,
   });
 }

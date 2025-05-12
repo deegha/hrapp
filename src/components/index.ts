@@ -22,3 +22,4 @@ export { Drawer } from "./drawer/drawer";
 export { ItemsList } from "./ItemsList/itemsList";
 export { ConfirmationsModal } from "./confirmationsModal/confirmationsModal";
 export { Detail } from "./userDetail/userDetail";
+export { Shimmer } from "./shimmer/shimmer";

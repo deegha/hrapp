@@ -24,7 +24,13 @@ export type TCreateUser = {
   firstName: string;
   lastName: string;
   email: string;
-  userStatusId: number;
+  userRole: string;
+};
+
+export type TUpdateUser = {
+  firstName: string;
+  lastName: string;
+  email: string;
   userRole: string;
 };
 

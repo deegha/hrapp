@@ -7,6 +7,7 @@ export {
   createUserService,
   fetchUsers,
   fetchUser,
+  updateUser,
 } from "./userService";
 export { getNavigationItems } from "./uiService";
 export {
