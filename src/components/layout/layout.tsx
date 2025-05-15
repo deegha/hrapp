@@ -1,6 +1,6 @@
 import { Navigation } from "@/components";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { checkAuthServiceCall, logOutServiceCall } from "@/services/";
 import { useAuthStore } from "@/store/authstore";
 import { LogOut } from "react-feather";
@@ -13,7 +13,10 @@ export function Layout({ children }: IPrps) {
   const router = useRouter();
   const { logout } = useAuthStore();
   const { showNotification } = useNotificationStore();
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
+    setLoading(true);
     const handleAuth = async () => {
       const res = await checkAuthServiceCall();
 
@@ -25,7 +28,7 @@ export function Layout({ children }: IPrps) {
         logout();
         router.push("/login");
       }
-
+      setLoading(false);
       return;
     };
 
@@ -37,6 +40,14 @@ export function Layout({ children }: IPrps) {
     logout();
 
     router.push("/login");
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center w-full h-screen">
+        <div className="loader">Loading Please wait</div>
+      </div>
+    );
   }
 
   return (

@@ -37,10 +37,6 @@ export function UserLeave() {
     setActiveLeaveRequest(leaveRequest);
   }
 
-  if (!data) {
-    return <NoDataFound pageName="Leave Management" />;
-  }
-
   return (
     <PageLayout
       pageName="Leave Management"
@@ -98,7 +94,7 @@ export function UserLeave() {
           })}
         </div>
 
-        {data?.data?.totalPages > 1 && (
+        {data && data?.data?.totalPages > 1 && (
           <Pagination numberOfPage={data?.data.totalPages as number} />
         )}
       </div>
