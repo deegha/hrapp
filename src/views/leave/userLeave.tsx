@@ -4,7 +4,6 @@ import {
   Pagination,
   ItemsList,
   Drawer,
-  NoDataFound,
 } from "@/components";
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
