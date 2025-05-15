@@ -47,7 +47,7 @@ export function ApprovalDetailsUser() {
           <Button
             onClick={() =>
               handleApproval({
-                itemId: userRequest?.id as number,
+                itemId: userRequest?.employeeId as number,
                 action: "APPROVED",
               })
             }
@@ -61,7 +61,9 @@ export function ApprovalDetailsUser() {
           <Button
             loading={loading === "REJECTED" ? true : false}
             variant="danger"
-            onClick={() => handleConfirmation(userRequest?.id as number)}
+            onClick={() =>
+              handleConfirmation(userRequest?.employeeId as number)
+            }
           >
             <div className="flex gap-1 items-center">
               <Trash size={14} />

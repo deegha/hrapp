@@ -3,7 +3,6 @@ import {
   Layout,
   PageLayout,
   NoDataFoundComponent,
-  NoDataFound,
   Pagination,
   Drawer,
 } from "@/components";

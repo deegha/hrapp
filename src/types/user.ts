@@ -31,7 +31,6 @@ export type TUpdateUser = {
   firstName: string;
   lastName: string;
   email: string;
-  userRole: string;
 };
 
 export type TAllUserDetails = TUser & {

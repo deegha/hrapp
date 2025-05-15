@@ -1,6 +1,6 @@
 import { StatusTag, Button, Detail } from "@/components";
 import { useConfirmationModalStore } from "@/store/useConfirmationModalStore";
-import { Trash, Edit } from "react-feather";
+import { Trash } from "react-feather";
 import { deleteUser } from "@/services/userService";
 import { usePagination } from "@/hooks/usePagination";
 import { useNotificationStore } from "@/store/notificationStore";

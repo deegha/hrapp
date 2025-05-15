@@ -1,7 +1,7 @@
 import { Layout, PageLayout, Button, Shimmer } from "@/components";
 import { useForm, FormProvider } from "react-hook-form";
 import { FormInput } from "@/components";
-import { userSchema } from "@/utils/formvalidations/userSchema";
+import { editUserSchema } from "@/utils/formvalidations/userSchema";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useNotificationStore } from "@/store/notificationStore";
 import { useEffect, useState } from "react";
@@ -24,7 +24,7 @@ export default function EditProfile() {
   });
 
   const methods = useForm<TUpdateUser>({
-    resolver: yupResolver(userSchema),
+    resolver: yupResolver(editUserSchema),
   });
 
   useEffect(() => {

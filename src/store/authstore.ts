@@ -1,11 +1,11 @@
 import { create } from "zustand";
-import { User } from "@/types/user";
+import { TUser } from "@/types/user";
 
 interface AuthState {
-  user: User | null;
+  user: TUser | null;
   token: string | null;
   isAuthenticated: boolean;
-  login: (user: User, token: string) => void;
+  login: (user: TUser, token: string) => void;
   logout: () => void;
   isLoggedIn: () => boolean;
 }
@@ -15,7 +15,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   token: null,
   isAuthenticated: false,
 
-  login: (user: User, token: string) => {
+  login: (user: TUser, token: string) => {
     set({ user, token, isAuthenticated: true });
     localStorage.setItem("token", token);
     localStorage.setItem("user", JSON.stringify(user));

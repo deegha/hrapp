@@ -1,5 +1,3 @@
-import { InputField } from "../input/input";
-
 type IPolicyItem = {
   id: number;
   item: string;
