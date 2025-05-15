@@ -109,11 +109,11 @@ export async function deleteUser(empId: number) {
   });
 }
 
-export async function updateUser(empId: number, user: TUpdateUser) {
+export async function updateMyProfile(user: TUpdateUser) {
   return serviceHandler<TResponse<TAllUserDetails>, TUpdateUser>({
     method: "PUT",
     baseURL: process.env.NEXT_PUBLIC_API as string,
-    resource: `user/${empId}`,
+    resource: `my-profile`,
     body: user,
   });
 }

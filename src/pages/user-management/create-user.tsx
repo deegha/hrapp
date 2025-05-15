@@ -17,10 +17,7 @@ export default function CreateUser() {
   const onSubmit = async (data: TCreateUser) => {
     try {
       setIsLoading(true);
-      const response = await createUserService({
-        ...data,
-        userStatusId: 7,
-      });
+      const response = await createUserService(data);
 
       if (response.error) {
         showNotification({

@@ -13,7 +13,7 @@ export function FormInput({ name, label, ...rest }: FormInputProps) {
   } = useFormContext();
 
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-1 ">
       <label htmlFor={name} className="text-sm font-semibold text-textPrimary">
         {label}
       </label>

@@ -1,24 +1,44 @@
-import { Layout, PageLayout, Button } from "@/components";
+import { Layout, PageLayout, Button, Shimmer } from "@/components";
 import { useForm, FormProvider } from "react-hook-form";
 import { FormInput } from "@/components";
 import { userSchema } from "@/utils/formvalidations/userSchema";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useNotificationStore } from "@/store/notificationStore";
-import { useState } from "react";
-import { updateUser } from "@/services";
+import { useEffect, useState } from "react";
+import { fetchUser, updateMyProfile } from "@/services";
 import { TUpdateUser } from "@/types";
 import { getAuthUser } from "@/utils/getAuthUser";
+import useSWR from "swr";
 
 export default function EditProfile() {
   const { showNotification } = useNotificationStore();
-  const methods = useForm<TUpdateUser>({ resolver: yupResolver(userSchema) });
+
   const [isLoading, setIsLoading] = useState(false);
+
+  const { data: userData } = useSWR(`fetch-auth-user`, async () => {
+    const userSummary = await getAuthUser();
+
+    if (!userSummary) return;
+
+    return fetchUser(userSummary.employeeId.toString());
+  });
+
+  const methods = useForm<TUpdateUser>({
+    resolver: yupResolver(userSchema),
+  });
+
+  useEffect(() => {
+    if (userData) {
+      methods.reset(userData?.data);
+    }
+  }, [methods, userData]);
+
+  if (!userData) return <Shimmer />;
 
   const onSubmit = async (data: TUpdateUser) => {
     try {
-      const userSummary = await getAuthUser();
       setIsLoading(true);
-      const response = await updateUser(userSummary.employeeId, data);
+      const response = await updateMyProfile(data);
 
       if (response.error) {
         showNotification({
@@ -56,7 +76,7 @@ export default function EditProfile() {
           >
             <FormInput name="firstName" label="First Name" />
             <FormInput name="lastName" label="Last Name" />
-            <FormInput name="email" label="Email" type="email" />
+            <FormInput name="email" label="Email" type="email" disabled />
 
             <Button
               loading={isLoading}
