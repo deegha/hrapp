@@ -45,3 +45,11 @@ export async function fetchLeaveRequest(id: string) {
     resource: `orgLeave/${id}`,
   });
 }
+
+export async function fetchMyLeave(id: string) {
+  return await serviceHandler<TResponse<LeaveRequest>>({
+    method: "GET",
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: `leave/${id}`,
+  });
+}

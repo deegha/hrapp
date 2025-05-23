@@ -1,7 +1,7 @@
 "use client";
 
 import useSWR from "swr";
-import { fetchLeaveRequest } from "@/services";
+import { fetchMyLeave } from "@/services";
 import { format } from "date-fns";
 import { Button, StatusTag } from "@/components";
 import { leaveTypes } from "@/utils/staticValues";
@@ -14,7 +14,7 @@ export function LeaveRequestDetails({
 }) {
   const id = leaveRequestId;
   const { data, isLoading } = useSWR(id ? `leaveRequest-${id}` : null, () =>
-    fetchLeaveRequest(id.toString())
+    fetchMyLeave(id.toString())
   );
 
   if (!data || isLoading) return <LeaveDetailsSkeleton />;
