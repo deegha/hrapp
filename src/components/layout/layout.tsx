@@ -42,14 +42,6 @@ export function Layout({ children }: IPrps) {
     router.push("/login");
   }
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center w-full h-screen">
-        <div className="loader">Loading Please wait</div>
-      </div>
-    );
-  }
-
   return (
     <div className="flex w-full h-[100hv]">
       <div className="w-[207px] flex flex-col gap-10 border-r border-border h-[100vh] justify-between fixed">

@@ -24,8 +24,6 @@ export function LeaveRequestDetails({
     (a, b) => new Date(a.leaveDate).getTime() - new Date(b.leaveDate).getTime()
   );
 
-  console.log(sortedLeaves[0]);
-
   const fromDate = sortedLeaves[0]?.leaveDate;
   const toDate = sortedLeaves[sortedLeaves.length - 1]?.leaveDate;
   const statusLabel = sortedLeaves[0]?.LeaveStatus?.statusLabel;
@@ -50,7 +48,6 @@ export function LeaveRequestDetails({
           </div>
         )}
       </div>
-
       <div className="flex flex-col gap-3">
         <h2> Leave Days</h2>
         <ul className="text-sm text-textSecondary list-disc ml-4">
@@ -64,7 +61,6 @@ export function LeaveRequestDetails({
           ))}
         </ul>
       </div>
-
       {request.documents?.length > 0 && (
         <div className="flex flex-col gap-3">
           <h2>Documents</h2>
@@ -105,9 +101,7 @@ export function LeaveRequestDetails({
           </div>
         </div>
       )}
-
       <hr className="border-t border-border" />
-
       <div className="flex justify-end gap-2  w-full">
         <Button onClick={() => console.log("Edit leave")} variant="secondary">
           Edit
