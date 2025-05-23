@@ -1,6 +1,6 @@
 import { Navigation } from "@/components";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { checkAuthServiceCall, logOutServiceCall } from "@/services/";
 import { useAuthStore } from "@/store/authstore";
 import { LogOut } from "react-feather";
