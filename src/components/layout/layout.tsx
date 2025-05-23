@@ -13,10 +13,8 @@ export function Layout({ children }: IPrps) {
   const router = useRouter();
   const { logout } = useAuthStore();
   const { showNotification } = useNotificationStore();
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    setLoading(true);
     const handleAuth = async () => {
       const res = await checkAuthServiceCall();
 
@@ -28,7 +26,6 @@ export function Layout({ children }: IPrps) {
         logout();
         router.push("/login");
       }
-      setLoading(false);
       return;
     };
 
