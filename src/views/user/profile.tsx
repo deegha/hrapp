@@ -10,7 +10,7 @@ export function UserProfile() {
 
     if (!userSummary) return;
 
-    return fetchUser(userSummary.employeeId.toString());
+    return await fetchUser(userSummary.employeeId.toString());
   });
 
   if (!userData) return <Shimmer />;
