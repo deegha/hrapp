@@ -1,11 +1,11 @@
-import { StatusTag, Button, Detail } from "@/components";
-import { useConfirmationModalStore } from "@/store/useConfirmationModalStore";
-import { Trash } from "react-feather";
-import { deleteUser } from "@/services/userService";
-import { usePagination } from "@/hooks/usePagination";
-import { useNotificationStore } from "@/store/notificationStore";
-import { mutate } from "swr";
-import { useUserStore } from "@/store/useUserStore";
+import {StatusTag, Button, Detail} from "@/components";
+import {useConfirmationModalStore} from "@/store/useConfirmationModalStore";
+import {Trash} from "react-feather";
+import {deleteUser} from "@/services/userService";
+import {usePagination} from "@/hooks/usePagination";
+import {useNotificationStore} from "@/store/notificationStore";
+import {mutate} from "swr";
+import {useUserStore} from "@/store/useUserStore";
 
 const logs = [
   {
@@ -31,10 +31,10 @@ const logs = [
 ];
 
 export function UserDetails() {
-  const { openModal } = useConfirmationModalStore();
-  const { activePage } = usePagination();
-  const { showNotification } = useNotificationStore();
-  const { unsetUser, user } = useUserStore();
+  const {openModal} = useConfirmationModalStore();
+  const {activePage} = usePagination();
+  const {showNotification} = useNotificationStore();
+  const {unsetUser, user} = useUserStore();
 
   const handleDeleteUser = () => {
     openModal({
@@ -85,18 +85,16 @@ export function UserDetails() {
       <div className="flex flex-col gap-3">
         <h2>Most Recent User Logs</h2>
         {logs.map((log, i) => (
-          <div key={i} className="flex flex-col gap-1 ">
-            <div className="flex text-textSecondary font-semibold">
-              <div className="w-2 h-2 bg-primary rounded-full" />
-              <div className="text-sm ">{log.log}</div>
+          <div key={i} className="flex flex-col gap-1">
+            <div className="flex font-semibold text-textSecondary">
+              <div className="size-2 rounded-full bg-primary" />
+              <div className="text-sm">{log.log}</div>
             </div>
-            <div className="text-sm text-textSecondary">
-              {log.createdAt.toDateString()}
-            </div>
+            <div className="text-sm text-textSecondary">{log.createdAt.toDateString()}</div>
           </div>
         ))}
       </div>
-      <div className="flex gap-3  w-full">
+      <div className="flex w-full gap-3">
         {/* <Button variant="secondary">
           <div className="flex gap-1 items-center">
             <Edit size={14} /> Edit
@@ -105,7 +103,7 @@ export function UserDetails() {
 
         {user.UserStatus?.statusLabel !== "DELETED" && (
           <Button variant="danger" onClick={handleDeleteUser}>
-            <div className="flex gap-1 items-center">
+            <div className="flex items-center gap-1">
               <Trash size={14} />
               Delete
             </div>

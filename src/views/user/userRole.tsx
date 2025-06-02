@@ -1,13 +1,10 @@
-import { fetchPermission } from "@/services/";
-import { FormSelect } from "@/components";
+import {fetchPermission} from "@/services/";
+import {FormSelect} from "@/components";
 import useSWR from "swr";
-import { roles, RoleKey } from "@/utils/staticValues";
+import {roles, RoleKey} from "@/utils/staticValues";
 
 export function UserRole() {
-  const { error, data, isLoading } = useSWR(
-    "fetch-permission",
-    fetchPermission
-  );
+  const {error, data, isLoading} = useSWR("fetch-permission", fetchPermission);
 
   if (error || !data) {
     return <div>Loading...</div>;

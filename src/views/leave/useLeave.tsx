@@ -1,13 +1,13 @@
-import { useState } from "react";
-import { useNotificationStore } from "@/store/notificationStore";
-import { createLeaveRequest } from "@/services";
-import { leaveTypes } from "@/utils/staticValues";
+import {useState} from "react";
+import {useNotificationStore} from "@/store/notificationStore";
+import {createLeaveRequest} from "@/services";
+import {leaveTypes} from "@/utils/staticValues";
 
 export function useLeave() {
   const [selectedRange, setSelectedRange] = useState<{
     start: Date | null;
     end: Date | null;
-  }>({ start: null, end: null });
+  }>({start: null, end: null});
   const [leaveType, setSelectedLeaveType] = useState(leaveTypes[0]);
   const [notes, setNotes] = useState("");
   const [selectedDates, setSelectedDates] = useState<
@@ -17,7 +17,7 @@ export function useLeave() {
     }>
   >([]);
   const [documents, setDocuments] = useState<Array<string>>();
-  const { showNotification } = useNotificationStore();
+  const {showNotification} = useNotificationStore();
   const [loading, setLoading] = useState(false);
   const handleDocumentUpload = (url: string) => {
     if (!url) {
@@ -78,7 +78,7 @@ export function useLeave() {
     setDocuments([]);
     setSelectedDates([]);
     setSelectedLeaveType(leaveTypes[0]);
-    setSelectedRange({ start: null, end: null });
+    setSelectedRange({start: null, end: null});
   };
 
   return {

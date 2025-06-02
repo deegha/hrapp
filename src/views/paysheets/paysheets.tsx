@@ -1,4 +1,4 @@
-import { PageLayout } from "@/components";
+import {PageLayout} from "@/components";
 
 export function UserPaySheets() {
   return (

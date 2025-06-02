@@ -1,5 +1,5 @@
-import { Layout } from "@/components";
-import { ApplyLeave } from "@/views";
+import {Layout} from "@/components";
+import {ApplyLeave} from "@/views";
 
 export default function Home() {
   return (

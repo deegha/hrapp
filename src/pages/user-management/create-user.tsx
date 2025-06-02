@@ -1,17 +1,17 @@
-import { Layout, PageLayout, Button } from "@/components";
-import { useForm, FormProvider } from "react-hook-form";
-import { FormInput } from "@/components";
-import { userSchema } from "@/utils/formvalidations/userSchema";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { UserRole } from "@/views/";
-import { TCreateUser } from "@/types/";
-import { createUserService } from "@/services";
-import { useNotificationStore } from "@/store/notificationStore";
-import { useState } from "react";
+import {Layout, PageLayout, Button} from "@/components";
+import {useForm, FormProvider} from "react-hook-form";
+import {FormInput} from "@/components";
+import {userSchema} from "@/utils/formvalidations/userSchema";
+import {yupResolver} from "@hookform/resolvers/yup";
+import {UserRole} from "@/views/";
+import {TCreateUser} from "@/types/";
+import {createUserService} from "@/services";
+import {useNotificationStore} from "@/store/notificationStore";
+import {useState} from "react";
 
 export default function CreateUser() {
-  const { showNotification } = useNotificationStore();
-  const methods = useForm<TCreateUser>({ resolver: yupResolver(userSchema) });
+  const {showNotification} = useNotificationStore();
+  const methods = useForm<TCreateUser>({resolver: yupResolver(userSchema)});
   const [isLoading, setIsLoading] = useState(false);
 
   const onSubmit = async (data: TCreateUser) => {
@@ -49,10 +49,7 @@ export default function CreateUser() {
     <Layout>
       <PageLayout pageName="User Management - Create User">
         <FormProvider {...methods}>
-          <form
-            onSubmit={methods.handleSubmit(onSubmit)}
-            className="max-w-2xl flex flex-col gap-5"
-          >
+          <form onSubmit={methods.handleSubmit(onSubmit)} className="flex max-w-2xl flex-col gap-5">
             <FormInput name="firstName" label="First Name" />
             <FormInput name="lastName" label="Last Name" />
             <FormInput name="email" label="Email" type="email" />
@@ -60,11 +57,7 @@ export default function CreateUser() {
             {/* <UserStatus /> */}
             <UserRole />
 
-            <Button
-              loading={isLoading}
-              type="submit"
-              disabled={!methods.formState.isValid}
-            >
+            <Button loading={isLoading} type="submit" disabled={!methods.formState.isValid}>
               Create User
             </Button>
           </form>

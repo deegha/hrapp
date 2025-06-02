@@ -1,14 +1,12 @@
-import { useState, useCallback } from "react";
-import { useDropzone } from "react-dropzone";
+import {useState, useCallback} from "react";
+import {useDropzone} from "react-dropzone";
 
 type FileWithUrl = {
   name: string;
   url: string;
 };
 
-export const useDocumentUploader = (
-  onUploadComplete: (url: string) => void
-) => {
+export const useDocumentUploader = (onUploadComplete: (url: string) => void) => {
   const [uploadedFiles, setUploadedFiles] = useState<FileWithUrl[]>([]);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -25,22 +23,19 @@ export const useDocumentUploader = (
         try {
           const formData = new FormData();
           formData.append("file", file);
-          formData.append(
-            "upload_preset",
-            process.env.NEXT_PUBLIC_CLOUDINARY_PRESET as string
-          );
+          formData.append("upload_preset", process.env.NEXT_PUBLIC_CLOUDINARY_PRESET as string);
 
           const response = await fetch(
             `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY as string}/upload`,
             {
               method: "POST",
               body: formData,
-            }
+            },
           );
 
           const data = await response.json();
           if (data.secure_url) {
-            const newFile = { name: file.name, url: data.secure_url };
+            const newFile = {name: file.name, url: data.secure_url};
             setUploadedFiles((prev) => [...prev, newFile]);
             onUploadComplete(data.secure_url);
           } else {
@@ -55,10 +50,10 @@ export const useDocumentUploader = (
 
       setIsUploading(false);
     },
-    [onUploadComplete]
+    [onUploadComplete],
   );
 
-  const { getRootProps, getInputProps } = useDropzone({
+  const {getRootProps, getInputProps} = useDropzone({
     onDrop,
     accept: {
       "image/jpeg": [],

@@ -1,11 +1,11 @@
 // hooks/useApproval.ts
-import { useState } from "react";
-import { mutate } from "swr";
-import { approveRequest } from "@/services/approvalService";
-import { useApprovalStore } from "@/store/approvalStore";
-import { useNotificationStore } from "@/store/notificationStore";
-import { usePagination } from "@/hooks/usePagination";
-import { useConfirmationModalStore } from "@/store/useConfirmationModalStore";
+import {useState} from "react";
+import {mutate} from "swr";
+import {approveRequest} from "@/services/approvalService";
+import {useApprovalStore} from "@/store/approvalStore";
+import {useNotificationStore} from "@/store/notificationStore";
+import {usePagination} from "@/hooks/usePagination";
+import {useConfirmationModalStore} from "@/store/useConfirmationModalStore";
 
 type ApprovalAction = "APPROVED" | "REJECTED";
 
@@ -49,11 +49,11 @@ interface ApprovalHandlerPayload {
 }
 
 export function useApproval() {
-  const { approval, unsetApproval } = useApprovalStore();
-  const { showNotification } = useNotificationStore();
-  const { activePage } = usePagination();
+  const {approval, unsetApproval} = useApprovalStore();
+  const {showNotification} = useNotificationStore();
+  const {activePage} = usePagination();
   const [loading, setLoading] = useState<ApprovalAction>();
-  const { openModal } = useConfirmationModalStore();
+  const {openModal} = useConfirmationModalStore();
   const comms = getComs(approval.type);
 
   const handleConfirmation = (itemId: number) => {
@@ -69,11 +69,7 @@ export function useApproval() {
     });
   };
 
-  const handleApproval = async ({
-    itemId,
-    action,
-    rejectedReason,
-  }: ApprovalHandlerPayload) => {
+  const handleApproval = async ({itemId, action, rejectedReason}: ApprovalHandlerPayload) => {
     try {
       setLoading(action);
       const response = await approveRequest(approval.type, {

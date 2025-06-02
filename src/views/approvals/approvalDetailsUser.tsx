@@ -1,19 +1,19 @@
-import { useApprovalStore } from "@/store/approvalStore";
-import { fetchUser } from "@/services";
+import {useApprovalStore} from "@/store/approvalStore";
+import {fetchUser} from "@/services";
 import useSWR from "swr";
-import { Button, Detail, StatusTag } from "@/components";
+import {Button, Detail, StatusTag} from "@/components";
 import moment from "moment";
-import { Check, Trash } from "react-feather";
+import {Check, Trash} from "react-feather";
 
-import { useApproval } from "./useApprove";
+import {useApproval} from "./useApprove";
 export function ApprovalDetailsUser() {
-  const { approval } = useApprovalStore();
+  const {approval} = useApprovalStore();
 
-  const { handleApproval, loading, handleConfirmation } = useApproval();
+  const {handleApproval, loading, handleConfirmation} = useApproval();
 
-  const { data } = useSWR(
+  const {data} = useSWR(
     `fetch-user-${approval.id}`,
-    async () => await fetchUser(approval.targetId.toString())
+    async () => await fetchUser(approval.targetId.toString()),
   );
 
   if (!data) return <div>No data found</div>;
@@ -24,12 +24,9 @@ export function ApprovalDetailsUser() {
     <div className="flex flex-col gap-10">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[32px] font-semibold uppercase">
-            {approval?.title}
-          </h1>
+          <h1 className="text-[32px] font-semibold uppercase">{approval?.title}</h1>
           <p className="text-xxs text-textSecondary">
-            Created on{" "}
-            {moment(userRequest?.createdAt).format("yyyy-DD-mm : HH:mm")}
+            Created on {moment(userRequest?.createdAt).format("yyyy-DD-mm : HH:mm")}
           </p>
         </div>
         <StatusTag status={approval.status} />
@@ -43,7 +40,7 @@ export function ApprovalDetailsUser() {
       </div>
 
       {approval.status === "PENDING" && (
-        <div className="flex gap-3  w-full">
+        <div className="flex w-full gap-3">
           <Button
             onClick={() =>
               handleApproval({
@@ -53,7 +50,7 @@ export function ApprovalDetailsUser() {
             }
             loading={loading === "APPROVED" ? true : false}
           >
-            <div className="flex gap-1 items-center">
+            <div className="flex items-center gap-1">
               <Check size={14} /> Approve
             </div>
           </Button>
@@ -61,11 +58,9 @@ export function ApprovalDetailsUser() {
           <Button
             loading={loading === "REJECTED" ? true : false}
             variant="danger"
-            onClick={() =>
-              handleConfirmation(userRequest?.employeeId as number)
-            }
+            onClick={() => handleConfirmation(userRequest?.employeeId as number)}
           >
-            <div className="flex gap-1 items-center">
+            <div className="flex items-center gap-1">
               <Trash size={14} />
               Reject
             </div>

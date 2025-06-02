@@ -1,4 +1,4 @@
-import { cn } from "@/utils/cn";
+import {cn} from "@/utils/cn";
 
 type TextAreaProps = {
   value: string;
@@ -25,8 +25,8 @@ export const TextArea = ({
       className={cn(
         "w-full rounded-md border border-border bg-white p-4 text-sm text-textPrimary shadow-sm",
         "placeholder:text-textSecondary focus:outline-none focus:ring-1 focus:ring-primary",
-        "hover:border-gray-400 transition resize-none",
-        disabled && "opacity-50 cursor-not-allowed"
+        "resize-none transition hover:border-gray-400",
+        disabled && "cursor-not-allowed opacity-50",
       )}
     />
   );

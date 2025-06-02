@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { useRouter } from "next/router";
+import {useRouter} from "next/router";
 import {
   CheckSquare,
   DollarSign,
@@ -12,7 +12,7 @@ import {
   Users,
 } from "react-feather";
 import useSWR from "swr";
-import { getNavigationItems } from "@/services/uiService";
+import {getNavigationItems} from "@/services/uiService";
 
 const iconMap: Record<string, Icon> = {
   Home,
@@ -28,11 +28,7 @@ const iconMap: Record<string, Icon> = {
 export const Navigation = () => {
   const router = useRouter();
 
-  const {
-    data: navItems,
-    error,
-    isLoading,
-  } = useSWR("/navigation", getNavigationItems);
+  const {data: navItems, error, isLoading} = useSWR("/navigation", getNavigationItems);
 
   if ((!navItems && !isLoading) || error || navItems?.error) return null;
 
@@ -40,30 +36,27 @@ export const Navigation = () => {
     <div className="flex flex-col gap-2">
       {isLoading
         ? // Skeleton Loader
-          Array.from({ length: 4 }).map((_, index) => (
+          Array.from({length: 4}).map((_, index) => (
             <div
               key={index}
-              className="animate-pulse flex gap-2 items-center bg-gray-200 rounded-md p-2 h-6"
+              className="flex h-6 animate-pulse items-center gap-2 rounded-md bg-gray-200 p-2"
             >
-              <div className="w-4 h-4 bg-gray-300 rounded-md" />
-              <div className="w-20 h-3 bg-gray-300 rounded-md" />
+              <div className="size-4 rounded-md bg-gray-300" />
+              <div className="h-3 w-20 rounded-md bg-gray-300" />
             </div>
           ))
         : // Actual Navigation Items
           navItems?.data.map((item) => {
             const IconComponent = iconMap[item.icon] || null;
             const isSelected =
-              router.pathname === item.url ||
-              router.pathname.startsWith(item.url + "/");
+              router.pathname === item.url || router.pathname.startsWith(item.url + "/");
             return (
               <Link
                 href={item.url}
                 key={item.url}
                 className={` ${
-                  isSelected
-                    ? "bg-primary rounded-md text-black "
-                    : "text-textSecondary"
-                } text-xs uppercase hover:text-tHover p-2 flex gap-2 font-semibold`}
+                  isSelected ? "rounded-md bg-primary text-black" : "text-textSecondary"
+                } hover:text-tHover flex gap-2 p-2 text-xs font-semibold uppercase`}
               >
                 {IconComponent && <IconComponent size={15} />}
                 <p>{item.name}</p>

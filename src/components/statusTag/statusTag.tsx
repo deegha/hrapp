@@ -1,9 +1,9 @@
-import { TGenericStatus } from "@/types/";
+import {TGenericStatus} from "@/types/";
 interface IProps {
   status: TGenericStatus;
 }
 
-export function StatusTag({ status }: IProps) {
+export function StatusTag({status}: IProps) {
   const typeStyles: Record<IProps["status"], string> = {
     PENDING: "bg-secondary text-white",
     APPROVED: "bg-primary text-white",
@@ -14,7 +14,7 @@ export function StatusTag({ status }: IProps) {
 
   return (
     <div
-      className={`inline-block px-[6px] py-[2px] text-xxs  font-medium rounded-md  ${typeStyles[status]}`}
+      className={`inline-block rounded-md px-[6px] py-[2px] text-xxs font-medium ${typeStyles[status]}`}
     >
       {status}
     </div>

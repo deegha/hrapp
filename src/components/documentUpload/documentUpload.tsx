@@ -1,52 +1,36 @@
-import { useDocumentUploader } from "./useDocumentUploader";
-import { Upload, Trash } from "react-feather";
-import { cn } from "@/utils/cn";
+import {useDocumentUploader} from "./useDocumentUploader";
+import {Upload, Trash} from "react-feather";
+import {cn} from "@/utils/cn";
 
 type DocumentUploaderProps = {
   onUploadComplete: (url: string) => void;
 };
 
-export const DocumentUploader = ({
-  onUploadComplete,
-}: DocumentUploaderProps) => {
-  const {
-    getRootProps,
-    getInputProps,
-    uploadedFiles,
-    removeFile,
-    isUploading,
-  } = useDocumentUploader(onUploadComplete);
+export const DocumentUploader = ({onUploadComplete}: DocumentUploaderProps) => {
+  const {getRootProps, getInputProps, uploadedFiles, removeFile, isUploading} =
+    useDocumentUploader(onUploadComplete);
 
   return (
     <div className="w-full">
       <div
         {...getRootProps()}
         className={cn(
-          "border-2 border-dashed border-border rounded-md p-8 text-center cursor-pointer hover:border-gray-400 transition relative",
-          isUploading && "opacity-50 pointer-events-none"
+          "relative cursor-pointer rounded-md border-2 border-dashed border-border p-8 text-center transition hover:border-gray-400",
+          isUploading && "pointer-events-none opacity-50",
         )}
       >
         <input {...getInputProps()} />
 
         {isUploading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-70 rounded-2xl z-10">
-            <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+          <div className="bg-white/70 absolute inset-0 z-10 flex items-center justify-center rounded-2xl">
+            <div className="size-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
           </div>
         )}
 
-        <div
-          className={cn(
-            "flex flex-col items-center justify-center",
-            isUploading && "blur-sm"
-          )}
-        >
-          <Upload className="h-10 w-10 text-textSecondary mb-4" />
-          <p className="text-textSecondary">
-            Drag & drop files here, or click to select files
-          </p>
-          <p className="text-sm text-textSecondary mt-2">
-            (JPG, PNG, PDF. Max size 10MB)
-          </p>
+        <div className={cn("flex flex-col items-center justify-center", isUploading && "blur-sm")}>
+          <Upload className="mb-4 size-10 text-textSecondary" />
+          <p className="text-textSecondary">Drag & drop files here, or click to select files</p>
+          <p className="mt-2 text-sm text-textSecondary">(JPG, PNG, PDF. Max size 10MB)</p>
         </div>
       </div>
 
@@ -55,7 +39,7 @@ export const DocumentUploader = ({
           {uploadedFiles.map((file, index) => (
             <div
               key={index}
-              className="flex items-center justify-between bg-gray-50 rounded-xl p-4 border"
+              className="flex items-center justify-between rounded-xl border bg-gray-50 p-4"
             >
               <div className="flex items-center gap-3">
                 <a
@@ -63,14 +47,14 @@ export const DocumentUploader = ({
                   download
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline break-all"
+                  className="break-all text-blue-600 hover:underline"
                 >
                   {file.name}
                 </a>
               </div>
               <button
                 onClick={() => removeFile(index)}
-                className="text-red-500 hover:text-red-700 transition"
+                className="text-red-500 transition hover:text-red-700"
               >
                 <Trash size={18} />
               </button>

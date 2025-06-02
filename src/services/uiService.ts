@@ -1,5 +1,5 @@
-import { serviceHandler } from "@/utils/serviceHandler";
-import { NavItem } from "@/types/ui";
+import {serviceHandler} from "@/utils/serviceHandler";
+import {NavItem} from "@/types/ui";
 
 type TNavItemResponse = {
   error: boolean;

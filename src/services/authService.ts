@@ -1,4 +1,4 @@
-import { serviceHandler } from "@/utils/serviceHandler";
+import {serviceHandler} from "@/utils/serviceHandler";
 
 export type ApiResponse = {
   error: boolean;

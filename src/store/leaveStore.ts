@@ -1,5 +1,5 @@
-import { create } from "zustand";
-import { LeaveRequest } from "@/types/";
+import {create} from "zustand";
+import {LeaveRequest} from "@/types/";
 
 interface LeaveRequestState {
   leaveRequest: LeaveRequest;
@@ -11,10 +11,10 @@ export const useLeaveRequestStore = create<LeaveRequestState>((set) => ({
   leaveRequest: {} as LeaveRequest,
 
   setActiveLeaveRequest: async (leaveRequest: LeaveRequest) => {
-    set({ leaveRequest });
+    set({leaveRequest});
   },
 
   unsetActiveLeaveRequest: () => {
-    set({ leaveRequest: {} as LeaveRequest });
+    set({leaveRequest: {} as LeaveRequest});
   },
 }));

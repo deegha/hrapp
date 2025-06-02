@@ -1,31 +1,24 @@
-import {
-  PageLayout,
-  Button,
-  Pagination,
-  ItemsList,
-  Drawer,
-} from "@/components";
-import { useRouter } from "next/navigation";
+import {PageLayout, Button, Pagination, ItemsList, Drawer} from "@/components";
+import {useRouter} from "next/navigation";
 import useSWR from "swr";
-import { fetchLeave } from "@/services/";
-import { format } from "date-fns";
+import {fetchLeave} from "@/services/";
+import {format} from "date-fns";
 
-import { leaveTypes } from "@/utils/staticValues";
-import { usePagination } from "@/hooks/usePagination";
+import {leaveTypes} from "@/utils/staticValues";
+import {usePagination} from "@/hooks/usePagination";
 import moment from "moment";
-import { useLeaveRequestStore } from "@/store/leaveStore";
-import { LeaveRequest } from "@/types";
+import {useLeaveRequestStore} from "@/store/leaveStore";
+import {LeaveRequest} from "@/types";
 
-import { LeaveRequestDetails } from "./leaveRequestDetail";
+import {LeaveRequestDetails} from "./leaveRequestDetail";
 
 export function UserLeave() {
-  const { setActiveLeaveRequest, leaveRequest, unsetActiveLeaveRequest } =
-    useLeaveRequestStore();
-  const { activePage } = usePagination();
+  const {setActiveLeaveRequest, leaveRequest, unsetActiveLeaveRequest} = useLeaveRequestStore();
+  const {activePage} = usePagination();
   const router = useRouter();
-  const { data } = useSWR(
+  const {data} = useSWR(
     `fetch-leaves-${activePage}`,
-    async () => await fetchLeave({ page: parseInt(activePage), limit: 6 })
+    async () => await fetchLeave({page: parseInt(activePage), limit: 6}),
   );
 
   function handleApplyLeave() {
@@ -39,23 +32,16 @@ export function UserLeave() {
   return (
     <PageLayout
       pageName="Leave Management"
-      actionButton={
-        <Button onClick={handleApplyLeave}>REQUEST TIME OUT</Button>
-      }
+      actionButton={<Button onClick={handleApplyLeave}>REQUEST TIME OUT</Button>}
     >
-      <Drawer
-        open={leaveRequest.id ? true : false}
-        close={unsetActiveLeaveRequest}
-      >
+      <Drawer open={leaveRequest.id ? true : false} close={unsetActiveLeaveRequest}>
         <LeaveRequestDetails leaveRequestId={leaveRequest.id} />
       </Drawer>
       <div className="flex flex-col gap-5">
-        <div className="flex flex-col ">
+        <div className="flex flex-col">
           {data?.data?.data?.map((request) => {
             const sortedLeaves = [...request.leaves].sort(
-              (a, b) =>
-                new Date(a.leaveDate).getTime() -
-                new Date(b.leaveDate).getTime()
+              (a, b) => new Date(a.leaveDate).getTime() - new Date(b.leaveDate).getTime(),
             );
 
             const fromDate = sortedLeaves[0]?.leaveDate;
@@ -73,19 +59,15 @@ export function UserLeave() {
                   <div>
                     <div className="text-xs text-textPrimary">
                       Type:{" "}
-                      {leaveTypes.filter(
-                        (type) => parseInt(type.value) === firstLeave.leaveType
-                      )[0].label || "Unknown"}
+                      {leaveTypes.filter((type) => parseInt(type.value) === firstLeave.leaveType)[0]
+                        .label || "Unknown"}
                     </div>
                     <div className="text-xs text-textSecondary">
                       {firstLeave?.halfDay
                         ? `First Day: Half Day (${firstLeave?.halfDay === "AM" ? "Morning" : "Evening"})`
                         : "Full Days"}
                     </div>
-                    <div>
-                      Applied on{" "}
-                      {moment(request.createdAt).format("yyyy-Do-MM : hh:mm a")}
-                    </div>
+                    <div>Applied on {moment(request.createdAt).format("yyyy-Do-MM : hh:mm a")}</div>
                   </div>
                 }
               />
