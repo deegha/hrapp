@@ -2,10 +2,10 @@ export const Card: React.FC<{
   className?: string;
   children: React.ReactNode;
   onclick?: () => void;
-}> = ({ className = "", children, onclick }) => {
+}> = ({className = "", children, onclick}) => {
   return (
     <div
-      className={`bg-white border border-border rounded-md shadow-sm ${className}`}
+      className={`rounded-md border border-border bg-white shadow-sm ${className}`}
       onClick={onclick}
     >
       {children}
@@ -17,6 +17,6 @@ export const Card: React.FC<{
 export const CardContent: React.FC<{
   className?: string;
   children: React.ReactNode;
-}> = ({ className = "", children }) => {
+}> = ({className = "", children}) => {
   return <div className={`px-4 py-3 ${className}`}>{children}</div>;
 };

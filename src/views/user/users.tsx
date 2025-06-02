@@ -1,12 +1,12 @@
-import { ItemsList } from "@/components";
-import { TUser } from "@/types/user";
-import { useUserStore } from "@/store/useUserStore";
+import {ItemsList} from "@/components";
+import {TUser} from "@/types/user";
+import {useUserStore} from "@/store/useUserStore";
 
 interface IUsers {
   users: TUser[];
 }
-export function Users({ users }: IUsers) {
-  const { setActiveUser } = useUserStore();
+export function Users({users}: IUsers) {
+  const {setActiveUser} = useUserStore();
   return (
     <div>
       {users.map((user) => (

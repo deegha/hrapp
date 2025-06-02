@@ -1,6 +1,6 @@
-import { usePathname } from "next/navigation";
+import {usePathname} from "next/navigation";
 import Link from "next/link";
-import { ChevronRight } from "react-feather";
+import {ChevronRight} from "react-feather";
 
 interface IProps {
   pageName: string;
@@ -8,14 +8,14 @@ interface IProps {
   children: React.ReactNode;
 }
 
-export function PageLayout({ pageName, actionButton, children }: IProps) {
+export function PageLayout({pageName, actionButton, children}: IProps) {
   const pathname = usePathname();
 
   const pathSegments = pathname.split("/").filter(Boolean);
 
   return (
-    <div className="flex w-full flex-col gap-[40px] p-[25px] animate-appear">
-      <div className="w-full flex justify-between items-center h-[40px]">
+    <div className="flex w-full animate-appear flex-col gap-[40px] p-[25px]">
+      <div className="flex h-[40px] w-full items-center justify-between">
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-2">
             <h2 className="text-md font-semibold">{pageName}</h2>
@@ -32,9 +32,7 @@ export function PageLayout({ pageName, actionButton, children }: IProps) {
                       {segment}
                     </Link>
                   ) : (
-                    <span className="font-semibold text-textPrimary">
-                      {segment}
-                    </span>
+                    <span className="font-semibold text-textPrimary">{segment}</span>
                   )}
                   {!isLast && <ChevronRight size={12} />}
                 </div>
@@ -44,7 +42,7 @@ export function PageLayout({ pageName, actionButton, children }: IProps) {
         </div>
         <div>{actionButton}</div>
       </div>
-      <div className="w-full flex flex-col ">{children}</div>
+      <div className="flex w-full flex-col">{children}</div>
     </div>
   );
 }

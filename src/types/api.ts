@@ -19,9 +19,4 @@ export type TGenericFilters = {
   page?: number;
 };
 
-export type TGenericStatus =
-  | "PENDING"
-  | "DEACTIVATED"
-  | "DELETED"
-  | "APPROVED"
-  | "REJECTED";
+export type TGenericStatus = "PENDING" | "DEACTIVATED" | "DELETED" | "APPROVED" | "REJECTED";

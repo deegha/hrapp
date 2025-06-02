@@ -1,6 +1,6 @@
-import { create } from "zustand";
-import { TAllUserDetails } from "@/types/user";
-import { fetchUser } from "@/services/";
+import {create} from "zustand";
+import {TAllUserDetails} from "@/types/user";
+import {fetchUser} from "@/services/";
 
 interface UserState {
   user: TAllUserDetails;
@@ -14,10 +14,10 @@ export const useUserStore = create<UserState>((set) => ({
   setActiveUser: async (empId: string) => {
     const userResponse = await fetchUser(empId);
 
-    set({ user: userResponse.data });
+    set({user: userResponse.data});
   },
 
   unsetUser: () => {
-    set({ user: {} as TAllUserDetails });
+    set({user: {} as TAllUserDetails});
   },
 }));

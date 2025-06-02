@@ -1,4 +1,4 @@
-import { serviceHandler } from "@/utils/serviceHandler";
+import {serviceHandler} from "@/utils/serviceHandler";
 import {
   TResponseWithPagination,
   TApproval,
@@ -29,7 +29,7 @@ type TApprove = {
 
 export function approveRequest(
   type: "USER" | "LEAVEREQUEST",
-  { approvalRequestId, itemId, approveReject, rejectedReason }: TApprove
+  {approvalRequestId, itemId, approveReject, rejectedReason}: TApprove,
 ) {
   const resource = type === "LEAVEREQUEST" ? `leave-approval` : `user-approval`;
 

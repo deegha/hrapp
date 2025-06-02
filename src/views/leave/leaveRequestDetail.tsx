@@ -1,27 +1,23 @@
 "use client";
 
 import useSWR from "swr";
-import { fetchMyLeave } from "@/services";
-import { format } from "date-fns";
-import { Button, StatusTag } from "@/components";
-import { leaveTypes } from "@/utils/staticValues";
+import {fetchMyLeave} from "@/services";
+import {format} from "date-fns";
+import {Button, StatusTag} from "@/components";
+import {leaveTypes} from "@/utils/staticValues";
 import LeaveDetailsSkeleton from "@/utils/skeletons/LeaveDetailsSkeleton";
 
-export function LeaveRequestDetails({
-  leaveRequestId,
-}: {
-  leaveRequestId: number;
-}) {
+export function LeaveRequestDetails({leaveRequestId}: {leaveRequestId: number}) {
   const id = leaveRequestId;
-  const { data, isLoading } = useSWR(id ? `leaveRequest-${id}` : null, () =>
-    fetchMyLeave(id.toString())
+  const {data, isLoading} = useSWR(id ? `leaveRequest-${id}` : null, () =>
+    fetchMyLeave(id.toString()),
   );
 
   if (!data || isLoading) return <LeaveDetailsSkeleton />;
 
   const request = data?.data;
   const sortedLeaves = [...request.leaves].sort(
-    (a, b) => new Date(a.leaveDate).getTime() - new Date(b.leaveDate).getTime()
+    (a, b) => new Date(a.leaveDate).getTime() - new Date(b.leaveDate).getTime(),
   );
 
   const fromDate = sortedLeaves[0]?.leaveDate;
@@ -31,9 +27,7 @@ export function LeaveRequestDetails({
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-[32px] font-semibold uppercase">
-          Leave Request Details
-        </h1>
+        <h1 className="text-[32px] font-semibold uppercase">Leave Request Details</h1>
         <StatusTag status={statusLabel} />
       </div>
       <div>
@@ -43,20 +37,17 @@ export function LeaveRequestDetails({
         </div>
 
         {request.note && (
-          <div className="text-sm text-textSecondary mt-1">
-            Note: {request.note}
-          </div>
+          <div className="mt-1 text-sm text-textSecondary">Note: {request.note}</div>
         )}
       </div>
       <div className="flex flex-col gap-3">
         <h2> Leave Days</h2>
-        <ul className="text-sm text-textSecondary list-disc ml-4">
+        <ul className="ml-4 list-disc text-sm text-textSecondary">
           {sortedLeaves.map((leave) => (
             <li key={leave.id}>
               {format(new Date(leave.leaveDate), "dd MMM yyyy")} -{" "}
               {leaveTypes[leave.leaveType].label || "Unknown"}{" "}
-              {leave.halfDay &&
-                `(Half Day: ${leave.halfDay === "AM" ? "Morning" : "Evening"})`}
+              {leave.halfDay && `(Half Day: ${leave.halfDay === "AM" ? "Morning" : "Evening"})`}
             </li>
           ))}
         </ul>
@@ -68,14 +59,11 @@ export function LeaveRequestDetails({
             {request.documents.map((doc) => {
               const isPDF = doc.fileUrl.toLowerCase().endsWith(".pdf");
               return (
-                <div
-                  key={doc.id}
-                  className="border border-border rounded-md p-2"
-                >
+                <div key={doc.id} className="rounded-md border border-border p-2">
                   {isPDF ? (
                     <iframe
                       src={doc.fileUrl}
-                      className="w-full h-[400px]"
+                      className="h-[400px] w-full"
                       title={`Document ${doc.id}`}
                     />
                   ) : (
@@ -83,7 +71,7 @@ export function LeaveRequestDetails({
                     <img
                       src={doc.fileUrl}
                       alt={`Document ${doc.id}`}
-                      className="w-full h-48 object-contain"
+                      className="h-48 w-full object-contain"
                     />
                   )}
                   <a
@@ -91,7 +79,7 @@ export function LeaveRequestDetails({
                     download
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-500 text-xs underline block mt-2"
+                    className="mt-2 block text-xs text-blue-500 underline"
                   >
                     Download
                   </a>
@@ -102,7 +90,7 @@ export function LeaveRequestDetails({
         </div>
       )}
       <hr className="border-t border-border" />
-      <div className="flex justify-end gap-2  w-full">
+      <div className="flex w-full justify-end gap-2">
         <Button onClick={() => console.log("Edit leave")} variant="secondary">
           Edit
         </Button>

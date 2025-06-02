@@ -1,5 +1,5 @@
-import { Layout } from "@/components";
-import { UserHome } from "@/views";
+import {Layout} from "@/components";
+import {UserHome} from "@/views";
 
 export default function Home() {
   return (

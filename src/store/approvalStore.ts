@@ -1,5 +1,5 @@
-import { create } from "zustand";
-import { TApproval } from "@/types/";
+import {create} from "zustand";
+import {TApproval} from "@/types/";
 
 interface ApprovalState {
   approval: TApproval;
@@ -11,10 +11,10 @@ export const useApprovalStore = create<ApprovalState>((set) => ({
   approval: {} as TApproval,
 
   setActiveApproval: async (approval: TApproval) => {
-    set({ approval });
+    set({approval});
   },
 
   unsetApproval: () => {
-    set({ approval: {} as TApproval });
+    set({approval: {} as TApproval});
   },
 }));

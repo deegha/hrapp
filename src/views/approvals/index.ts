@@ -1,2 +1,2 @@
-export { ApprovalDetailsLeave } from "./approvalDetailsLeave";
-export { ApprovalDetailsUser } from "./approvalDetailsUser";
+export {ApprovalDetailsLeave} from "./approvalDetailsLeave";
+export {ApprovalDetailsUser} from "./approvalDetailsUser";

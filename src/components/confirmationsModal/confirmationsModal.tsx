@@ -1,9 +1,8 @@
-import { useConfirmationModalStore } from "@/store/useConfirmationModalStore";
-import { Button } from "@/components";
+import {useConfirmationModalStore} from "@/store/useConfirmationModalStore";
+import {Button} from "@/components";
 
 export function ConfirmationsModal() {
-  const { isOpen, title, description, onConfirm, onCancel, closeModal } =
-    useConfirmationModalStore();
+  const {isOpen, title, description, onConfirm, onCancel, closeModal} = useConfirmationModalStore();
 
   if (!isOpen) return null;
 
@@ -18,10 +17,10 @@ export function ConfirmationsModal() {
   };
 
   return (
-    <div className="fixed z-[100] inset-0 flex items-center justify-center bg-black bg-opacity-30 backdrop-blur-sm">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">{title}</h2>
-        <p className="text-gray-600 mb-6">{description}</p>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/30 backdrop-blur-sm">
+      <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
+        <h2 className="mb-4 text-lg font-semibold text-gray-800">{title}</h2>
+        <p className="mb-6 text-gray-600">{description}</p>
         <div className="flex justify-end space-x-3">
           <Button variant="danger" onClick={handleCancel}>
             Cancel

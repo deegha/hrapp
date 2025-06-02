@@ -1,4 +1,4 @@
-import { TGenericStatus } from "./api";
+import {TGenericStatus} from "./api";
 
 export type TLeaves = {
   date: Date;

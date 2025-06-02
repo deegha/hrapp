@@ -8,8 +8,8 @@ import {
   Dropdown,
   TextArea,
 } from "@/components";
-import { useLeave } from "./useLeave";
-import { leaveTypes } from "@/utils/staticValues";
+import {useLeave} from "./useLeave";
+import {leaveTypes} from "@/utils/staticValues";
 
 export function ApplyLeave() {
   const {
@@ -29,9 +29,9 @@ export function ApplyLeave() {
 
   return (
     <PageLayout pageName="Leave Management - Request timeout">
-      <div className="flex items-start  gap-10">
+      <div className="flex items-start gap-10">
         <div className="w-full">
-          <div className="flex flex-col gap-[41px] ">
+          <div className="flex flex-col gap-[41px]">
             <div className="flex flex-col gap-5">
               <PageSubHeading heading="Select Dates" />
               <DatePicker onRangeChange={(range) => setSelectedRange(range)} />
@@ -70,7 +70,7 @@ export function ApplyLeave() {
                 placeholder="Write your thoughts here..."
               />
             </div>
-            <div className="w-full flex justify-end">
+            <div className="flex w-full justify-end">
               <div className="w-[150px]">
                 <Button
                   loading={loading}
@@ -85,15 +85,15 @@ export function ApplyLeave() {
           </div>
         </div>
 
-        <div className="flex flex-col w-1/4 gap-10 ">
-          <div className=" border border-border flex flex-col items-start justify-center p-10 rounded-md ">
+        <div className="flex w-1/4 flex-col gap-10">
+          <div className="flex flex-col items-start justify-center rounded-md border border-border p-10">
             <p className="text-sm">Days</p>
             <p className="text-lg font-semibold">20</p>
-            <p className="text-sm text-primary font-semibold">+3</p>
+            <p className="text-sm font-semibold text-primary">+3</p>
           </div>
           <p>
-            You have 20 days of remaining leave. Use them wisely for
-            rejuvenation and personal pursuits. You&apos;ve earned them!
+            You have 20 days of remaining leave. Use them wisely for rejuvenation and personal
+            pursuits. You&apos;ve earned them!
           </p>
         </div>
       </div>

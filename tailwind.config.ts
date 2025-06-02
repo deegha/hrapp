@@ -1,4 +1,4 @@
-import type { Config } from "tailwindcss";
+import type {Config} from "tailwindcss";
 
 export default {
   content: [
@@ -7,20 +7,20 @@ export default {
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
-    colors: {
-      primary: "var(--color-primary)",
-      secondary: "var(--color-secondary)",
-      accent: "var(--color-third)",
-      background: "var(--color-gray-1)",
-      textPrimary: "var(--color-text-primary)",
-      textSecondary: "var(--color-text-secondary)",
-      textHover: "var(--color-text-hover)",
-      border: "var(--color-border)",
-      placeholder: "var(--color-placeholder)",
-      danger: "var(--color-dander)",
-      white: "var(--color-white)",
-    },
     extend: {
+      colors: {
+        primary: "var(--color-primary)",
+        secondary: "var(--color-secondary)",
+        accent: "var(--color-third)",
+        background: "var(--color-gray-1)",
+        textPrimary: "var(--color-text-primary)",
+        textSecondary: "var(--color-text-secondary)",
+        textHover: "var(--color-text-hover)",
+        border: "var(--color-border)",
+        placeholder: "var(--color-placeholder)",
+        danger: "var(--color-dander)",
+        white: "var(--color-white)",
+      },
       fontSize: {
         xxs: "10px",
         xs: "12px",
@@ -36,8 +36,8 @@ export default {
       },
       keyframes: {
         appear: {
-          "0%": { opacity: "0" },
-          "100%": { opacity: "1" },
+          "0%": {opacity: "0"},
+          "100%": {opacity: "1"},
         },
       },
       animation: {

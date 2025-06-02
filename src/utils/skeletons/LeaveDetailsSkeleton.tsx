@@ -1,39 +1,34 @@
-import { PageSubHeading } from "@/components";
+import {PageSubHeading} from "@/components";
 import React from "react";
 
 export default function LeaveDetailsSkeleton() {
   return (
     <div>
       <div>
-        <div className="space-y-6 animate-pulse">
-          <h1 className="text-[32px] font-semibold uppercase">
-            Leave Request Details
-          </h1>
+        <div className="animate-pulse space-y-6">
+          <h1 className="text-[32px] font-semibold uppercase">Leave Request Details</h1>
           <div>
-            <div className="h-4 w-64 bg-border rounded mb-2" />
-            <div className="h-4 w-32 bg-border rounded mb-2" />
-            <div className="h-3 w-80 bg-border rounded mb-2" />
+            <div className="mb-2 h-4 w-64 rounded bg-border" />
+            <div className="mb-2 h-4 w-32 rounded bg-border" />
+            <div className="mb-2 h-3 w-80 rounded bg-border" />
           </div>
 
           <div>
             <PageSubHeading heading="Leave Days" />
-            <ul className="flex flex-col gap-2 mt-2">
+            <ul className="mt-2 flex flex-col gap-2">
               {[...Array(3)].map((_, i) => (
-                <li key={i} className="h-4 w-72 bg-border rounded" />
+                <li key={i} className="h-4 w-72 rounded bg-border" />
               ))}
             </ul>
           </div>
 
           <div>
             <PageSubHeading heading="Documents" />
-            <div className="flex flex-col gap-4 mt-2">
+            <div className="mt-2 flex flex-col gap-4">
               {[...Array(2)].map((_, i) => (
-                <div
-                  key={i}
-                  className="border border-border rounded-md p-2 space-y-2"
-                >
-                  <div className="w-full h-[20px] bg-border rounded" />
-                  <div className="h-3 w-20 bg-border rounded" />
+                <div key={i} className="space-y-2 rounded-md border border-border p-2">
+                  <div className="h-[20px] w-full rounded bg-border" />
+                  <div className="h-3 w-20 rounded bg-border" />
                 </div>
               ))}
             </div>
@@ -41,10 +36,10 @@ export default function LeaveDetailsSkeleton() {
 
           <hr className="border-t border-border" />
 
-          <div className="flex justify-end gap-2 w-full">
-            <div className="flex gap-5 max-w-[200px]">
-              <div className="h-10 w-20 bg-border rounded" />
-              <div className="h-10 w-20 bg-border rounded" />
+          <div className="flex w-full justify-end gap-2">
+            <div className="flex max-w-[200px] gap-5">
+              <div className="h-10 w-20 rounded bg-border" />
+              <div className="h-10 w-20 rounded bg-border" />
             </div>
           </div>
         </div>

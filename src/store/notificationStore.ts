@@ -1,5 +1,5 @@
 // stores/notificationStore.ts
-import { create } from "zustand";
+import {create} from "zustand";
 
 type NotificationType = "success" | "error" | "info";
 
@@ -16,6 +16,6 @@ type NotificationStore = {
 
 export const useNotificationStore = create<NotificationStore>((set) => ({
   notification: null,
-  showNotification: (notification) => set({ notification }),
-  clearNotification: () => set({ notification: null }),
+  showNotification: (notification) => set({notification}),
+  clearNotification: () => set({notification: null}),
 }));

@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
-import { useNotificationStore } from "@/store/notificationStore";
-import { CheckCircle, AlertCircle, Info } from "react-feather";
-import { cn } from "@/utils/cn";
+import {useEffect, useState} from "react";
+import {useNotificationStore} from "@/store/notificationStore";
+import {CheckCircle, AlertCircle, Info} from "react-feather";
+import {cn} from "@/utils/cn";
 
 export const Notification = () => {
-  const { notification, clearNotification } = useNotificationStore();
+  const {notification, clearNotification} = useNotificationStore();
   const [show, setShow] = useState(false);
 
   useEffect(() => {
@@ -22,7 +22,7 @@ export const Notification = () => {
 
   if (!notification) return null;
 
-  const { message, type } = notification;
+  const {message, type} = notification;
 
   const iconMap = {
     success: <CheckCircle className="text-white" />,
@@ -31,14 +31,14 @@ export const Notification = () => {
   };
 
   return (
-    <div className="relative  z-60 overflow-hidden">
+    <div className="z-60 relative overflow-hidden">
       <div
         className={cn(
-          "flex items-center gap-3 px-6 py-4 rounded-xl shadow-lg transform transition-all duration-300 ease-out fixed top-6 right-6 z-[100]",
+          "fixed right-6 top-6 z-[100] flex transform items-center gap-3 rounded-xl px-6 py-4 shadow-lg transition-all duration-300 ease-out",
           show ? "translate-x-0 opacity-100" : "translate-x-full opacity-0",
-          type === "success" && "bg-primary border border-primary",
-          type === "error" && "bg-danger border border-danger",
-          type === "info" && "bg-secondary border border-secondary"
+          type === "success" && "border border-primary bg-primary",
+          type === "error" && "border border-danger bg-danger",
+          type === "info" && "border border-secondary bg-secondary",
         )}
       >
         {iconMap[type]}

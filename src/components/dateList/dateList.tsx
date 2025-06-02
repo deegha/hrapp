@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { PageSubHeading } from "@/components";
+import React, {useEffect} from "react";
+import {PageSubHeading} from "@/components";
 
 interface DateRange {
   start: Date | null;
@@ -8,24 +8,20 @@ interface DateRange {
 
 interface DateListProps {
   selectedRange: DateRange;
-  onDateSelect: (dates: { date: Date; half: "AM" | "PM" | null }[]) => void;
-  dateList: { date: Date; half: "AM" | "PM" | null }[];
+  onDateSelect: (dates: {date: Date; half: "AM" | "PM" | null}[]) => void;
+  dateList: {date: Date; half: "AM" | "PM" | null}[];
 }
 
-export const DateList: React.FC<DateListProps> = ({
-  selectedRange,
-  onDateSelect,
-  dateList,
-}) => {
+export const DateList: React.FC<DateListProps> = ({selectedRange, onDateSelect, dateList}) => {
   useEffect(() => {
     if (selectedRange.start && selectedRange.end) {
       const startDate = new Date(selectedRange.start);
       const endDate = new Date(selectedRange.end);
       const currentDate = new Date(startDate);
-      const dates: { date: Date; half: "AM" | "PM" | null }[] = [];
+      const dates: {date: Date; half: "AM" | "PM" | null}[] = [];
 
       while (currentDate <= endDate) {
-        dates.push({ date: new Date(currentDate), half: null });
+        dates.push({date: new Date(currentDate), half: null});
         currentDate.setDate(currentDate.getDate() + 1);
       }
 
@@ -38,14 +34,14 @@ export const DateList: React.FC<DateListProps> = ({
 
   const handleCheckboxChange = (index: number, half: "AM" | "PM") => {
     const updatedList = dateList.map((item, i) =>
-      i === index ? { ...item, half: item.half === half ? null : half } : item
+      i === index ? {...item, half: item.half === half ? null : half} : item,
     );
 
     onDateSelect(updatedList);
   };
 
   return (
-    <div className="flex flex-col gap-5 animate-appear">
+    <div className="flex animate-appear flex-col gap-5">
       <PageSubHeading heading="Half day requests (If any)" />
       <ul className="flex flex-col gap-2">
         {dateList.map((item, index) => (
@@ -53,16 +49,16 @@ export const DateList: React.FC<DateListProps> = ({
             <div className="w-[150px]">{item.date.toDateString()}</div>
             <div className="flex items-center gap-2">
               <input
-                className="cursor-pointer accent-primary h-4 w-4 "
+                className="size-4 cursor-pointer accent-primary"
                 type="checkbox"
                 checked={item.half === "AM"}
                 onChange={() => handleCheckboxChange(index, "AM")}
               />
               <p>(AM)</p>
             </div>
-            <div className="flex items-center gap-2 ">
+            <div className="flex items-center gap-2">
               <input
-                className="cursor-pointer accent-primary  h-4 w-4 "
+                className="size-4 cursor-pointer accent-primary"
                 type="checkbox"
                 checked={item.half === "PM"}
                 onChange={() => handleCheckboxChange(index, "PM")}

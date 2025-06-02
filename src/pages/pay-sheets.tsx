@@ -1,5 +1,5 @@
-import { Layout } from "@/components";
-import { UserPaySheets } from "@/views";
+import {Layout} from "@/components";
+import {UserPaySheets} from "@/views";
 
 export default function Home() {
   return (

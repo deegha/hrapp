@@ -1,21 +1,21 @@
-import { Layout, PageLayout, Button, Shimmer } from "@/components";
-import { useForm, FormProvider } from "react-hook-form";
-import { FormInput } from "@/components";
-import { editUserSchema } from "@/utils/formvalidations/userSchema";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { useNotificationStore } from "@/store/notificationStore";
-import { useEffect, useState } from "react";
-import { fetchUser, updateMyProfile } from "@/services";
-import { TUpdateUser } from "@/types";
-import { getAuthUser } from "@/utils/getAuthUser";
+import {Layout, PageLayout, Button, Shimmer} from "@/components";
+import {useForm, FormProvider} from "react-hook-form";
+import {FormInput} from "@/components";
+import {editUserSchema} from "@/utils/formvalidations/userSchema";
+import {yupResolver} from "@hookform/resolvers/yup";
+import {useNotificationStore} from "@/store/notificationStore";
+import {useEffect, useState} from "react";
+import {fetchUser, updateMyProfile} from "@/services";
+import {TUpdateUser} from "@/types";
+import {getAuthUser} from "@/utils/getAuthUser";
 import useSWR from "swr";
 
 export default function EditProfile() {
-  const { showNotification } = useNotificationStore();
+  const {showNotification} = useNotificationStore();
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const { data: userData } = useSWR(`fetch-auth-user`, async () => {
+  const {data: userData} = useSWR(`fetch-auth-user`, async () => {
     const userSummary = await getAuthUser();
 
     if (!userSummary) return;
@@ -70,19 +70,12 @@ export default function EditProfile() {
     <Layout>
       <PageLayout pageName="Edit Profile">
         <FormProvider {...methods}>
-          <form
-            onSubmit={methods.handleSubmit(onSubmit)}
-            className="max-w-2xl flex flex-col gap-5"
-          >
+          <form onSubmit={methods.handleSubmit(onSubmit)} className="flex max-w-2xl flex-col gap-5">
             <FormInput name="firstName" label="First Name" />
             <FormInput name="lastName" label="Last Name" />
             <FormInput name="email" label="Email" type="email" disabled />
 
-            <Button
-              loading={isLoading}
-              type="submit"
-              disabled={!methods.formState.isValid}
-            >
+            <Button loading={isLoading} type="submit" disabled={!methods.formState.isValid}>
               Save Changes
             </Button>
           </form>

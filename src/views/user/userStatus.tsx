@@ -1,12 +1,9 @@
-import { fetchUserStatus } from "@/services/";
-import { FormSelect } from "@/components";
+import {fetchUserStatus} from "@/services/";
+import {FormSelect} from "@/components";
 import useSWR from "swr";
 
 export function UserStatus() {
-  const { error, data, isLoading } = useSWR(
-    "fetch-use-status",
-    fetchUserStatus
-  );
+  const {error, data, isLoading} = useSWR("fetch-use-status", fetchUserStatus);
 
   if (error || !data) {
     return <div>Loading...</div>;
@@ -16,13 +13,9 @@ export function UserStatus() {
   }
 
   const options = data?.data?.map((status) => ({
-    label: status?.statusLabel
-      .toLowerCase()
-      .replace(/^\w/, (c) => c.toUpperCase()),
+    label: status?.statusLabel.toLowerCase().replace(/^\w/, (c) => c.toUpperCase()),
     value: status.id,
   }));
 
-  return (
-    <FormSelect name="userStatusId" label="User Status" options={options} />
-  );
+  return <FormSelect name="userStatusId" label="User Status" options={options} />;
 }

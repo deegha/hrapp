@@ -29,6 +29,7 @@ const eslintConfig = [
     plugins: ["tailwindcss"],
     rules: {
       "tailwindcss/classnames-order": "off", // Prettier handles this
+      "tailwindcss/no-custom-classname": "off",
     },
   }),
 ];
