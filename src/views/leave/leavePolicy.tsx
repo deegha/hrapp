@@ -1,9 +1,10 @@
-import {Button, PageLayout, PolicySection, InputField} from "@/components";
+import {Button, PageLayout, PolicySection, InputField, FormSelect} from "@/components";
 import {useState, useEffect} from "react";
 import useSWR from "swr";
 import {fetchLeavePolicies, updateLeavePolicy} from "@/services";
 import {TLeavePolicy} from "@/types";
 import {useNotificationStore} from "@/store/notificationStore";
+import {FormProvider, useForm} from "react-hook-form";
 
 export function LeavePolicies() {
   const [edit, setEdit] = useState(false);
@@ -11,6 +12,12 @@ export function LeavePolicies() {
   const [policies, setPolicies] = useState<TLeavePolicy[]>([]);
   const [loading, setLoading] = useState(false);
   const {showNotification} = useNotificationStore();
+
+  // Local state for temporary changes during editing
+  const [tempPolicies, setTempPolicies] = useState<TLeavePolicy[]>([]);
+
+  // Create form methods for the FormSelect component
+  const formMethods = useForm();
 
   const {data, isLoading, mutate} = useSWR("leave-policies", async () => {
     const response = await fetchLeavePolicies();
@@ -20,41 +27,92 @@ export function LeavePolicies() {
   useEffect(() => {
     if (data) {
       setPolicies(data);
+      setTempPolicies(data); // Initialize temp state with current data
     }
   }, [data]);
 
-  const handlePolicyUpdate = async (
+  // Update form values when tempPolicies change
+  useEffect(() => {
+    if (tempPolicies.length > 0) {
+      // Set default values for each dropdown
+      const defaultValues: Record<string, string> = {};
+
+      tempPolicies.forEach((policy) => {
+        defaultValues[`accrual-${policy.id}`] = policy.accrualType;
+        defaultValues[`carryForward-${policy.id}`] = policy.canCarryForward.toString();
+      });
+
+      formMethods.reset(defaultValues);
+    }
+  }, [tempPolicies, formMethods]);
+
+  const handleLocalPolicyUpdate = (
     policyId: number,
     field: keyof TLeavePolicy,
     value: string | number | boolean,
   ) => {
+    // Update only local temp state, don't save to server
+    setTempPolicies((prev) =>
+      prev.map((policy) => (policy.id === policyId ? {...policy, [field]: value} : policy)),
+    );
+  };
+
+  const saveChanges = async () => {
     try {
       setLoading(true);
-      const updateData: Record<string, unknown> & {id: number} = {id: policyId};
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (updateData as any)[field] = value;
 
-      await updateLeavePolicy(updateData);
+      // Get form values and update tempPolicies before saving
+      const formValues = formMethods.getValues();
 
-      // Update local state
-      setPolicies((prev) =>
-        prev.map((policy) => (policy.id === policyId ? {...policy, [field]: value} : policy)),
-      );
+      // Update tempPolicies with form values
+      const updatedPolicies = tempPolicies.map((policy) => {
+        const accrualValue = formValues[`accrual-${policy.id}`];
+        const carryForwardValue = formValues[`carryForward-${policy.id}`] === "true";
+
+        return {
+          ...policy,
+          accrualType: accrualValue,
+          canCarryForward: carryForwardValue,
+        };
+      });
+
+      setTempPolicies(updatedPolicies);
+
+      // Find policies that have changed
+      const changedPolicies = updatedPolicies.filter((tempPolicy) => {
+        const originalPolicy = policies.find((p) => p.id === tempPolicy.id);
+        return originalPolicy && JSON.stringify(tempPolicy) !== JSON.stringify(originalPolicy);
+      });
+
+      // Update each changed policy
+      for (const policy of changedPolicies) {
+        await updateLeavePolicy(policy);
+      }
+
+      // Update the main state with temp changes
+      setPolicies(updatedPolicies);
 
       showNotification({
-        message: "Leave policy updated successfully!",
+        message: "Leave policies updated successfully!",
         type: "success",
       });
 
       mutate(); // Refresh data
+      setEdit(false); // Exit edit mode
     } catch {
       showNotification({
-        message: "Failed to update leave policy",
+        message: "Failed to update leave policies",
         type: "error",
       });
     } finally {
       setLoading(false);
     }
+  };
+
+  const cancelEdit = () => {
+    // Reset temp state to original data
+    setTempPolicies(policies);
+    setEdit(false);
   };
 
   if (isLoading) {
@@ -65,8 +123,11 @@ export function LeavePolicies() {
     );
   }
 
+  // Use tempPolicies for display during edit mode
+  const displayPolicies = edit ? tempPolicies : policies;
+
   // Transform policies to display format
-  const entitlements = policies.map((policy) => ({
+  const entitlements = displayPolicies.map((policy) => ({
     id: policy.id,
     item: policy.name,
     value: `${policy.daysPerYear} days per year`,
@@ -74,43 +135,45 @@ export function LeavePolicies() {
       <InputField
         value={policy.daysPerYear.toString()}
         onChange={(e) =>
-          handlePolicyUpdate(policy.id, "daysPerYear", parseInt(e.target.value) || 0)
+          handleLocalPolicyUpdate(policy.id, "daysPerYear", parseInt(e.target.value) || 0)
         }
       />
     ),
   }));
 
-  const accrual = policies.map((policy) => ({
+  const accrualOptions = [
+    {label: "All from Day 1", value: "ALL_FROM_DAY_1"},
+    {label: "Half Day per Month", value: "HALF_DAY_PER_MONTH"},
+  ];
+
+  const accrual = displayPolicies.map((policy) => ({
     id: policy.id,
     item: `${policy.name} Accrual Type`,
     value: policy.accrualType === "ALL_FROM_DAY_1" ? "All from Day 1" : "Half Day per Month",
     editValue: (
-      <select
-        value={policy.accrualType}
-        onChange={(e) => handlePolicyUpdate(policy.id, "accrualType", e.target.value)}
-        className="rounded border px-2 py-1"
-      >
-        <option value="ALL_FROM_DAY_1">All from Day 1</option>
-        <option value="HALF_DAY_PER_MONTH">Half Day per Month</option>
-      </select>
+      <div className="w-full">
+        <FormProvider {...formMethods}>
+          <FormSelect name={`accrual-${policy.id}`} label="" options={accrualOptions} />
+        </FormProvider>
+      </div>
     ),
   }));
 
-  const carryForward = policies.map((policy) => ({
+  const carryForwardOptions = [
+    {label: "Allowed", value: "true"},
+    {label: "Not Allowed", value: "false"},
+  ];
+
+  const carryForward = displayPolicies.map((policy) => ({
     id: policy.id,
     item: `${policy.name} Carry Forward`,
     value: policy.canCarryForward ? "Allowed" : "Not Allowed",
     editValue: (
-      <select
-        value={policy.canCarryForward.toString()}
-        onChange={(e) =>
-          handlePolicyUpdate(policy.id, "canCarryForward", e.target.value === "true")
-        }
-        className="rounded border px-2 py-1"
-      >
-        <option value="true">Allowed</option>
-        <option value="false">Not Allowed</option>
-      </select>
+      <div className="w-full">
+        <FormProvider {...formMethods}>
+          <FormSelect name={`carryForward-${policy.id}`} label="" options={carryForwardOptions} />
+        </FormProvider>
+      </div>
     ),
   }));
 
@@ -144,10 +207,25 @@ export function LeavePolicies() {
         <PolicySection edit={edit} title="Leave Approval Workflows" items={leaveApprovalWorkflow} />
         <PolicySection edit={edit} title="Restricted Leave Periods" items={restricted} />
 
-        <div className="w-20">
-          <Button onClick={() => setEdit(!edit)} loading={loading}>
-            {edit ? "Save" : "Edit"}
-          </Button>
+        <div className="flex gap-3">
+          {edit ? (
+            <>
+              <div className="w-20">
+                <Button onClick={saveChanges} loading={loading}>
+                  Save
+                </Button>
+              </div>
+              <div className="w-20">
+                <Button onClick={cancelEdit} variant="secondary" disabled={loading}>
+                  Cancel
+                </Button>
+              </div>
+            </>
+          ) : (
+            <div className="w-20">
+              <Button onClick={() => setEdit(true)}>Edit</Button>
+            </div>
+          )}
         </div>
       </div>
     </PageLayout>
