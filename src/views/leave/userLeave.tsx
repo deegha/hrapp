@@ -4,7 +4,7 @@ import useSWR from "swr";
 import {fetchLeave} from "@/services/";
 import {format} from "date-fns";
 
-import {leaveTypes} from "@/utils/staticValues";
+import {useLeaveTypes} from "@/hooks/useLeaveTypes";
 import {usePagination} from "@/hooks/usePagination";
 import moment from "moment";
 import {useLeaveRequestStore} from "@/store/leaveStore";
@@ -16,6 +16,7 @@ export function UserLeave() {
   const {setActiveLeaveRequest, leaveRequest, unsetActiveLeaveRequest} = useLeaveRequestStore();
   const {activePage} = usePagination();
   const router = useRouter();
+  const {leaveTypes} = useLeaveTypes();
   const {data} = useSWR(
     `fetch-leaves-${activePage}`,
     async () => await fetchLeave({page: parseInt(activePage), limit: 6}),
@@ -60,7 +61,7 @@ export function UserLeave() {
                     <div className="text-xs text-textPrimary">
                       Type:{" "}
                       {leaveTypes.filter((type) => parseInt(type.value) === firstLeave.leaveType)[0]
-                        .label || "Unknown"}
+                        ?.label || "Unknown"}
                     </div>
                     <div className="text-xs text-textSecondary">
                       {firstLeave?.halfDay

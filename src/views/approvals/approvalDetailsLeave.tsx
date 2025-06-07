@@ -3,12 +3,13 @@ import {fetchLeaveRequest} from "@/services";
 import useSWR from "swr";
 import {Button, StatusTag} from "@/components";
 import moment from "moment";
-import {leaveTypes} from "@/utils/staticValues";
+import {useLeaveTypes} from "@/hooks/useLeaveTypes";
 import {Check, Trash, Paperclip} from "react-feather";
 
 import {useApproval} from "./useApprove";
 export function ApprovalDetailsLeave() {
   const {approval} = useApprovalStore();
+  const {leaveTypes} = useLeaveTypes();
 
   const {handleApproval, loading, handleConfirmation} = useApproval();
 
@@ -42,8 +43,9 @@ export function ApprovalDetailsLeave() {
         <h2>Leave dates</h2>
         {leaveRequest?.leaves?.map((leave) => (
           <div key={leave.leaveDate} className="text-sm text-textSecondary">
-            {leaveTypes.filter((type) => parseInt(type.value) === leave.leaveType)[0].label} -{" "}
-            {moment(leave.leaveDate).format("YYYY-DD-MM")}
+            {leaveTypes.filter((type) => parseInt(type.value) === leave.leaveType)[0]?.label ||
+              "Unknown"}{" "}
+            - {moment(leave.leaveDate).format("YYYY-DD-MM")}
             {leave.halfDay && `- Half day ${leave.halfDay}`}
           </div>
         ))}

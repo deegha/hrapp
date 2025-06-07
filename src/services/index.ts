@@ -11,3 +11,5 @@ export {
 } from "./userService";
 export {getNavigationItems} from "./uiService";
 export {createLeaveRequest, fetchLeave, fetchLeaveRequest, fetchMyLeave} from "./leaveService";
+export {approvalService, approveRequest} from "./approvalService";
+export {fetchLeaveTypes, fetchLeavePolicies, updateLeavePolicy} from "./organizationService";

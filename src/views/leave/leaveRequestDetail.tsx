@@ -4,11 +4,12 @@ import useSWR from "swr";
 import {fetchMyLeave} from "@/services";
 import {format} from "date-fns";
 import {Button, StatusTag} from "@/components";
-import {leaveTypes} from "@/utils/staticValues";
+import {useLeaveTypes} from "@/hooks/useLeaveTypes";
 import LeaveDetailsSkeleton from "@/utils/skeletons/LeaveDetailsSkeleton";
 
 export function LeaveRequestDetails({leaveRequestId}: {leaveRequestId: number}) {
   const id = leaveRequestId;
+  const {leaveTypes} = useLeaveTypes();
   const {data, isLoading} = useSWR(id ? `leaveRequest-${id}` : null, () =>
     fetchMyLeave(id.toString()),
   );
@@ -46,7 +47,8 @@ export function LeaveRequestDetails({leaveRequestId}: {leaveRequestId: number}) 
           {sortedLeaves.map((leave) => (
             <li key={leave.id}>
               {format(new Date(leave.leaveDate), "dd MMM yyyy")} -{" "}
-              {leaveTypes[leave.leaveType].label || "Unknown"}{" "}
+              {leaveTypes.filter((type) => parseInt(type.value) === leave.leaveType)[0]?.label ||
+                "Unknown"}{" "}
               {leave.halfDay && `(Half Day: ${leave.halfDay === "AM" ? "Morning" : "Evening"})`}
             </li>
           ))}

@@ -1,14 +1,19 @@
 import {useState} from "react";
 import {useNotificationStore} from "@/store/notificationStore";
 import {createLeaveRequest} from "@/services";
-import {leaveTypes} from "@/utils/staticValues";
+import {useLeaveTypes} from "@/hooks/useLeaveTypes";
 
 export function useLeave() {
+  const {leaveTypes} = useLeaveTypes();
+
   const [selectedRange, setSelectedRange] = useState<{
     start: Date | null;
     end: Date | null;
   }>({start: null, end: null});
-  const [leaveType, setSelectedLeaveType] = useState(leaveTypes[0]);
+  const [leaveType, setSelectedLeaveType] = useState<{label: string; value: string}>({
+    label: "",
+    value: "",
+  });
   const [notes, setNotes] = useState("");
   const [selectedDates, setSelectedDates] = useState<
     Array<{
@@ -19,6 +24,14 @@ export function useLeave() {
   const [documents, setDocuments] = useState<Array<string>>();
   const {showNotification} = useNotificationStore();
   const [loading, setLoading] = useState(false);
+
+  // Update selected leave type when leave types are loaded
+  useState(() => {
+    if (leaveTypes.length > 0 && !leaveType.value) {
+      setSelectedLeaveType({label: leaveTypes[0].label, value: leaveTypes[0].value});
+    }
+  });
+
   const handleDocumentUpload = (url: string) => {
     if (!url) {
       showNotification({
@@ -77,7 +90,11 @@ export function useLeave() {
   const cleanForm = () => {
     setDocuments([]);
     setSelectedDates([]);
-    setSelectedLeaveType(leaveTypes[0]);
+    setSelectedLeaveType(
+      leaveTypes.length > 0
+        ? {label: leaveTypes[0].label, value: leaveTypes[0].value}
+        : {label: "", value: ""},
+    );
     setSelectedRange({start: null, end: null});
   };
 
@@ -94,5 +111,6 @@ export function useLeave() {
     notes,
     leaveType,
     setSelectedLeaveType,
+    leaveTypes,
   };
 }
