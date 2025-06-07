@@ -9,7 +9,6 @@ import {
   TextArea,
 } from "@/components";
 import {useLeave} from "./useLeave";
-import {leaveTypes} from "@/utils/staticValues";
 
 export function ApplyLeave() {
   const {
@@ -24,6 +23,7 @@ export function ApplyLeave() {
     notes,
     leaveType,
     setSelectedLeaveType,
+    leaveTypes,
   } = useLeave();
   const isFormDisabled = selectedDates.length === 0;
 
