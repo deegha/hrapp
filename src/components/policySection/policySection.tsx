@@ -19,7 +19,7 @@ export function PolicySection(props: IPolicySection) {
         {props.items.map((item) => (
           <div key={item.id} className="flex items-center gap-5 border-t border-border py-2">
             <div className="w-[350px] text-sm text-textSecondary">{item.item}</div>
-            <div className={`text-sm text-black ${props.edit ? "" : "p-2"} `}>
+            <div className={`text-sm text-black ${props.edit ? "w-[200px]" : "p-2"}`}>
               {props.edit ? item.editValue : item.value}
             </div>
           </div>
