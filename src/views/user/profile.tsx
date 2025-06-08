@@ -3,6 +3,7 @@ import {fetchUser} from "@/services";
 import {getAuthUser} from "@/utils/getAuthUser";
 import useSWR from "swr";
 import Link from "next/link";
+import {roles} from "@/utils/staticValues";
 
 export function UserProfile() {
   const {data: userData} = useSWR(`fetch-auth-user`, async () => {
@@ -16,6 +17,8 @@ export function UserProfile() {
   if (!userData) return <Shimmer />;
 
   const user = userData?.data;
+
+  const userLevel = roles[user.userLevel as keyof typeof roles] || user.userLevel;
 
   return (
     <PageLayout
@@ -32,7 +35,7 @@ export function UserProfile() {
           <div>
             <ProfileRow label="Name" value={`${user.firstName} ${user.lastName}`} />
             <ProfileRow label="Email" value={user.email} />
-            <ProfileRow label="User Level" value={user.userStatusId.toString()} />
+            <ProfileRow label="User Level" value={userLevel} />
             <ProfileRow
               label="Status"
               value={
@@ -43,7 +46,10 @@ export function UserProfile() {
                 )
               }
             />
-            <ProfileRow label="Employee ID" value={user.employeeId?.toString() ?? "N/A"} />
+            <ProfileRow
+              label="Employee ID"
+              value={user.employeeId?.toString() ? `EMP-${user.employeeId?.toString()}` : "N/A"}
+            />
 
             <ProfileRow label="Joined At" value={new Date(user.createdAt).toLocaleDateString()} />
           </div>
