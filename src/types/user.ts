@@ -39,6 +39,7 @@ export type TAllUserDetails = TUser & {
     salary: number;
     userId: number;
   } | null;
+  userLevel: string;
   skills: {
     id: number;
     skillName: number;
