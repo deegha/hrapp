@@ -1,5 +1,12 @@
 import {serviceHandler} from "@/utils/serviceHandler";
-import {TLeaves, LeaveRequest, TResponse, TGenericFilters, TResponseWithPagination} from "@/types";
+import {
+  TLeaves,
+  LeaveRequest,
+  LeaveRequestWithUser,
+  TResponse,
+  TGenericFilters,
+  TResponseWithPagination,
+} from "@/types";
 
 type TCreateLeaveRequestResponse = {
   error: boolean;
@@ -42,5 +49,23 @@ export async function fetchMyLeave(id: string) {
     method: "GET",
     baseURL: process.env.NEXT_PUBLIC_API as string,
     resource: `leave/${id}`,
+  });
+}
+
+export async function fetchLeaveBalance() {
+  return await serviceHandler<
+    TResponse<{yearlyAllowance: number; usedDays: number; remainingDays: number}>
+  >({
+    method: "GET",
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: "leave-balance",
+  });
+}
+
+export async function fetchUpcomingCompanyLeaves() {
+  return await serviceHandler<TResponse<LeaveRequestWithUser[]>>({
+    method: "GET",
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: "upcoming-company-leaves",
   });
 }

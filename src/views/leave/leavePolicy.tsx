@@ -1,10 +1,66 @@
-import {Button, PageLayout, PolicySection, InputField, FormSelect} from "@/components";
+import {Button, PageLayout, PolicySection, InputField} from "@/components";
 import {useState, useEffect} from "react";
 import useSWR from "swr";
 import {fetchLeavePolicies, updateLeavePolicy} from "@/services";
 import {TLeavePolicy} from "@/types";
 import {useNotificationStore} from "@/store/notificationStore";
-import {FormProvider, useForm} from "react-hook-form";
+import {Listbox} from "@headlessui/react";
+import {ChevronDown, Check} from "react-feather";
+import clsx from "clsx";
+
+// Custom dropdown without text truncation
+const PolicyDropdown = ({
+  value,
+  options,
+  onChange,
+}: {
+  value: string;
+  options: {label: string; value: string}[];
+  onChange: (value: string) => void;
+}) => {
+  const selected = options.find((opt) => opt.value === value) || null;
+
+  return (
+    <Listbox value={selected} onChange={(val) => onChange(val?.value || "")}>
+      <div className="relative min-w-[200px]">
+        <Listbox.Button className="relative w-full cursor-default rounded-md border border-border py-2 pl-3 pr-10 text-left text-sm">
+          <span className="block">{selected?.label || "Select option"}</span>
+          <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+            <ChevronDown className="size-4 text-gray-400" />
+          </span>
+        </Listbox.Button>
+        <Listbox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white text-sm shadow-lg ring-1 ring-black/5 focus:outline-none">
+          {options.map((option) => (
+            <Listbox.Option key={option.value} value={option}>
+              {({active, selected}) => (
+                <li
+                  className={clsx(
+                    "relative cursor-pointer select-none list-none py-2 pl-10 pr-4",
+                    active ? "bg-gray-100 text-gray-900" : "text-gray-700",
+                  )}
+                >
+                  <span
+                    className={clsx("block", {
+                      "font-medium": selected,
+                      "font-normal": !selected,
+                    })}
+                  >
+                    {option.label}
+                  </span>
+                  {selected && (
+                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-primary">
+                      <Check size={16} />
+                    </span>
+                  )}
+                </li>
+              )}
+            </Listbox.Option>
+          ))}
+        </Listbox.Options>
+      </div>
+    </Listbox>
+  );
+};
 
 export function LeavePolicies() {
   const [edit, setEdit] = useState(false);
@@ -15,9 +71,6 @@ export function LeavePolicies() {
 
   // Local state for temporary changes during editing
   const [tempPolicies, setTempPolicies] = useState<TLeavePolicy[]>([]);
-
-  // Create form methods for the FormSelect component
-  const formMethods = useForm();
 
   const {data, isLoading, mutate} = useSWR("leave-policies", async () => {
     const response = await fetchLeavePolicies();
@@ -30,21 +83,6 @@ export function LeavePolicies() {
       setTempPolicies(data); // Initialize temp state with current data
     }
   }, [data]);
-
-  // Update form values when tempPolicies change
-  useEffect(() => {
-    if (tempPolicies.length > 0) {
-      // Set default values for each dropdown
-      const defaultValues: Record<string, string> = {};
-
-      tempPolicies.forEach((policy) => {
-        defaultValues[`accrual-${policy.id}`] = policy.accrualType;
-        defaultValues[`carryForward-${policy.id}`] = policy.canCarryForward.toString();
-      });
-
-      formMethods.reset(defaultValues);
-    }
-  }, [tempPolicies, formMethods]);
 
   const handleLocalPolicyUpdate = (
     policyId: number,
@@ -61,25 +99,8 @@ export function LeavePolicies() {
     try {
       setLoading(true);
 
-      // Get form values and update tempPolicies before saving
-      const formValues = formMethods.getValues();
-
-      // Update tempPolicies with form values
-      const updatedPolicies = tempPolicies.map((policy) => {
-        const accrualValue = formValues[`accrual-${policy.id}`];
-        const carryForwardValue = formValues[`carryForward-${policy.id}`] === "true";
-
-        return {
-          ...policy,
-          accrualType: accrualValue,
-          canCarryForward: carryForwardValue,
-        };
-      });
-
-      setTempPolicies(updatedPolicies);
-
       // Find policies that have changed
-      const changedPolicies = updatedPolicies.filter((tempPolicy) => {
+      const changedPolicies = tempPolicies.filter((tempPolicy) => {
         const originalPolicy = policies.find((p) => p.id === tempPolicy.id);
         return originalPolicy && JSON.stringify(tempPolicy) !== JSON.stringify(originalPolicy);
       });
@@ -90,7 +111,7 @@ export function LeavePolicies() {
       }
 
       // Update the main state with temp changes
-      setPolicies(updatedPolicies);
+      setPolicies(tempPolicies);
 
       showNotification({
         message: "Leave policies updated successfully!",
@@ -151,10 +172,12 @@ export function LeavePolicies() {
     item: `${policy.name} Accrual Type`,
     value: policy.accrualType === "ALL_FROM_DAY_1" ? "All from Day 1" : "Half Day per Month",
     editValue: (
-      <div className="w-full">
-        <FormProvider {...formMethods}>
-          <FormSelect name={`accrual-${policy.id}`} label="" options={accrualOptions} />
-        </FormProvider>
+      <div className="w-fit min-w-[200px]">
+        <PolicyDropdown
+          value={policy.accrualType}
+          options={accrualOptions}
+          onChange={(value) => handleLocalPolicyUpdate(policy.id, "accrualType", value)}
+        />
       </div>
     ),
   }));
@@ -169,10 +192,14 @@ export function LeavePolicies() {
     item: `${policy.name} Carry Forward`,
     value: policy.canCarryForward ? "Allowed" : "Not Allowed",
     editValue: (
-      <div className="w-full">
-        <FormProvider {...formMethods}>
-          <FormSelect name={`carryForward-${policy.id}`} label="" options={carryForwardOptions} />
-        </FormProvider>
+      <div className="w-fit min-w-[200px]">
+        <PolicyDropdown
+          value={policy.canCarryForward.toString()}
+          options={carryForwardOptions}
+          onChange={(value) =>
+            handleLocalPolicyUpdate(policy.id, "canCarryForward", value === "true")
+          }
+        />
       </div>
     ),
   }));

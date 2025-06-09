@@ -49,3 +49,11 @@ export type Document = {
   fileUrl: string;
   createdAt: string;
 };
+
+export type LeaveRequestWithUser = LeaveRequest & {
+  user?: {
+    firstName: string;
+    lastName: string;
+    employeeId: number;
+  };
+};

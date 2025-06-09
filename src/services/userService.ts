@@ -117,3 +117,11 @@ export async function updateMyProfile(user: TUpdateUser) {
     body: user,
   });
 }
+
+export async function fetchMyPermissions() {
+  return serviceHandler<TResponse<{permission: string | null}>>({
+    method: "GET",
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: "my-permission",
+  });
+}
