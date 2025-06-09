@@ -2,9 +2,13 @@ import {useState} from "react";
 import {useNotificationStore} from "@/store/notificationStore";
 import {createLeaveRequest} from "@/services";
 import {useLeaveTypes} from "@/hooks/useLeaveTypes";
+import {useLeaveBalance} from "@/hooks/useLeaveBalance";
+import {useBookedDates} from "@/hooks/useBookedDates";
 
 export function useLeave() {
   const {leaveTypes} = useLeaveTypes();
+  const {leaveBalance} = useLeaveBalance();
+  const {bookedDates} = useBookedDates();
 
   const [selectedRange, setSelectedRange] = useState<{
     start: Date | null;
@@ -47,6 +51,23 @@ export function useLeave() {
   };
 
   const onSubmit = async () => {
+    // Check if selected leave type has remaining days
+    const selectedLeaveTypeBalance = leaveBalance?.leaveTypeBalances?.find(
+      (balance) => balance.id === parseInt(leaveType.value),
+    );
+
+    const requestedDays = selectedDates.reduce((total, date) => {
+      return total + (date.half ? 0.5 : 1);
+    }, 0);
+
+    if (selectedLeaveTypeBalance && selectedLeaveTypeBalance.remainingDays < requestedDays) {
+      showNotification({
+        message: `Insufficient ${selectedLeaveTypeBalance.name} balance. You have ${selectedLeaveTypeBalance.remainingDays} days remaining but requested ${requestedDays} days.`,
+        type: "error",
+      });
+      return;
+    }
+
     setLoading(true);
     try {
       const leaves = selectedDates.map((date) => ({
@@ -98,6 +119,17 @@ export function useLeave() {
     setSelectedRange({start: null, end: null});
   };
 
+  const getSelectedLeaveTypeBalance = () => {
+    return leaveBalance?.leaveTypeBalances?.find(
+      (balance) => balance.id === parseInt(leaveType.value),
+    );
+  };
+
+  const hasNoRemainingDays = () => {
+    const balance = getSelectedLeaveTypeBalance();
+    return balance && balance.remainingDays <= 0;
+  };
+
   return {
     handleDocumentUpload,
     onSubmit,
@@ -112,5 +144,9 @@ export function useLeave() {
     leaveType,
     setSelectedLeaveType,
     leaveTypes,
+    leaveBalance,
+    bookedDates,
+    getSelectedLeaveTypeBalance,
+    hasNoRemainingDays,
   };
 }

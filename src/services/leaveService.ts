@@ -54,7 +54,18 @@ export async function fetchMyLeave(id: string) {
 
 export async function fetchLeaveBalance() {
   return await serviceHandler<
-    TResponse<{yearlyAllowance: number; usedDays: number; remainingDays: number}>
+    TResponse<{
+      yearlyAllowance: number;
+      usedDays: number;
+      remainingDays: number;
+      leaveTypeBalances: Array<{
+        id: number;
+        name: string;
+        yearlyAllowance: number;
+        usedDays: number;
+        remainingDays: number;
+      }>;
+    }>
   >({
     method: "GET",
     baseURL: process.env.NEXT_PUBLIC_API as string,
@@ -67,5 +78,22 @@ export async function fetchUpcomingCompanyLeaves() {
     method: "GET",
     baseURL: process.env.NEXT_PUBLIC_API as string,
     resource: "upcoming-company-leaves",
+  });
+}
+
+export async function fetchUserBookedDates() {
+  return await serviceHandler<
+    TResponse<{
+      bookedDates: Array<{
+        date: string;
+        status: string;
+        halfDay: string | null;
+        leaveType: number;
+      }>;
+    }>
+  >({
+    method: "GET",
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: "user-booked-dates",
   });
 }

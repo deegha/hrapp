@@ -2,11 +2,19 @@ import React, {useState} from "react";
 import {format, addMonths, subMonths} from "date-fns";
 import {ChevronLeft, ChevronRight} from "react-feather";
 
-interface IDatePickerProps {
-  onRangeChange?: (range: {start: Date | null; end: Date | null}) => void;
+interface BookedDate {
+  date: string;
+  status: string;
+  halfDay: string | null;
+  leaveType: number;
 }
 
-export const DatePicker: React.FC<IDatePickerProps> = ({onRangeChange}) => {
+interface IDatePickerProps {
+  onRangeChange?: (range: {start: Date | null; end: Date | null}) => void;
+  bookedDates?: BookedDate[];
+}
+
+export const DatePicker: React.FC<IDatePickerProps> = ({onRangeChange, bookedDates = []}) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedRange, setSelectedRange] = useState<{
     start: Date | null;
@@ -60,6 +68,16 @@ export const DatePicker: React.FC<IDatePickerProps> = ({onRangeChange}) => {
     return false;
   };
 
+  const getDateStatus = (date: Date) => {
+    const dateString = date.toISOString().split("T")[0];
+    const bookedDate = bookedDates.find((bd) => bd.date.split("T")[0] === dateString);
+    return bookedDate?.status || null;
+  };
+
+  const isDateBooked = (date: Date) => {
+    return getDateStatus(date) !== null;
+  };
+
   const renderCalendar = (monthOffset: number) => {
     const month = addMonths(currentMonth, monthOffset);
     const {prevMonthDays, monthDays} = generateMonthDays(month);
@@ -83,19 +101,34 @@ export const DatePicker: React.FC<IDatePickerProps> = ({onRangeChange}) => {
             const isSelected =
               (selectedRange.start && date.getTime() === selectedRange.start.getTime()) ||
               (selectedRange.end && date.getTime() === selectedRange.end.getTime());
+            const dateStatus = getDateStatus(date);
+            const isBooked = isDateBooked(date);
+
+            let buttonClass =
+              "flex size-7 items-center justify-center rounded-full text-sm transition-colors lg:size-10 ";
+
+            if (isSelected) {
+              buttonClass += "bg-[#80CBC4] text-white";
+            } else if (dateStatus === "APPROVED") {
+              buttonClass += "bg-green-200 text-green-800 cursor-not-allowed";
+            } else if (dateStatus === "PENDING") {
+              buttonClass += "bg-orange-200 text-orange-800 cursor-not-allowed";
+            } else if (isInRange(date)) {
+              buttonClass += "bg-border";
+            } else {
+              buttonClass += "hover:bg-border";
+            }
+
             return (
               <button
                 key={day}
-                className={`flex size-7 items-center justify-center rounded-full text-sm transition-colors lg:size-10 ${
-                  isSelected
-                    ? "bg-[#80CBC4] text-white"
-                    : isInRange(date)
-                      ? "bg-border"
-                      : "hover:bg-border"
-                }`}
+                className={buttonClass}
+                disabled={isBooked}
                 onClick={(e: React.SyntheticEvent) => {
                   e.preventDefault();
-                  handleDateClick(day, monthOffset);
+                  if (!isBooked) {
+                    handleDateClick(day, monthOffset);
+                  }
                 }}
               >
                 {day}

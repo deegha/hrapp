@@ -10,6 +10,14 @@ export {
   updateMyProfile,
 } from "./userService";
 export {getNavigationItems} from "./uiService";
-export {createLeaveRequest, fetchLeave, fetchLeaveRequest, fetchMyLeave} from "./leaveService";
+export {
+  createLeaveRequest,
+  fetchLeave,
+  fetchLeaveRequest,
+  fetchMyLeave,
+  fetchLeaveBalance,
+  fetchUpcomingCompanyLeaves,
+  fetchUserBookedDates,
+} from "./leaveService";
 export {approvalService, approveRequest} from "./approvalService";
 export {fetchLeaveTypes, fetchLeavePolicies, updateLeavePolicy} from "./organizationService";
