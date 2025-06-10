@@ -51,8 +51,8 @@ export function Layout({children}: IPrps) {
         <div className="flex h-[88px] items-center justify-center border-b border-border font-semibold">
           <Image
             src="https://res.cloudinary.com/duqpgdc9v/image/upload/v1749524495/POD_Talent_logo-1_en5z24.png"
-            width={90}
-            height={90}
+            width={70}
+            height={70}
             alt="podtalent.net"
           />
         </div>
