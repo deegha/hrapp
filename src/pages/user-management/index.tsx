@@ -17,10 +17,6 @@ export default function UserManagement() {
 
   useEffect(() => unsetUser, [unsetUser]);
 
-  if (users?.error || !users?.data) {
-    return <div>Some error</div>;
-  }
-
   function handleApplyLeave() {
     router.push("./user-management/create-user");
   }
@@ -38,8 +34,10 @@ export default function UserManagement() {
           <NoDataFoundComponent />
         ) : (
           <div className="flex flex-col gap-5">
-            <Users users={users?.data.data} />
-            {users.data.totalPages > 1 && <Pagination numberOfPage={users.data.totalPages} />}
+            {users && <Users users={users?.data?.data} />}
+            {users && users.data.totalPages > 1 && (
+              <Pagination numberOfPage={users.data.totalPages} />
+            )}
           </div>
         )}
       </PageLayout>
