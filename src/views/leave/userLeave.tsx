@@ -40,7 +40,7 @@ export function UserLeave() {
   return (
     <PageLayout
       pageName="Leave Management"
-      actionButton={<Button onClick={handleApplyLeave}>REQUEST TIME OUT</Button>}
+      actionButton={<Button onClick={handleApplyLeave}>REQUEST LEAVE</Button>}
     >
       <Drawer open={leaveRequest.id ? true : false} close={unsetActiveLeaveRequest}>
         <LeaveRequestDetails leaveRequestId={leaveRequest.id} />
