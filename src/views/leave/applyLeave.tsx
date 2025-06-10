@@ -24,8 +24,12 @@ export function ApplyLeave() {
     leaveType,
     setSelectedLeaveType,
     leaveTypes,
+    leaveBalance,
+    bookedDates,
+    getSelectedLeaveTypeBalance,
+    hasNoRemainingDays,
   } = useLeave();
-  const isFormDisabled = selectedDates.length === 0;
+  const isFormDisabled = selectedDates.length === 0 || hasNoRemainingDays();
 
   return (
     <PageLayout pageName="Leave Management - Request timeout">
@@ -34,7 +38,10 @@ export function ApplyLeave() {
           <div className="flex flex-col gap-[41px]">
             <div className="flex flex-col gap-5">
               <PageSubHeading heading="Select Dates" />
-              <DatePicker onRangeChange={(range) => setSelectedRange(range)} />
+              <DatePicker
+                onRangeChange={(range) => setSelectedRange(range)}
+                bookedDates={bookedDates}
+              />
 
               {selectedRange.start && selectedRange.end && (
                 <DateList
@@ -55,6 +62,15 @@ export function ApplyLeave() {
                   placeholder="Pick a fruit"
                 />
               </div>
+
+              {hasNoRemainingDays() && (
+                <div className="rounded-md border border-red-200 bg-red-50 p-3">
+                  <p className="text-sm text-red-800">
+                    ⚠️ No remaining days for {getSelectedLeaveTypeBalance()?.name}. Please select a
+                    different leave type.
+                  </p>
+                </div>
+              )}
             </div>
 
             <div className="flex flex-col gap-5">
@@ -85,16 +101,33 @@ export function ApplyLeave() {
           </div>
         </div>
 
-        <div className="flex w-1/4 flex-col gap-10">
-          <div className="flex flex-col items-start justify-center rounded-md border border-border p-10">
-            <p className="text-sm">Days</p>
-            <p className="text-lg font-semibold">20</p>
-            <p className="text-sm font-semibold text-primary">+3</p>
+        <div className="flex flex-col gap-6" style={{width: "320px"}}>
+          <div className="flex flex-col gap-4">
+            <h3 className="text-base font-semibold">Leave Balance</h3>
+
+            {leaveBalance?.leaveTypeBalances?.map((balance) => (
+              <div
+                key={balance.id}
+                className="flex flex-col items-start justify-center rounded-md border border-border p-4"
+              >
+                <p className="text-sm font-medium">{balance.name}</p>
+                <p className="text-lg font-semibold">{balance.remainingDays}</p>
+                <p className="text-xs text-gray-500">
+                  {balance.usedDays} used / {balance.yearlyAllowance} total
+                </p>
+              </div>
+            ))}
+
+            {leaveBalance && (
+              <div className="bg-primary/5 flex flex-col items-start justify-center rounded-md border border-primary p-4">
+                <p className="text-sm font-medium">Total Remaining</p>
+                <p className="text-lg font-semibold text-primary">{leaveBalance.remainingDays}</p>
+                <p className="text-xs text-gray-500">
+                  {leaveBalance.usedDays} used / {leaveBalance.yearlyAllowance} total
+                </p>
+              </div>
+            )}
           </div>
-          <p>
-            You have 20 days of remaining leave. Use them wisely for rejuvenation and personal
-            pursuits. You&apos;ve earned them!
-          </p>
         </div>
       </div>
     </PageLayout>
