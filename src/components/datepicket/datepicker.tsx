@@ -12,14 +12,15 @@ interface BookedDate {
 interface IDatePickerProps {
   onRangeChange?: (range: {start: Date | null; end: Date | null}) => void;
   bookedDates?: BookedDate[];
+  selectedRange?: {start: Date | null; end: Date | null};
 }
 
-export const DatePicker: React.FC<IDatePickerProps> = ({onRangeChange, bookedDates = []}) => {
+export const DatePicker: React.FC<IDatePickerProps> = ({
+  onRangeChange,
+  bookedDates = [],
+  selectedRange = {start: null, end: null},
+}) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [selectedRange, setSelectedRange] = useState<{
-    start: Date | null;
-    end: Date | null;
-  }>({start: null, end: null});
 
   const generateMonthDays = (month: Date) => {
     const startOfMonth = new Date(month.getFullYear(), month.getMonth(), 1);
@@ -53,8 +54,6 @@ export const DatePicker: React.FC<IDatePickerProps> = ({onRangeChange, bookedDat
     } else {
       newRange = {start: selectedRange.start, end: selectedDate};
     }
-
-    setSelectedRange(newRange);
 
     if (onRangeChange) {
       onRangeChange(newRange);
