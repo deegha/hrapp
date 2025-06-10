@@ -39,10 +39,10 @@ export const Navigation = () => {
           Array.from({length: 6}).map((_, index) => (
             <div
               key={index}
-              className="flex h-[34px] w-[163px] animate-pulse items-center gap-2 rounded-md bg-gray-200 p-2"
+              className={`flex h-[34px] w-[163px] animate-pulse items-center gap-2 rounded-md ${index === 0 && "bg-gray-200"} p-2`}
             >
               <div className="size-4 rounded-md bg-gray-300" />
-              <div className="h-4 w-20 rounded-md bg-gray-300" />
+              <div className="h-3 w-20 rounded-md bg-gray-300" />
             </div>
           ))
         : // Actual Navigation Items
