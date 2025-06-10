@@ -82,10 +82,19 @@ export function UserHome() {
     <PageLayout pageName="Home">
       <div className="mx-auto max-w-4xl">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-textPrimary">Dashboard</h1>
-          <p className="text-sm text-textSecondary">
-            Overview of your leave information and activities
-          </p>
+          {isAdmin ? (
+            <p className="max-w-[250px] text-sm text-textSecondary">
+              Get a complete overview of your leave balance, upcoming time off, pending approvals,
+              and <br />
+              team leave schedule—all in one place. Stay informed and manage your time off
+              effortlessly
+            </p>
+          ) : (
+            <p className="max-w-[250px] text-sm text-textSecondary">
+              Get a complete overview of your leave balance, upcoming time off and <br /> Your
+              profile information. Stay informed and manage your time off effortlessly
+            </p>
+          )}
         </div>
 
         <div className="space-y-6">
@@ -133,7 +142,7 @@ export function UserHome() {
               My Upcoming Leaves
             </h3>
             {upcomingLeaves.length > 0 ? (
-              <div className="space-y-3">
+              <div className="flex flex-col gap-3">
                 {upcomingLeaves.slice(0, 5).map((leave) => {
                   const sortedLeaves = [...leave.leaves].sort(
                     (a, b) => new Date(a.leaveDate).getTime() - new Date(b.leaveDate).getTime(),
