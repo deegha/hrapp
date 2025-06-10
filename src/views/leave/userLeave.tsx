@@ -1,4 +1,11 @@
-import {PageLayout, Button, Pagination, ItemsList, Drawer} from "@/components";
+import {
+  PageLayout,
+  Button,
+  Pagination,
+  ItemsList,
+  Drawer,
+  NoDataFoundComponent,
+} from "@/components";
 import {useRouter} from "next/navigation";
 import useSWR from "swr";
 import {fetchLeave} from "@/services/";
@@ -38,6 +45,7 @@ export function UserLeave() {
       <Drawer open={leaveRequest.id ? true : false} close={unsetActiveLeaveRequest}>
         <LeaveRequestDetails leaveRequestId={leaveRequest.id} />
       </Drawer>
+      {(data?.data?.data?.length ?? 0) < 1 && <NoDataFoundComponent />}
       <div className="flex flex-col gap-5">
         <div className="flex flex-col">
           {data?.data?.data?.map((request) => {

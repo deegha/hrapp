@@ -5,6 +5,8 @@ import {checkAuthServiceCall, logOutServiceCall} from "@/services/";
 import {useAuthStore} from "@/store/authstore";
 import {LogOut} from "react-feather";
 import {useNotificationStore} from "@/store/notificationStore";
+import Image from "next/image";
+
 interface IPrps {
   children: React.ReactNode;
 }
@@ -47,12 +49,17 @@ export function Layout({children}: IPrps) {
     <div className="flex h-[100hv] w-full">
       <div className="fixed flex h-screen w-[207px] flex-col justify-between gap-10 border-r border-border">
         <div className="flex h-[88px] items-center justify-center border-b border-border font-semibold">
-          PODTALENT.net
+          <Image
+            src="https://res.cloudinary.com/duqpgdc9v/image/upload/v1749524495/POD_Talent_logo-1_en5z24.png"
+            width={90}
+            height={90}
+            alt="podtalent.net"
+          />
         </div>
-        <div className="flex flex-[70%] items-start justify-center">
+        <div className="flex flex-[70%] flex-col items-center justify-between gap-2 overflow-y-auto">
           <Navigation />
         </div>
-        <div className="flex h-[88px] items-center justify-center border-t border-border">
+        <div className="flex h-[88px] flex-col items-center justify-center gap-2 border-t border-border">
           <div
             className="flex cursor-pointer items-center gap-2 text-sm font-semibold uppercase hover:font-bold"
             onClick={doLogout}
