@@ -8,7 +8,7 @@ import {useBookedDates} from "@/hooks/useBookedDates";
 export function useLeave() {
   const {leaveTypes} = useLeaveTypes();
   const {leaveBalance} = useLeaveBalance();
-  const {bookedDates} = useBookedDates();
+  const {bookedDates, mutate: mutateBookedDates} = useBookedDates();
 
   const [selectedRange, setSelectedRange] = useState<{
     start: Date | null;
@@ -92,12 +92,17 @@ export function useLeave() {
         return;
       }
 
-      cleanForm();
       setLoading(false);
       showNotification({
         message: "Leave requested successfully!",
         type: "success",
       });
+
+      // Refresh booked dates to show the new leave request in calendar
+      await mutateBookedDates();
+
+      // Clear form after calendar is updated
+      cleanForm();
     } catch {
       setLoading(false);
       console.log("here we are");

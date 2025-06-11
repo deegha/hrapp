@@ -41,6 +41,7 @@ export function ApplyLeave() {
               <DatePicker
                 onRangeChange={(range) => setSelectedRange(range)}
                 bookedDates={bookedDates}
+                selectedRange={selectedRange}
               />
 
               {selectedRange.start && selectedRange.end && (
@@ -59,7 +60,7 @@ export function ApplyLeave() {
                   options={leaveTypes}
                   value={leaveType}
                   onChange={setSelectedLeaveType}
-                  placeholder="Pick a fruit"
+                  placeholder="Pick a leave type"
                 />
               </div>
 
