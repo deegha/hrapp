@@ -47,7 +47,7 @@ export function Layout({children}: IPrps) {
 
   return (
     <div className="flex h-[100hv] w-full">
-      <div className="fixed flex h-screen w-[207px] flex-col justify-between gap-10 border-r border-border">
+      <div className="fixed hidden h-screen w-[207px] flex-col justify-between gap-10 border-r border-border md:flex">
         <div className="flex h-[88px] items-center justify-center border-b border-border font-semibold">
           <Image
             src="https://res.cloudinary.com/duqpgdc9v/image/upload/v1749524495/POD_Talent_logo-1_en5z24.png"
@@ -69,7 +69,7 @@ export function Layout({children}: IPrps) {
           </div>
         </div>
       </div>
-      <div className="ml-[207px] w-full">{children}</div>
+      <div className="ml-0 w-full sm:ml-[207px]">{children}</div>
     </div>
   );
 }

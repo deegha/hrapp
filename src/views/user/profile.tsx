@@ -14,11 +14,9 @@ export function UserProfile() {
     return await fetchUser(userSummary.employeeId.toString());
   });
 
-  if (!userData) return <Shimmer />;
-
   const user = userData?.data;
 
-  const userLevel = roles[user.userLevel as keyof typeof roles] || user.userLevel;
+  const userLevel = roles[user?.userLevel as keyof typeof roles] || user?.userLevel;
 
   return (
     <PageLayout
@@ -32,27 +30,31 @@ export function UserProfile() {
       <div className="flex flex-col gap-10">
         <div className="flex flex-col gap-5">
           <h2 className="text-md font-bold">Personal Information</h2>
-          <div>
-            <ProfileRow label="Name" value={`${user.firstName} ${user.lastName}`} />
-            <ProfileRow label="Email" value={user.email} />
-            <ProfileRow label="User Level" value={userLevel} />
-            <ProfileRow
-              label="Status"
-              value={
-                user.UserStatus?.statusLabel ? (
-                  <StatusTag status={user.UserStatus?.statusLabel} />
-                ) : (
-                  "N/A"
-                )
-              }
-            />
-            <ProfileRow
-              label="Employee ID"
-              value={user.employeeId?.toString() ? `EMP-${user.employeeId?.toString()}` : "N/A"}
-            />
+          {!user ? (
+            <Shimmer />
+          ) : (
+            <div>
+              <ProfileRow label="Name" value={`${user.firstName} ${user.lastName}`} />
+              <ProfileRow label="Email" value={user.email} />
+              <ProfileRow label="User Level" value={userLevel} />
+              <ProfileRow
+                label="Status"
+                value={
+                  user.UserStatus?.statusLabel ? (
+                    <StatusTag status={user.UserStatus?.statusLabel} />
+                  ) : (
+                    "N/A"
+                  )
+                }
+              />
+              <ProfileRow
+                label="Employee ID"
+                value={user.employeeId?.toString() ? `EMP-${user.employeeId?.toString()}` : "N/A"}
+              />
 
-            <ProfileRow label="Joined At" value={new Date(user.createdAt).toLocaleDateString()} />
-          </div>
+              <ProfileRow label="Joined At" value={new Date(user.createdAt).toLocaleDateString()} />
+            </div>
+          )}
         </div>
       </div>
     </PageLayout>
