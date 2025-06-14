@@ -5,7 +5,7 @@ import {useAuthStore} from "@/store/authstore";
 import {useRouter} from "next/router";
 import {useEffect, useState} from "react";
 import {checkAuthServiceCall} from "@/services";
-
+import zipy from "zipyai";
 import {useNotificationStore} from "@/store/notificationStore";
 
 type TLogin = {
@@ -37,6 +37,14 @@ export default function Login() {
     try {
       const loginRes = await loginServiceCall(data.email, data.password);
 
+      const user = loginRes.data.user;
+
+      zipy.identify(user.email, {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+      });
+
       if (loginRes.error) {
         setIsLoading(false);
         showNotification({
@@ -54,13 +62,13 @@ export default function Login() {
       setIsLoading(false);
       login(loginRes.data.user, loginRes.data.token);
       router.push("./");
-    } catch {
+    } catch (e) {
       setIsLoading(false);
       showNotification({
         message: "Login failed",
         type: "error",
       });
-      console.log("here we are");
+      console.log(e);
     }
   };
 
