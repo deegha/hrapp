@@ -240,7 +240,7 @@ export function UserHome() {
                   All Company Leave Requests (Next 7 Days)
                 </h3>
                 {companyLeaves.length > 0 ? (
-                  <div className="space-y-3">
+                  <div className="flex flex-col gap-3">
                     {companyLeaves.map((leave) => {
                       const sortedLeaves = [...leave.leaves].sort(
                         (a, b) => new Date(a.leaveDate).getTime() - new Date(b.leaveDate).getTime(),
