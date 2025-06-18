@@ -7,7 +7,12 @@ export type TUser = {
   createdAt: string;
   updatedAt: string;
   userStatusId: number;
+  employmentTypeId?: number;
   UserStatus: TUserStatus;
+  EmploymentType?: {
+    id: number;
+    typeLabel: string;
+  };
 };
 
 export type TUserStatus = {
@@ -25,6 +30,7 @@ export type TCreateUser = {
   lastName: string;
   email: string;
   userRole: string;
+  employmentTypeId: number | null;
 };
 
 export type TUpdateUser = {

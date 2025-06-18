@@ -6,5 +6,6 @@ export {UserPaySheets} from "./paysheets/paysheets";
 export {LeavePolicies} from "./leave/leavePolicy";
 export {UserStatus} from "./user/userStatus";
 export {UserRole} from "./user/userRole";
+export {EmploymentType} from "./user/employmentType";
 export {Users} from "./user/users";
 export {UserDetails} from "./user/userDetails";

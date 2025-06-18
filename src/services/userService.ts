@@ -125,3 +125,26 @@ export async function fetchMyPermissions() {
     resource: "my-permission",
   });
 }
+
+export async function fetchEmploymentTypes() {
+  return serviceHandler<TResponse<{id: number; typeLabel: string}[]>>({
+    method: "GET",
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: "employment-types",
+  });
+}
+
+export async function updateEmploymentType(employeeId: number, newEmploymentTypeId: number) {
+  return serviceHandler<
+    TResponse<{message: string}>,
+    {employeeId: number; newEmploymentTypeId: number}
+  >({
+    method: "PUT",
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: "user/employment-type",
+    body: {
+      employeeId,
+      newEmploymentTypeId,
+    },
+  });
+}

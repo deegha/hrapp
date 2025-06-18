@@ -3,7 +3,7 @@ import {useForm, FormProvider} from "react-hook-form";
 import {FormInput} from "@/components";
 import {userSchema} from "@/utils/formvalidations/userSchema";
 import {yupResolver} from "@hookform/resolvers/yup";
-import {UserRole} from "@/views/";
+import {UserRole, EmploymentType} from "@/views/";
 import {TCreateUser} from "@/types/";
 import {createUserService} from "@/services";
 import {useNotificationStore} from "@/store/notificationStore";
@@ -56,6 +56,7 @@ export default function CreateUser() {
 
             {/* <UserStatus /> */}
             <UserRole />
+            <EmploymentType />
 
             <Button loading={isLoading} type="submit" disabled={!methods.formState.isValid}>
               Create User
