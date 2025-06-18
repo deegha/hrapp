@@ -1,11 +1,11 @@
 import {Button, PageLayout, PolicySection, InputField} from "@/components";
 import {useState, useEffect} from "react";
 import useSWR from "swr";
-import {fetchLeavePolicies, updateLeavePolicy} from "@/services";
-import {TLeavePolicy} from "@/types";
+import {fetchLeavePolicies, updateLeavePolicy, createLeaveType} from "@/services";
+import {TLeavePolicy, TCreateLeaveTypePayload} from "@/types";
 import {useNotificationStore} from "@/store/notificationStore";
 import {Listbox} from "@headlessui/react";
-import {ChevronDown, Check} from "react-feather";
+import {ChevronDown, Check, X} from "react-feather";
 import clsx from "clsx";
 
 // Custom dropdown without text truncation
@@ -72,6 +72,16 @@ export function LeavePolicies() {
   // Local state for temporary changes during editing
   const [tempPolicies, setTempPolicies] = useState<TLeavePolicy[]>([]);
 
+  // Create leave type modal state
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [createFormData, setCreateFormData] = useState<TCreateLeaveTypePayload>({
+    name: "",
+    daysPerYear: 10,
+    accrualType: "ALL_FROM_DAY_1",
+    canCarryForward: false,
+  });
+  const [createLoading, setCreateLoading] = useState(false);
+
   const {data, isLoading, mutate} = useSWR("leave-policies", async () => {
     const response = await fetchLeavePolicies();
     return response.data || [];
@@ -134,6 +144,41 @@ export function LeavePolicies() {
     // Reset temp state to original data
     setTempPolicies(policies);
     setEdit(false);
+  };
+
+  const handleCreateLeaveType = async () => {
+    try {
+      setCreateLoading(true);
+
+      await createLeaveType(createFormData);
+
+      showNotification({
+        message: "Leave type created successfully!",
+        type: "success",
+      });
+
+      // Reset form and close modal
+      setCreateFormData({
+        name: "",
+        daysPerYear: 10,
+        accrualType: "ALL_FROM_DAY_1",
+        canCarryForward: false,
+      });
+      setShowCreateModal(false);
+
+      // Refresh data
+      mutate();
+    } catch (error) {
+      // Check if it's a string error message from API
+      const errorMessage = typeof error === "string" ? error : "Failed to create leave type";
+
+      showNotification({
+        message: errorMessage,
+        type: "error",
+      });
+    } finally {
+      setCreateLoading(false);
+    }
   };
 
   if (isLoading) {
@@ -218,7 +263,12 @@ export function LeavePolicies() {
   const restricted = [{id: 1, item: "Restricted Dates", value: "December 15th - January 5th"}];
 
   return (
-    <PageLayout pageName="Leave Policies">
+    <PageLayout
+      pageName="Leave Policies"
+      actionButton={
+        !edit && <Button onClick={() => setShowCreateModal(true)}>ADD NEW LEAVE TYPE</Button>
+      }
+    >
       <div className="flex flex-col gap-10">
         <p className="max-w-[600px] text-sm text-textSecondary">
           Configure leave policies to define eligibility and accrual rules. These settings ensure
@@ -254,6 +304,107 @@ export function LeavePolicies() {
             </div>
           )}
         </div>
+
+        {/* Create Leave Type Modal */}
+        {showCreateModal && (
+          <div
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/30 backdrop-blur-sm"
+            onClick={() => setShowCreateModal(false)}
+          >
+            <div
+              className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-gray-800">Create New Leave Type</h2>
+                <button
+                  onClick={() => setShowCreateModal(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-gray-700">
+                    Leave Type Name
+                  </label>
+                  <InputField
+                    value={createFormData.name}
+                    onChange={(e) => setCreateFormData((prev) => ({...prev, name: e.target.value}))}
+                    placeholder="e.g., Paternity Leave"
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-gray-700">
+                    Days Per Year
+                  </label>
+                  <InputField
+                    value={createFormData.daysPerYear.toString()}
+                    onChange={(e) =>
+                      setCreateFormData((prev) => ({
+                        ...prev,
+                        daysPerYear: parseInt(e.target.value) || 0,
+                      }))
+                    }
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-gray-700">
+                    Accrual Type
+                  </label>
+                  <PolicyDropdown
+                    value={createFormData.accrualType}
+                    options={accrualOptions}
+                    onChange={(value) =>
+                      setCreateFormData((prev) => ({
+                        ...prev,
+                        accrualType: value as "ALL_FROM_DAY_1" | "HALF_DAY_PER_MONTH",
+                      }))
+                    }
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-gray-700">
+                    Carry Forward
+                  </label>
+                  <PolicyDropdown
+                    value={createFormData.canCarryForward.toString()}
+                    options={carryForwardOptions}
+                    onChange={(value) =>
+                      setCreateFormData((prev) => ({
+                        ...prev,
+                        canCarryForward: value === "true",
+                      }))
+                    }
+                  />
+                </div>
+              </div>
+
+              <div className="mt-6 flex justify-end space-x-3">
+                <Button
+                  onClick={() => setShowCreateModal(false)}
+                  variant="danger"
+                  disabled={createLoading}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleCreateLeaveType}
+                  variant="primary"
+                  loading={createLoading}
+                  disabled={!createFormData.name.trim()}
+                >
+                  Create Leave Type
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </PageLayout>
   );

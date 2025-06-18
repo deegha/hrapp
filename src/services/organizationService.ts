@@ -1,6 +1,11 @@
 import {serviceHandler} from "@/utils/serviceHandler";
 import {TResponse} from "@/types";
-import {TLeaveType, TLeavePolicy, TUpdateLeavePolicyPayload} from "@/types/organization";
+import {
+  TLeaveType,
+  TLeavePolicy,
+  TUpdateLeavePolicyPayload,
+  TCreateLeaveTypePayload,
+} from "@/types/organization";
 
 export async function fetchLeaveTypes() {
   return await serviceHandler<TResponse<TLeaveType[]>>({
@@ -24,5 +29,14 @@ export async function updateLeavePolicy(policy: TUpdateLeavePolicyPayload) {
     body: policy,
     baseURL: process.env.NEXT_PUBLIC_API as string,
     resource: "organization/leave-policy",
+  });
+}
+
+export async function createLeaveType(leaveType: TCreateLeaveTypePayload) {
+  return await serviceHandler<TResponse<TLeavePolicy>, TCreateLeaveTypePayload>({
+    method: "POST",
+    body: leaveType,
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: "organization/leave-type",
   });
 }

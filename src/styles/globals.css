@@ -3,52 +3,47 @@
 @tailwind utilities;
 
 :root {
-  --color-primary: #80CBC4;
-  --color-secondary: #FFB433;
-  --color-third: #B4EBE6;
-  --color-gray-1: #FBF8EF;
+  --color-primary: #80cbc4;
+  --color-secondary: #ffb433;
+  --color-third: #b4ebe6;
+  --color-gray-1: #fbf8ef;
   --color-text-hover: #262525;
   --color-white: #fff;
-  --color-border: #F1F2F6;
-  --color-placeholder: #DFE4EA;
-  --color-dander: #FF4757;
-  --color-text-secondary: #9E9E9E;
+  --color-border: #f1f2f6;
+  --color-placeholder: #dfe4ea;
+  --color-dander: #ff4757;
+  --color-text-secondary: #9e9e9e;
   --color-text-primary: #000000;
 }
 
-
-
 @layer base {
   :root {
-    --color-primary :#80CBC4;
-    --color-secondary : #FFB433;
-    --color-third : #B4EBE6;
-    --color-gray-1 : #FBF8EF;
-    --color-text-hover : #262525;
-    --color-white :  #fff;
-    --color-border :  #F1F2F6;
-    --color-placeholder :  #DFE4EA;
-    --color-dander: #FF4757;
-    --color-text-secondary: #9E9E9E;
+    --color-primary: #80cbc4;
+    --color-secondary: #ffb433;
+    --color-third: #b4ebe6;
+    --color-gray-1: #fbf8ef;
+    --color-text-hover: #262525;
+    --color-white: #fff;
+    --color-border: #f1f2f6;
+    --color-placeholder: #dfe4ea;
+    --color-dander: #ff4757;
+    --color-text-secondary: #9e9e9e;
     --color-text-primary: #000000;
   }
-
-
 }
 
 .theme-dark {
-    --color-primary :#ededed  ;
-    --color-secondary : #989494;
-    --color-text-base : #ffffff;
-    --color-text-unselected : #797777;
-    --color-text-hover : #262525;
-    --color-bg-primary :  #3c3c3c;
-    --color-border :  #323538;
-    --color-bg-secondary :  #000000;
-    --color-bg-form: #202426;
-    --color-bg-text-input: #363636;
-    --color-text-input: #ececeb;
-
+  --color-primary: #ededed;
+  --color-secondary: #989494;
+  --color-text-base: #ffffff;
+  --color-text-unselected: #797777;
+  --color-text-hover: #262525;
+  --color-bg-primary: #3c3c3c;
+  --color-border: #323538;
+  --color-bg-secondary: #000000;
+  --color-bg-form: #202426;
+  --color-bg-text-input: #363636;
+  --color-text-input: #ececeb;
 }
 
 body {
