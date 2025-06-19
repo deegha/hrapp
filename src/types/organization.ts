@@ -21,3 +21,10 @@ export type TUpdateLeavePolicyPayload = {
   accrualType?: "ALL_FROM_DAY_1" | "HALF_DAY_PER_MONTH";
   canCarryForward?: boolean;
 };
+
+export type TCreateLeaveTypePayload = {
+  name: string;
+  daysPerYear: number;
+  accrualType: "ALL_FROM_DAY_1" | "HALF_DAY_PER_MONTH";
+  canCarryForward: boolean;
+};

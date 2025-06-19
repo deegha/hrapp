@@ -47,5 +47,11 @@ export const serviceHandler = async <TResponse, TBody = undefined>({
   }
 
   const data = await response.json();
+
+  // Check if response indicates an error
+  if (data.error === true) {
+    throw data.data; // Throw the error message
+  }
+
   return data as TResponse;
 };
