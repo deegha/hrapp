@@ -1,11 +1,13 @@
 import {StatusTag, Button, Detail} from "@/components";
 import {useConfirmationModalStore} from "@/store/useConfirmationModalStore";
-import {Trash} from "react-feather";
-import {deleteUser} from "@/services/userService";
+import {Trash, ArrowUp} from "react-feather";
+import {deleteUser, updateEmploymentType, fetchEmploymentTypes} from "@/services/userService";
 import {usePagination} from "@/hooks/usePagination";
 import {useNotificationStore} from "@/store/notificationStore";
 import {mutate} from "swr";
 import {useUserStore} from "@/store/useUserStore";
+import useSWR from "swr";
+import {useState} from "react";
 
 const logs = [
   {
@@ -34,7 +36,66 @@ export function UserDetails() {
   const {openModal} = useConfirmationModalStore();
   const {activePage} = usePagination();
   const {showNotification} = useNotificationStore();
-  const {unsetUser, user} = useUserStore();
+  const {unsetUser, user, setActiveUser} = useUserStore();
+  const [isUpdatingEmploymentType, setIsUpdatingEmploymentType] = useState(false);
+  const {data: employmentTypesData} = useSWR("fetch-employment-types", fetchEmploymentTypes);
+
+  // Get the next possible employment type transition
+  const getNextEmploymentType = () => {
+    if (!user.EmploymentType || !employmentTypesData?.data) return null;
+
+    const currentType = user.EmploymentType.typeLabel;
+    const employmentTypes = employmentTypesData.data;
+
+    const transitions: Record<string, string> = {
+      INTERN: "PROBATION",
+      PROBATION: "FULLTIME",
+    };
+
+    const nextTypeLabel = transitions[currentType];
+    if (!nextTypeLabel) return null;
+
+    return employmentTypes.find((type) => type.typeLabel === nextTypeLabel);
+  };
+
+  const handleEmploymentTypeTransition = () => {
+    const nextType = getNextEmploymentType();
+    if (!nextType) return;
+
+    openModal({
+      title: `Promote to ${nextType.typeLabel}?`,
+      description: `Are you sure you want to promote ${user.firstName} ${user.lastName} from ${user.EmploymentType?.typeLabel} to ${nextType.typeLabel}?`,
+      onConfirm: async () => {
+        try {
+          setIsUpdatingEmploymentType(true);
+          const response = await updateEmploymentType(user.employeeId, nextType.id);
+
+          if (response.error) {
+            showNotification({
+              type: "error",
+              message: "Something went wrong when updating employment type",
+            });
+            return;
+          }
+
+          // Refresh user data in store and user list
+          await setActiveUser(user.employeeId.toString());
+          mutate(`fetch-users${activePage}`);
+          showNotification({
+            type: "success",
+            message: `Successfully promoted to ${nextType.typeLabel}`,
+          });
+        } catch {
+          showNotification({
+            type: "error",
+            message: "Something went wrong when updating employment type",
+          });
+        } finally {
+          setIsUpdatingEmploymentType(false);
+        }
+      },
+    });
+  };
 
   const handleDeleteUser = () => {
     openModal({
@@ -80,6 +141,9 @@ export function UserDetails() {
         <Detail label={"First Name"} value={user.firstName} />
         <Detail label={"Last Name"} value={user.lastName} />
         <Detail label={"Email"} value={user.email} />
+        {user.EmploymentType && (
+          <Detail label={"Employment Type"} value={user.EmploymentType.typeLabel} />
+        )}
       </div>
 
       <div className="flex flex-col gap-3">
@@ -100,6 +164,19 @@ export function UserDetails() {
             <Edit size={14} /> Edit
           </div>
         </Button> */}
+
+        {getNextEmploymentType() && user.UserStatus?.statusLabel === "APPROVED" && (
+          <Button
+            variant="secondary"
+            onClick={handleEmploymentTypeTransition}
+            loading={isUpdatingEmploymentType}
+          >
+            <div className="flex items-center gap-1">
+              <ArrowUp size={14} />
+              Promote to {getNextEmploymentType()?.typeLabel}
+            </div>
+          </Button>
+        )}
 
         {user.UserStatus?.statusLabel !== "DELETED" && (
           <Button variant="danger" onClick={handleDeleteUser}>

@@ -18,6 +18,7 @@ export function Users({users}: IUsers) {
             <>
               <span>EMPID: {user.employeeId}</span>
               <span>{user.email}</span>
+              {user.EmploymentType && <span>Type: {user.EmploymentType.typeLabel}</span>}
             </>
           }
           status={user.UserStatus?.statusLabel}
