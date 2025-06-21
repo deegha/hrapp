@@ -21,6 +21,7 @@ export const DatePicker: React.FC<IDatePickerProps> = ({
   selectedRange = {start: null, end: null},
 }) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [hoverDate, setHoverDate] = useState<Date | null>(null);
 
   const generateMonthDays = (month: Date) => {
     const startOfMonth = new Date(month.getFullYear(), month.getMonth(), 1);
@@ -49,10 +50,22 @@ export const DatePicker: React.FC<IDatePickerProps> = ({
     );
 
     let newRange;
-    if (!selectedRange.start || (selectedRange.start && selectedRange.end)) {
-      newRange = {start: selectedDate, end: null};
+    if (!selectedRange.start) {
+      newRange = {start: selectedDate, end: selectedDate};
+    } else if (
+      selectedRange.start &&
+      selectedRange.end &&
+      selectedRange.start.getTime() === selectedRange.end.getTime()
+    ) {
+      // Single day selected - check if clicking different date for range
+      if (selectedRange.start.getTime() === selectedDate.getTime()) {
+        newRange = selectedRange;
+      } else {
+        newRange = {start: selectedRange.start, end: selectedDate};
+      }
     } else {
-      newRange = {start: selectedRange.start, end: selectedDate};
+      // Range exists - start new single day selection
+      newRange = {start: selectedDate, end: selectedDate};
     }
 
     if (onRangeChange) {
@@ -75,6 +88,23 @@ export const DatePicker: React.FC<IDatePickerProps> = ({
 
   const isDateBooked = (date: Date) => {
     return getDateStatus(date) !== null;
+  };
+
+  const isInPreviewRange = (date: Date) => {
+    // Show preview only when single day selected and hovering over different date
+    if (
+      selectedRange.start &&
+      selectedRange.end &&
+      selectedRange.start.getTime() === selectedRange.end.getTime() &&
+      hoverDate &&
+      !isDateBooked(date)
+    ) {
+      const selectedDate = selectedRange.start;
+      const minDate = selectedDate < hoverDate ? selectedDate : hoverDate;
+      const maxDate = selectedDate > hoverDate ? selectedDate : hoverDate;
+      return date >= minDate && date <= maxDate && date.getTime() !== selectedDate.getTime();
+    }
+    return false;
   };
 
   const renderCalendar = (monthOffset: number) => {
@@ -114,6 +144,8 @@ export const DatePicker: React.FC<IDatePickerProps> = ({
               buttonClass += "bg-orange-200 text-orange-800 cursor-not-allowed";
             } else if (isInRange(date)) {
               buttonClass += "bg-border";
+            } else if (isInPreviewRange(date)) {
+              buttonClass += "bg-blue-50 border border-blue-200";
             } else {
               buttonClass += "hover:bg-border";
             }
@@ -129,6 +161,8 @@ export const DatePicker: React.FC<IDatePickerProps> = ({
                     handleDateClick(day, monthOffset);
                   }
                 }}
+                onMouseEnter={() => !isBooked && setHoverDate(date)}
+                onMouseLeave={() => setHoverDate(null)}
               >
                 {day}
               </button>
@@ -140,7 +174,10 @@ export const DatePicker: React.FC<IDatePickerProps> = ({
   };
 
   return (
-    <div className="flex flex-col items-center rounded-md bg-white p-4 shadow-md">
+    <div
+      className="flex flex-col items-center rounded-md bg-white p-4 shadow-md"
+      onMouseLeave={() => setHoverDate(null)}
+    >
       <div className="relative top-[38px] mb-4 flex w-full justify-between">
         <button onClick={handlePrevMonth}>
           <ChevronLeft className="text-gray-600" />
