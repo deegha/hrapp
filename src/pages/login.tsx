@@ -7,6 +7,7 @@ import {useEffect, useState} from "react";
 import {checkAuthServiceCall} from "@/services";
 import zipy from "zipyai";
 import {useNotificationStore} from "@/store/notificationStore";
+import Link from "next/link";
 
 type TLogin = {
   email: string;
@@ -93,7 +94,9 @@ export default function Login() {
             </Button>
           </div>
           <div className="flex w-full justify-center text-primary">
-            <a>Forgot your password ?</a>
+            <Link href="/forgot-password" className="hover:underline">
+              Forgot your password ?
+            </Link>
           </div>
         </form>
       </div>
