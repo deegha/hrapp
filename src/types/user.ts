@@ -30,7 +30,7 @@ export type TCreateUser = {
   lastName: string;
   email: string;
   userRole: string;
-  employmentTypeId: number | null;
+  employmentTypeId: number;
 };
 
 export type TUpdateUser = {
