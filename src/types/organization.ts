@@ -5,6 +5,8 @@ export type TLeaveType = {
   daysPerYear: number;
 };
 
+import {EmploymentType} from "../constants/employmentTypes";
+
 export type TLeavePolicy = {
   id: number;
   name: string;
@@ -12,6 +14,7 @@ export type TLeavePolicy = {
   accrualType: "ALL_FROM_DAY_1" | "HALF_DAY_PER_MONTH";
   canCarryForward: boolean;
   organizationId: number;
+  daysPerEmploymentType?: Partial<Record<EmploymentType, number>>;
 };
 
 export type TUpdateLeavePolicyPayload = {
@@ -20,6 +23,7 @@ export type TUpdateLeavePolicyPayload = {
   daysPerYear?: number;
   accrualType?: "ALL_FROM_DAY_1" | "HALF_DAY_PER_MONTH";
   canCarryForward?: boolean;
+  daysPerEmploymentType?: Partial<Record<EmploymentType, number>>;
 };
 
 export type TCreateLeaveTypePayload = {
@@ -27,4 +31,5 @@ export type TCreateLeaveTypePayload = {
   daysPerYear: number;
   accrualType: "ALL_FROM_DAY_1" | "HALF_DAY_PER_MONTH";
   canCarryForward: boolean;
+  daysPerEmploymentType?: Partial<Record<EmploymentType, number>>;
 };

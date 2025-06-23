@@ -5,7 +5,7 @@ export const userSchema = yup.object({
   lastName: yup.string().required("Last name is required"),
   email: yup.string().email("Invalid email").required("Email is required"),
   userRole: yup.string().required("User role is required"),
-  employmentTypeId: yup.number().nullable().default(null),
+  employmentTypeId: yup.number().required("Employment type is required"),
 });
 
 export const editUserSchema = yup.object({

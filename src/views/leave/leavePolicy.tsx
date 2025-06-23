@@ -7,6 +7,7 @@ import {useNotificationStore} from "@/store/notificationStore";
 import {Listbox} from "@headlessui/react";
 import {ChevronDown, Check, X} from "react-feather";
 import clsx from "clsx";
+import {EMPLOYMENT_TYPES, EmploymentType} from "@/constants/employmentTypes";
 
 // Custom dropdown without text truncation
 const PolicyDropdown = ({
@@ -79,6 +80,11 @@ export function LeavePolicies() {
     daysPerYear: 10,
     accrualType: "ALL_FROM_DAY_1",
     canCarryForward: false,
+    daysPerEmploymentType: {
+      [EMPLOYMENT_TYPES.FULLTIME]: 10,
+      [EMPLOYMENT_TYPES.PROBATION]: 5,
+      [EMPLOYMENT_TYPES.INTERN]: 1,
+    },
   });
   const [createLoading, setCreateLoading] = useState(false);
 
@@ -102,6 +108,26 @@ export function LeavePolicies() {
     // Update only local temp state, don't save to server
     setTempPolicies((prev) =>
       prev.map((policy) => (policy.id === policyId ? {...policy, [field]: value} : policy)),
+    );
+  };
+
+  const handleEmploymentTypeDaysUpdate = (
+    policyId: number,
+    employmentType: EmploymentType,
+    days: number,
+  ) => {
+    setTempPolicies((prev) =>
+      prev.map((policy) =>
+        policy.id === policyId
+          ? {
+              ...policy,
+              daysPerEmploymentType: {
+                ...policy.daysPerEmploymentType,
+                [employmentType]: days,
+              },
+            }
+          : policy,
+      ),
     );
   };
 
@@ -163,6 +189,11 @@ export function LeavePolicies() {
         daysPerYear: 10,
         accrualType: "ALL_FROM_DAY_1",
         canCarryForward: false,
+        daysPerEmploymentType: {
+          [EMPLOYMENT_TYPES.FULLTIME]: 10,
+          [EMPLOYMENT_TYPES.PROBATION]: 5,
+          [EMPLOYMENT_TYPES.INTERN]: 1,
+        },
       });
       setShowCreateModal(false);
 
@@ -192,20 +223,69 @@ export function LeavePolicies() {
   // Use tempPolicies for display during edit mode
   const displayPolicies = edit ? tempPolicies : policies;
 
-  // Transform policies to display format
-  const entitlements = displayPolicies.map((policy) => ({
-    id: policy.id,
-    item: policy.name,
-    value: `${policy.daysPerYear} days per year`,
-    editValue: (
-      <InputField
-        value={policy.daysPerYear.toString()}
-        onChange={(e) =>
-          handleLocalPolicyUpdate(policy.id, "daysPerYear", parseInt(e.target.value) || 0)
-        }
-      />
-    ),
-  }));
+  // Transform policies to display format with employment type columns
+  const entitlements = displayPolicies.map((policy) => {
+    const fulltimeDays =
+      policy.daysPerEmploymentType?.[EMPLOYMENT_TYPES.FULLTIME] ?? policy.daysPerYear;
+    const probationDays =
+      policy.daysPerEmploymentType?.[EMPLOYMENT_TYPES.PROBATION] ?? policy.daysPerYear;
+    const internDays =
+      policy.daysPerEmploymentType?.[EMPLOYMENT_TYPES.INTERN] ?? policy.daysPerYear;
+
+    return {
+      id: policy.id,
+      item: policy.name,
+      value: edit
+        ? ""
+        : `Fulltime: ${fulltimeDays}, Probation: ${probationDays}, Intern: ${internDays} days per year`,
+      editValue: edit ? (
+        <div className="flex gap-4">
+          <div className="flex flex-col">
+            <label className="mb-1 text-xs font-medium text-gray-600">Fulltime</label>
+            <InputField
+              value={fulltimeDays.toString()}
+              onChange={(e) =>
+                handleEmploymentTypeDaysUpdate(
+                  policy.id,
+                  EMPLOYMENT_TYPES.FULLTIME,
+                  parseInt(e.target.value) || 0,
+                )
+              }
+              className="w-20"
+            />
+          </div>
+          <div className="flex flex-col">
+            <label className="mb-1 text-xs font-medium text-gray-600">Probation</label>
+            <InputField
+              value={probationDays.toString()}
+              onChange={(e) =>
+                handleEmploymentTypeDaysUpdate(
+                  policy.id,
+                  EMPLOYMENT_TYPES.PROBATION,
+                  parseInt(e.target.value) || 0,
+                )
+              }
+              className="w-20"
+            />
+          </div>
+          <div className="flex flex-col">
+            <label className="mb-1 text-xs font-medium text-gray-600">Intern</label>
+            <InputField
+              value={internDays.toString()}
+              onChange={(e) =>
+                handleEmploymentTypeDaysUpdate(
+                  policy.id,
+                  EMPLOYMENT_TYPES.INTERN,
+                  parseInt(e.target.value) || 0,
+                )
+              }
+              className="w-20"
+            />
+          </div>
+        </div>
+      ) : undefined,
+    };
+  });
 
   const accrualOptions = [
     {label: "All from Day 1", value: "ALL_FROM_DAY_1"},
@@ -339,17 +419,71 @@ export function LeavePolicies() {
 
                 <div>
                   <label className="mb-1 block text-sm font-medium text-gray-700">
-                    Days Per Year
+                    Days Per Employment Type
                   </label>
-                  <InputField
-                    value={createFormData.daysPerYear.toString()}
-                    onChange={(e) =>
-                      setCreateFormData((prev) => ({
-                        ...prev,
-                        daysPerYear: parseInt(e.target.value) || 0,
-                      }))
-                    }
-                  />
+                  <div className="grid grid-cols-3 gap-3">
+                    <div>
+                      <label className="mb-1 block text-xs font-medium text-gray-600">
+                        Fulltime
+                      </label>
+                      <InputField
+                        value={
+                          createFormData.daysPerEmploymentType?.[
+                            EMPLOYMENT_TYPES.FULLTIME
+                          ]?.toString() || "10"
+                        }
+                        onChange={(e) =>
+                          setCreateFormData((prev) => ({
+                            ...prev,
+                            daysPerEmploymentType: {
+                              ...prev.daysPerEmploymentType,
+                              [EMPLOYMENT_TYPES.FULLTIME]: parseInt(e.target.value) || 0,
+                            },
+                          }))
+                        }
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-xs font-medium text-gray-600">
+                        Probation
+                      </label>
+                      <InputField
+                        value={
+                          createFormData.daysPerEmploymentType?.[
+                            EMPLOYMENT_TYPES.PROBATION
+                          ]?.toString() || "5"
+                        }
+                        onChange={(e) =>
+                          setCreateFormData((prev) => ({
+                            ...prev,
+                            daysPerEmploymentType: {
+                              ...prev.daysPerEmploymentType,
+                              [EMPLOYMENT_TYPES.PROBATION]: parseInt(e.target.value) || 0,
+                            },
+                          }))
+                        }
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-xs font-medium text-gray-600">Intern</label>
+                      <InputField
+                        value={
+                          createFormData.daysPerEmploymentType?.[
+                            EMPLOYMENT_TYPES.INTERN
+                          ]?.toString() || "1"
+                        }
+                        onChange={(e) =>
+                          setCreateFormData((prev) => ({
+                            ...prev,
+                            daysPerEmploymentType: {
+                              ...prev.daysPerEmploymentType,
+                              [EMPLOYMENT_TYPES.INTERN]: parseInt(e.target.value) || 0,
+                            },
+                          }))
+                        }
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 <div>
