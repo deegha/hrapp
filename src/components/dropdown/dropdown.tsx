@@ -3,12 +3,14 @@
 
 import {Fragment} from "react";
 import {Listbox, Transition} from "@headlessui/react";
-import {ChevronDown, Check} from "react-feather";
+import {ChevronDown, Check, Info} from "react-feather";
 import {cn} from "@/utils/cn";
 
 type Option = {
   label: string;
   value: string;
+  disabled?: boolean;
+  tooltip?: string;
 };
 
 type DropdownProps = {
@@ -52,20 +54,30 @@ export const Dropdown = ({
                   key={option.value}
                   className={({active}) =>
                     cn(
-                      "relative cursor-pointer select-none py-3 pl-10 pr-4",
-                      active ? "bg-gray-100 text-gray-900" : "text-gray-700",
+                      "relative select-none py-3 pl-10 pr-4",
+                      option.disabled ? "cursor-not-allowed text-gray-400" : "cursor-pointer",
+                      active && !option.disabled ? "bg-gray-100 text-gray-900" : "text-gray-700",
                     )
                   }
                   value={option}
+                  disabled={option.disabled}
+                  title={option.disabled ? option.tooltip : undefined}
                 >
                   {({selected}) => (
                     <>
-                      <span
-                        className={cn("block truncate", selected ? "font-medium" : "font-normal")}
-                      >
-                        {option.label}
-                      </span>
-                      {selected ? (
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={cn(
+                            "block truncate",
+                            selected ? "font-medium" : "font-normal",
+                            option.disabled ? "text-gray-400" : "",
+                          )}
+                        >
+                          {option.label}
+                        </span>
+                        {option.disabled && <Info className="size-4 shrink-0 text-gray-400" />}
+                      </div>
+                      {selected && !option.disabled ? (
                         <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-primary">
                           <Check className="size-4" />
                         </span>

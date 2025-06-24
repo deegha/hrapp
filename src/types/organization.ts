@@ -3,6 +3,7 @@ export type TLeaveType = {
   label: string;
   value: string;
   daysPerYear: number;
+  isLieuLeave?: boolean;
 };
 
 import {EmploymentType} from "../constants/employmentTypes";

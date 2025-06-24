@@ -7,6 +7,7 @@ import {
   PageSubHeading,
   Dropdown,
   TextArea,
+  SingleDatePicker,
 } from "@/components";
 import {useLeave} from "./useLeave";
 
@@ -28,6 +29,8 @@ export function ApplyLeave() {
     bookedDates,
     getSelectedLeaveTypeBalance,
     hasNoRemainingDays,
+    coveringDate,
+    handleCoveringDateChange,
   } = useLeave();
   const isFormDisabled = selectedDates.length === 0 || hasNoRemainingDays();
 
@@ -57,7 +60,14 @@ export function ApplyLeave() {
               <PageSubHeading heading="Leave type" />
               <div className="w-[100px]">
                 <Dropdown
-                  options={leaveTypes}
+                  options={leaveTypes.map((type) => ({
+                    ...type,
+                    disabled: type.isLieuLeave && selectedDates.length > 1,
+                    tooltip:
+                      type.isLieuLeave && selectedDates.length > 1
+                        ? "Lieu leave is only available for single-day selections. Select one day to enable this option."
+                        : undefined,
+                  }))}
                   value={leaveType}
                   onChange={setSelectedLeaveType}
                   placeholder="Pick a leave type"
@@ -72,6 +82,20 @@ export function ApplyLeave() {
                   </p>
                 </div>
               )}
+
+              {/* Show covering date picker when lieu leave type is selected */}
+              {selectedDates.length === 1 &&
+                leaveTypes.find((type) => type.value === leaveType.value)?.isLieuLeave && (
+                  <div className="flex flex-col gap-2">
+                    <label className="text-sm font-semibold text-gray-700">
+                      Select covering date for lieu leave:
+                    </label>
+                    <SingleDatePicker
+                      onDateChange={handleCoveringDateChange}
+                      selectedDate={coveringDate}
+                    />
+                  </div>
+                )}
             </div>
 
             <div className="flex flex-col gap-5">
@@ -106,18 +130,20 @@ export function ApplyLeave() {
           <div className="flex flex-col gap-4">
             <h3 className="text-base font-semibold">Leave Balance</h3>
 
-            {leaveBalance?.leaveTypeBalances?.map((balance) => (
-              <div
-                key={balance.id}
-                className="flex flex-col items-start justify-center rounded-md border border-border p-4"
-              >
-                <p className="text-sm font-medium">{balance.name}</p>
-                <p className="text-lg font-semibold">{balance.remainingDays}</p>
-                <p className="text-xs text-gray-500">
-                  {balance.usedDays} used / {balance.yearlyAllowance} total
-                </p>
-              </div>
-            ))}
+            {leaveBalance?.leaveTypeBalances
+              ?.filter((balance) => balance.name !== "Lieu Leave")
+              ?.map((balance) => (
+                <div
+                  key={balance.id}
+                  className="flex flex-col items-start justify-center rounded-md border border-border p-4"
+                >
+                  <p className="text-sm font-medium">{balance.name}</p>
+                  <p className="text-lg font-semibold">{balance.remainingDays}</p>
+                  <p className="text-xs text-gray-500">
+                    {balance.usedDays} used / {balance.yearlyAllowance} total
+                  </p>
+                </div>
+              ))}
 
             {leaveBalance && (
               <div className="bg-primary/5 flex flex-col items-start justify-center rounded-md border border-primary p-4">

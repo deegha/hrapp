@@ -71,6 +71,13 @@ export function UserLeave() {
                       {leaveTypes.filter((type) => parseInt(type.value) === firstLeave.leaveType)[0]
                         ?.label || "Unknown"}
                     </div>
+                    {leaveTypes.find((type) => parseInt(type.value) === firstLeave.leaveType)
+                      ?.isLieuLeave &&
+                      firstLeave.coveringDate && (
+                        <div className="text-xs text-textSecondary">
+                          Covering Date: {format(new Date(firstLeave.coveringDate), "dd MMM yyyy")}
+                        </div>
+                      )}
                     <div className="text-xs text-textSecondary">
                       {firstLeave?.halfDay
                         ? `First Day: Half Day (${firstLeave?.halfDay === "AM" ? "Morning" : "Evening"})`
