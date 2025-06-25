@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useState, useEffect} from "react";
 import {useNotificationStore} from "@/store/notificationStore";
 import {createLeaveRequest} from "@/services";
 import {useLeaveTypes} from "@/hooks/useLeaveTypes";
@@ -28,6 +28,7 @@ export function useLeave() {
   const [documents, setDocuments] = useState<Array<string>>();
   const {showNotification} = useNotificationStore();
   const [loading, setLoading] = useState(false);
+  const [coveringDate, setCoveringDate] = useState<Date | null>(null);
 
   // Update selected leave type when leave types are loaded
   useState(() => {
@@ -35,6 +36,27 @@ export function useLeave() {
       setSelectedLeaveType({label: leaveTypes[0].label, value: leaveTypes[0].value});
     }
   });
+
+  // Auto-reset leave type when lieu leave becomes unavailable
+  useEffect(() => {
+    // Check if currently selected leave type is lieu leave
+    const selectedLeaveTypeData = leaveTypes.find((type) => type.value === leaveType.value);
+    const isCurrentlyLieuLeave = selectedLeaveTypeData?.isLieuLeave;
+
+    // If lieu leave is selected but we have multiple dates (making it unavailable)
+    if (isCurrentlyLieuLeave && selectedDates.length > 1) {
+      // Reset to the first non-lieu leave type
+      const firstNonLieuLeave = leaveTypes.find((type) => !type.isLieuLeave);
+      if (firstNonLieuLeave) {
+        setSelectedLeaveType({
+          label: firstNonLieuLeave.label,
+          value: firstNonLieuLeave.value,
+        });
+        // Clear covering date since it's no longer relevant
+        setCoveringDate(null);
+      }
+    }
+  }, [selectedDates.length, leaveType.value, leaveTypes]);
 
   const handleDocumentUpload = (url: string) => {
     if (!url) {
@@ -50,22 +72,40 @@ export function useLeave() {
     setDocuments(newDocs);
   };
 
+  const handleCoveringDateChange = (date: Date | null) => {
+    setCoveringDate(date);
+  };
+
   const onSubmit = async () => {
-    // Check if selected leave type has remaining days
-    const selectedLeaveTypeBalance = leaveBalance?.leaveTypeBalances?.find(
-      (balance) => balance.id === parseInt(leaveType.value),
-    );
+    // Check if lieu leave type is selected and validate covering date
+    const selectedLeaveTypeData = leaveTypes.find((type) => type.value === leaveType.value);
+    const isLieuLeaveType = selectedLeaveTypeData?.isLieuLeave;
 
-    const requestedDays = selectedDates.reduce((total, date) => {
-      return total + (date.half ? 0.5 : 1);
-    }, 0);
-
-    if (selectedLeaveTypeBalance && selectedLeaveTypeBalance.remainingDays < requestedDays) {
+    if (isLieuLeaveType && !coveringDate) {
       showNotification({
-        message: `Insufficient ${selectedLeaveTypeBalance.name} balance. You have ${selectedLeaveTypeBalance.remainingDays} days remaining but requested ${requestedDays} days.`,
+        message: "Please select a covering date for lieu leave.",
         type: "error",
       });
       return;
+    }
+
+    // Check if selected leave type has remaining days (skip for lieu leave)
+    if (!isLieuLeaveType) {
+      const selectedLeaveTypeBalance = leaveBalance?.leaveTypeBalances?.find(
+        (balance) => balance.id === parseInt(leaveType.value),
+      );
+
+      const requestedDays = selectedDates.reduce((total, date) => {
+        return total + (date.half ? 0.5 : 1);
+      }, 0);
+
+      if (selectedLeaveTypeBalance && selectedLeaveTypeBalance.remainingDays < requestedDays) {
+        showNotification({
+          message: `Insufficient ${selectedLeaveTypeBalance.name} balance. You have ${selectedLeaveTypeBalance.remainingDays} days remaining but requested ${requestedDays} days.`,
+          type: "error",
+        });
+        return;
+      }
     }
 
     setLoading(true);
@@ -73,6 +113,7 @@ export function useLeave() {
       const leaves = selectedDates.map((date) => ({
         ...date,
         leaveType: parseInt(leaveType.value),
+        coveringDate: isLieuLeaveType && coveringDate ? coveringDate : undefined,
       }));
 
       const response = await createLeaveRequest({
@@ -122,6 +163,7 @@ export function useLeave() {
         : {label: "", value: ""},
     );
     setSelectedRange({start: null, end: null});
+    setCoveringDate(null);
   };
 
   const getSelectedLeaveTypeBalance = () => {
@@ -131,6 +173,12 @@ export function useLeave() {
   };
 
   const hasNoRemainingDays = () => {
+    // Skip balance check for lieu leave as it's compensatory time
+    const selectedLeaveTypeData = leaveTypes.find((type) => type.value === leaveType.value);
+    if (selectedLeaveTypeData?.isLieuLeave) {
+      return false;
+    }
+
     const balance = getSelectedLeaveTypeBalance();
     return balance && balance.remainingDays <= 0;
   };
@@ -153,5 +201,7 @@ export function useLeave() {
     bookedDates,
     getSelectedLeaveTypeBalance,
     hasNoRemainingDays,
+    coveringDate,
+    handleCoveringDateChange,
   };
 }

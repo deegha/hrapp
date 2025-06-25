@@ -50,6 +50,12 @@ export function LeaveRequestDetails({leaveRequestId}: {leaveRequestId: number}) 
               {leaveTypes.filter((type) => parseInt(type.value) === leave.leaveType)[0]?.label ||
                 "Unknown"}{" "}
               {leave.halfDay && `(Half Day: ${leave.halfDay === "AM" ? "Morning" : "Evening"})`}
+              {leaveTypes.find((type) => parseInt(type.value) === leave.leaveType)?.isLieuLeave &&
+                leave.coveringDate && (
+                  <div className="ml-4 text-xs text-textSecondary">
+                    Covering Date: {format(new Date(leave.coveringDate), "dd MMM yyyy")}
+                  </div>
+                )}
             </li>
           ))}
         </ul>

@@ -4,6 +4,7 @@ export type TLeaves = {
   date: Date;
   half: "AM" | "PM" | null;
   leaveType: number;
+  coveringDate?: Date;
 };
 
 export type LeaveResponse = {
@@ -32,6 +33,7 @@ export type Leave = {
   leaveDate: string;
   halfDay: "AM" | "PM" | null;
   leaveType: number;
+  coveringDate: string | null;
   createdAt: string;
   updatedAt: string;
   userId: number | null;

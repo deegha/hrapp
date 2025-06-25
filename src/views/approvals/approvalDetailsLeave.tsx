@@ -47,6 +47,12 @@ export function ApprovalDetailsLeave() {
               "Unknown"}{" "}
             - {moment(leave.leaveDate).format("YYYY-DD-MM")}
             {leave.halfDay && `- Half day ${leave.halfDay}`}
+            {leaveTypes.find((type) => parseInt(type.value) === leave.leaveType)?.isLieuLeave &&
+              leave.coveringDate && (
+                <div className="ml-4 text-xs text-textSecondary">
+                  Covering Date: {moment(leave.coveringDate).format("YYYY-DD-MM")}
+                </div>
+              )}
           </div>
         ))}
       </div>
