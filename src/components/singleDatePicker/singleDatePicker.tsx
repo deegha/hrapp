@@ -71,11 +71,16 @@ export const SingleDatePicker: React.FC<ISingleDatePickerProps> = ({
           {monthDays.map((day) => {
             const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
             const isSelected = selectedDate && date.getTime() === selectedDate.getTime();
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const isPastDate = date.getTime() < today.getTime();
 
             let buttonClass =
               "flex size-8 items-center justify-center rounded-full text-sm transition-colors ";
 
-            if (isSelected) {
+            if (isPastDate) {
+              buttonClass += "text-gray-300 cursor-not-allowed";
+            } else if (isSelected) {
               buttonClass += "bg-[#80CBC4] text-white";
             } else {
               buttonClass += "hover:bg-border";
@@ -85,9 +90,12 @@ export const SingleDatePicker: React.FC<ISingleDatePickerProps> = ({
               <button
                 key={day}
                 className={buttonClass}
+                disabled={isPastDate}
                 onClick={(e: React.SyntheticEvent) => {
                   e.preventDefault();
-                  handleDateClick(day);
+                  if (!isPastDate) {
+                    handleDateClick(day);
+                  }
                 }}
               >
                 {day}
