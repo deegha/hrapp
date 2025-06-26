@@ -40,3 +40,12 @@ export async function createLeaveType(leaveType: TCreateLeaveTypePayload) {
     resource: "organization/leave-type",
   });
 }
+
+export async function deleteLeaveType(leaveTypeId: number) {
+  return await serviceHandler<TResponse<{message: string}>, {leaveTypeId: number}>({
+    method: "DELETE",
+    body: {leaveTypeId},
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: "organization/leave-type",
+  });
+}
