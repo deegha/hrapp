@@ -1,11 +1,11 @@
 import {Button, PageLayout, PolicySection, InputField} from "@/components";
 import {useState, useEffect} from "react";
 import useSWR from "swr";
-import {fetchLeavePolicies, updateLeavePolicy, createLeaveType} from "@/services";
+import {fetchLeavePolicies, updateLeavePolicy, createLeaveType, deleteLeaveType} from "@/services";
 import {TLeavePolicy, TCreateLeaveTypePayload} from "@/types";
 import {useNotificationStore} from "@/store/notificationStore";
 import {Listbox} from "@headlessui/react";
-import {ChevronDown, Check, X} from "react-feather";
+import {ChevronDown, Check, X, Trash2} from "react-feather";
 import clsx from "clsx";
 import {EMPLOYMENT_TYPES, EmploymentType} from "@/constants/employmentTypes";
 
@@ -88,6 +88,11 @@ export function LeavePolicies() {
   });
   const [createLoading, setCreateLoading] = useState(false);
 
+  // Delete confirmation modal state
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteLeaveTypeId, setDeleteLeaveTypeId] = useState<number | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
   const {data, isLoading, mutate} = useSWR("leave-policies", async () => {
     const response = await fetchLeavePolicies();
     return response.data || [];
@@ -95,8 +100,10 @@ export function LeavePolicies() {
 
   useEffect(() => {
     if (data) {
-      setPolicies(data);
-      setTempPolicies(data); // Initialize temp state with current data
+      // Filter out "Lieu Leave" as it's a special leave type that shouldn't be manageable via UI
+      const filteredData = data.filter((policy) => policy.name !== "Lieu Leave");
+      setPolicies(filteredData);
+      setTempPolicies(filteredData); // Initialize temp state with current data
     }
   }, [data]);
 
@@ -212,6 +219,40 @@ export function LeavePolicies() {
     }
   };
 
+  const handleDeleteLeaveType = async () => {
+    if (!deleteLeaveTypeId) return;
+
+    try {
+      setDeleteLoading(true);
+
+      await deleteLeaveType(deleteLeaveTypeId);
+
+      showNotification({
+        message: "Leave type deleted successfully!",
+        type: "success",
+      });
+
+      // Refresh data
+      mutate();
+      setShowDeleteModal(false);
+      setDeleteLeaveTypeId(null);
+    } catch (error) {
+      const errorMessage = typeof error === "string" ? error : "Failed to delete leave type";
+
+      showNotification({
+        message: errorMessage,
+        type: "error",
+      });
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
+  const confirmDelete = (leaveTypeId: number) => {
+    setDeleteLeaveTypeId(leaveTypeId);
+    setShowDeleteModal(true);
+  };
+
   if (isLoading) {
     return (
       <PageLayout pageName="Leave Policies">
@@ -283,6 +324,15 @@ export function LeavePolicies() {
             />
           </div>
         </div>
+      ) : undefined,
+      action: !edit ? (
+        <button
+          onClick={() => confirmDelete(policy.id)}
+          className="flex items-center justify-center rounded-md p-2 text-red-500 hover:bg-red-50 hover:text-red-700"
+          title="Delete leave type"
+        >
+          <Trash2 size={16} />
+        </button>
       ) : undefined,
     };
   });
@@ -522,7 +572,7 @@ export function LeavePolicies() {
               <div className="mt-6 flex justify-end space-x-3">
                 <Button
                   onClick={() => setShowCreateModal(false)}
-                  variant="danger"
+                  variant="secondary"
                   disabled={createLoading}
                 >
                   Cancel
@@ -534,6 +584,49 @@ export function LeavePolicies() {
                   disabled={!createFormData.name.trim()}
                 >
                   Create Leave Type
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Delete Confirmation Modal */}
+        {showDeleteModal && (
+          <div
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/30 backdrop-blur-sm"
+            onClick={() => setShowDeleteModal(false)}
+          >
+            <div
+              className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-gray-800">Delete Leave Type</h2>
+                <button
+                  onClick={() => setShowDeleteModal(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="mb-6">
+                <p className="text-sm text-gray-600">
+                  Are you sure you want to delete this leave type? This action cannot be undone and
+                  will affect any related leave policies.
+                </p>
+              </div>
+
+              <div className="flex justify-end space-x-3">
+                <Button
+                  onClick={() => setShowDeleteModal(false)}
+                  variant="secondary"
+                  disabled={deleteLoading}
+                >
+                  Cancel
+                </Button>
+                <Button onClick={handleDeleteLeaveType} variant="danger" loading={deleteLoading}>
+                  Delete
                 </Button>
               </div>
             </div>
