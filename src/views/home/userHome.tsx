@@ -6,6 +6,7 @@ import {fetchMyPermissions} from "@/services/userService";
 import {useRouter} from "next/router";
 import {LeaveRequest, LeaveRequestWithUser, TApproval} from "@/types";
 import {format} from "date-fns";
+import LeaveBalanceSkeleton from "@/views/home/loading";
 
 type LeaveBalance = {
   yearlyAllowance: number;
@@ -72,9 +73,7 @@ export function UserHome() {
   if (loading)
     return (
       <PageLayout pageName="Home">
-        <div className="flex items-center justify-center py-8">
-          <div className="text-sm text-textSecondary">Loading dashboard...</div>
-        </div>
+        <LeaveBalanceSkeleton />
       </PageLayout>
     );
 
