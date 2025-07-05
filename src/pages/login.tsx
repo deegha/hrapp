@@ -74,11 +74,11 @@ export default function Login() {
   };
 
   return (
-    <div className="flex h-screen w-full items-center justify-center md:bg-accent">
-      <div className="flex w-[490px] flex-col rounded-md bg-white p-10 px-[71px] py-[61px]">
+    <div className="flex w-full items-center justify-center md:h-screen md:bg-accent">
+      <div className="flex w-[490px] flex-col rounded-md bg-white p-10 md:px-[71px] md:py-[61px]">
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-[41px]">
           <div className="flex w-full flex-col items-center justify-center gap-[9px]">
-            <h1 className="text-xl"> Welcome back</h1>
+            <h1 className="text-md md:text-xl"> Welcome back</h1>
             <p className="text-primary">Enter your credentials to login</p>
           </div>
           <div className="flex flex-col justify-center gap-[23px]">
