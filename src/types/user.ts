@@ -13,6 +13,13 @@ export type TUser = {
     id: number;
     typeLabel: string;
   };
+  activityLogs?: {
+    id: number;
+    createdAt: string;
+    content: string;
+    userId: number;
+    updatedAt: string;
+  }[];
 };
 
 export type TUserStatus = {

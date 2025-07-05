@@ -22,9 +22,9 @@ export default {
         white: "var(--color-white)",
       },
       fontSize: {
-        xxs: "10px",
-        xs: "12px",
-        sm: "14px",
+        xxs: "9px",
+        xs: "10px",
+        sm: "12px",
         md: "17px",
         lg: "30px",
         xl: "40px",

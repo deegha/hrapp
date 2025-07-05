@@ -8,29 +8,7 @@ import {mutate} from "swr";
 import {useUserStore} from "@/store/useUserStore";
 import useSWR from "swr";
 import {useState} from "react";
-
-const logs = [
-  {
-    log: "Jason requested leave on 2th march",
-    userEmp: 4,
-    createdAt: new Date(),
-  },
-  {
-    log: "Jason requested leave on 2th march",
-    userEmp: 4,
-    createdAt: new Date(),
-  },
-  {
-    log: "Jason requested leave on 2th march",
-    userEmp: 4,
-    createdAt: new Date(),
-  },
-  {
-    log: "Jason requested leave on 2th march",
-    userEmp: 4,
-    createdAt: new Date(),
-  },
-];
+import {roles} from "@/utils/staticValues";
 
 export function UserDetails() {
   const {openModal} = useConfirmationModalStore();
@@ -128,6 +106,8 @@ export function UserDetails() {
     });
   };
 
+  const userLevel = roles[user?.userLevel as keyof typeof roles] || user?.userLevel;
+
   return (
     <div className="flex flex-col gap-10">
       <div className="flex items-center justify-between">
@@ -140,24 +120,27 @@ export function UserDetails() {
         <h2>User Details</h2>
         <Detail label={"First Name"} value={user.firstName} />
         <Detail label={"Last Name"} value={user.lastName} />
-        <Detail label={"Email"} value={user.email} />
+        <Detail label={"Email"} value={user.email} type="email" />
+        <Detail label={"User Level"} value={userLevel} />
         {user.EmploymentType && (
           <Detail label={"Employment Type"} value={user.EmploymentType.typeLabel} />
         )}
       </div>
-
-      <div className="flex flex-col gap-3">
-        <h2>Most Recent User Logs</h2>
-        {logs.map((log, i) => (
-          <div key={i} className="flex flex-col gap-1">
-            <div className="flex font-semibold text-textSecondary">
-              <div className="size-2 rounded-full bg-primary" />
-              <div className="text-sm">{log.log}</div>
+      {user.activityLogs && user.activityLogs.length > 0 && (
+        <div className="flex flex-col gap-3">
+          <h2>Most Recent User Logs</h2>
+          {user.activityLogs.map((log, i) => (
+            <div key={i} className="flex flex-col gap-1 border-b border-border py-2 text-sm">
+              <div className="flex font-semibold text-textSecondary">
+                <div className="text-sm">{log.content}</div>
+              </div>
+              <div className="text-xs text-textSecondary">
+                {new Date(log.createdAt).toDateString()}
+              </div>
             </div>
-            <div className="text-sm text-textSecondary">{log.createdAt.toDateString()}</div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
       <div className="flex w-full gap-3">
         {/* <Button variant="secondary">
           <div className="flex gap-1 items-center">

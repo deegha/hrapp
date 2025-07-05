@@ -62,7 +62,7 @@ export function UserProfile() {
 }
 
 const ProfileRow: React.FC<{label: string; value: React.ReactNode}> = ({label, value}) => (
-  <div className="flex items-center gap-5 border-t border-border py-4">
+  <div className="flex items-center gap-5 border-t border-border py-3">
     <div className="flex w-[400px] items-center gap-2">
       <div className="textSecondary text-sm font-semiBold">{label}</div>
       <div>:</div>

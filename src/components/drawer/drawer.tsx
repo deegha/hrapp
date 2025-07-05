@@ -20,7 +20,9 @@ export function Drawer({open, children, close}: IDrawer) {
         <div className="flex w-full cursor-pointer justify-end text-textSecondary">
           <X onClick={close} />
         </div>
-        <div className="py-5">{children}</div>
+        <div className="scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-300 hover:scrollbar-thumb-gray-400 mt-4 max-h-[calc(100vh-60px)] overflow-y-auto py-5 pr-2">
+          {children}
+        </div>
       </div>
     </div>
   );

@@ -17,7 +17,7 @@ export default function UserManagement() {
 
   useEffect(() => unsetUser, [unsetUser]);
 
-  function handleApplyLeave() {
+  function handleCreateUser() {
     router.push("./user-management/create-user");
   }
 
@@ -27,7 +27,7 @@ export default function UserManagement() {
         <UserDetails />
       </Drawer>
       <PageLayout
-        actionButton={<Button onClick={handleApplyLeave}>CREATE USER</Button>}
+        actionButton={<Button onClick={handleCreateUser}>CREATE USER</Button>}
         pageName="User Management"
       >
         {users?.data.data.length === 0 ? (
