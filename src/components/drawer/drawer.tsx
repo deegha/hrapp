@@ -13,7 +13,7 @@ export function Drawer({open, children, close}: IDrawer) {
 
       <div
         // eslint-disable-next-line tailwindcss/migration-from-tailwind-2
-        className={`fixed right-0 top-0 z-50 h-full w-[560px] transform rounded-l-lg bg-white p-5 shadow-lg transition-transform duration-300 ease-out ${
+        className={`fixed right-0 top-0 z-50 size-full transform rounded-l-lg bg-white p-5 shadow-lg transition-transform duration-300 ease-out md:w-[560px] ${
           open ? "translate-x-0" : "translate-x-full"
         }`}
       >

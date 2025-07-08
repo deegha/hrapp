@@ -36,7 +36,7 @@ export function ApplyLeave() {
 
   return (
     <PageLayout pageName="Leave Management - Request timeout">
-      <div className="flex items-start gap-10">
+      <div className="flex flex-col gap-10 md:flex-row md:items-start">
         <div className="w-full">
           <div className="flex flex-col gap-[41px]">
             <div className="flex flex-col gap-5">
@@ -126,10 +126,11 @@ export function ApplyLeave() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-6" style={{width: "320px"}}>
+        <div className="flex w-[320px] flex-col gap-6" style={{width: "320px"}}>
           <div className="flex flex-col gap-4">
             <h3 className="text-base font-semibold">Leave Balance</h3>
-
+          </div>
+          <div className="flex flex-col gap-4">
             {leaveBalance?.leaveTypeBalances
               ?.filter((balance) => balance.name !== "Lieu Leave")
               ?.map((balance) => (

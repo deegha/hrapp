@@ -186,9 +186,9 @@ export const DatePicker: React.FC<IDatePickerProps> = ({
           <ChevronRight className="text-gray-600" />
         </button>
       </div>
-      <div className="flex w-full justify-between">
+      <div className="w-full justify-between md:flex">
         {renderCalendar(0)}
-        {renderCalendar(1)}
+        <div className="hidden md:block">{renderCalendar(1)}</div>
       </div>
     </div>
   );
