@@ -14,7 +14,7 @@ export function PageLayout({pageName, actionButton, children}: IProps) {
   const pathSegments = pathname.split("/").filter(Boolean);
 
   return (
-    <div className="flex w-full animate-appear flex-col gap-[40px] p-[25px]">
+    <div className="flex w-full animate-appear flex-col gap-[20px] p-[25px] md:gap-[40px]">
       <div className="flex h-[40px] w-full items-center justify-between">
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-2">
