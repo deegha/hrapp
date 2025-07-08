@@ -104,7 +104,7 @@ export function UserHome() {
             </h3>
             <div className="flex items-center justify-between">
               <div>
-                <p className="mb-2 text-lg font-semibold text-textPrimary">
+                <p className="mb-2 text-md font-semibold text-textPrimary md:text-lg">
                   Leave Balance Overview
                 </p>
                 <div className="flex gap-4 text-sm">
