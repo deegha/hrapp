@@ -5,7 +5,9 @@ import {Notification, ConfirmationsModal} from "@/components";
 import zipy from "zipyai";
 const inter = Inter({subsets: ["latin"]});
 
-zipy.init("74aae3f7");
+if (process.env.NEXT_PUBLIC_ENVIRONMENT !== "development") {
+  zipy.init("74aae3f7");
+}
 
 export default function MyApp({Component, pageProps}: AppProps) {
   return (

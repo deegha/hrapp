@@ -62,4 +62,18 @@ export type TAllUserDetails = TUser & {
     teamName: string;
     division: number;
   }[];
+  managerId?: number;
+  manager?: {
+    firstName: string;
+    lastName: string;
+    employeeId: number;
+    id: number;
+  };
 };
+export interface IUserSearchResult {
+  employeeId: number | null;
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+}

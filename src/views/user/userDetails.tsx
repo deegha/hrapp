@@ -1,7 +1,12 @@
-import {StatusTag, Button, Detail} from "@/components";
+import {StatusTag, Button, Detail, Autocomplete} from "@/components";
 import {useConfirmationModalStore} from "@/store/useConfirmationModalStore";
-import {Trash, ArrowUp} from "react-feather";
-import {deleteUser, updateEmploymentType, fetchEmploymentTypes} from "@/services/userService";
+import {Trash, ArrowUp, XCircle} from "react-feather";
+import {
+  deleteUser,
+  updateEmploymentType,
+  fetchEmploymentTypes,
+  assignManager,
+} from "@/services/userService";
 import {usePagination} from "@/hooks/usePagination";
 import {useNotificationStore} from "@/store/notificationStore";
 import {mutate} from "swr";
@@ -9,6 +14,7 @@ import {useUserStore} from "@/store/useUserStore";
 import useSWR from "swr";
 import {useState} from "react";
 import {roles} from "@/utils/staticValues";
+import {useUserSearch} from "@/hooks/useUserSearch";
 
 export function UserDetails() {
   const {openModal} = useConfirmationModalStore();
@@ -17,8 +23,9 @@ export function UserDetails() {
   const {unsetUser, user, setActiveUser} = useUserStore();
   const [isUpdatingEmploymentType, setIsUpdatingEmploymentType] = useState(false);
   const {data: employmentTypesData} = useSWR("fetch-employment-types", fetchEmploymentTypes);
+  const {searchResults, setSearchTerm, loading} = useUserSearch();
+  const [loadingManagerAssigning, setLoadingManagerAssigning] = useState(false);
 
-  // Get the next possible employment type transition
   const getNextEmploymentType = () => {
     if (!user.EmploymentType || !employmentTypesData?.data) return null;
 
@@ -57,8 +64,7 @@ export function UserDetails() {
           }
 
           // Refresh user data in store and user list
-          await setActiveUser(user.employeeId.toString());
-          mutate(`fetch-users${activePage}`);
+          refreshUserDetails();
           showNotification({
             type: "success",
             message: `Successfully promoted to ${nextType.typeLabel}`,
@@ -106,7 +112,37 @@ export function UserDetails() {
     });
   };
 
+  const refreshUserDetails = async () => {
+    await setActiveUser(user.employeeId.toString());
+    mutate(`fetch-users${activePage}`);
+    showNotification({
+      type: "success",
+      message: "Successfully updated manager",
+    });
+  };
+
+  const doAssignManager = async (managerId?: string) => {
+    try {
+      setLoadingManagerAssigning(true);
+      await assignManager(user.employeeId, managerId ? parseInt(managerId) : undefined);
+      await refreshUserDetails();
+      setSearchTerm("");
+    } catch (error) {
+      showNotification({
+        type: "error",
+        message: (error as string) || "Something went wrong when assigning manager",
+      });
+    } finally {
+      setLoadingManagerAssigning(false);
+    }
+  };
+
   const userLevel = roles[user?.userLevel as keyof typeof roles] || user?.userLevel;
+
+  const manager = {
+    label: user.manager ? `${user.manager.firstName} ${user.manager.lastName}` : "",
+    value: user.manager ? user.manager.employeeId.toString() : "",
+  };
 
   return (
     <div className="flex flex-col gap-10">
@@ -126,6 +162,42 @@ export function UserDetails() {
           <Detail label={"Employment Type"} value={user.EmploymentType.typeLabel} />
         )}
       </div>
+
+      <div className="flex flex-col gap-3">
+        <h2>User Manager</h2>
+        <Detail
+          loading={loadingManagerAssigning}
+          label={"Manager"}
+          value={
+            user.manager ? (
+              <div className="flex items-center gap-2">
+                {user.manager.firstName} {user.manager.lastName} (EMP-{user.manager.employeeId})
+                <div
+                  onClick={() => doAssignManager()}
+                  className="cursor-pointer font-bold text-red-500 hover:text-red-700"
+                >
+                  <XCircle size={12} />
+                </div>
+              </div>
+            ) : (
+              <Autocomplete
+                loading={loading}
+                value={{
+                  label: manager?.label || "",
+                  value: manager.value || "",
+                }}
+                options={searchResults}
+                onSearch={(option) => setSearchTerm(option)}
+                onChange={async (option) => {
+                  if (!option) return;
+                  doAssignManager(option.value);
+                }}
+              />
+            )
+          }
+        />
+      </div>
+
       {user.activityLogs && user.activityLogs.length > 0 && (
         <div className="flex flex-col gap-3">
           <h2>Most Recent User Logs</h2>

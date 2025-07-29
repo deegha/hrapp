@@ -6,6 +6,7 @@ import {
   TCreateUser,
   TAllUserDetails,
   TUpdateUser,
+  IUserSearchResult,
 } from "@/types/user";
 import {TResponse, TGenericFilters} from "@/types";
 import {TResponseWithPagination} from "@/types/api";
@@ -145,6 +146,25 @@ export async function updateEmploymentType(employeeId: number, newEmploymentType
     body: {
       employeeId,
       newEmploymentTypeId,
+    },
+  });
+}
+
+export async function searchUserService(searchTerm: string) {
+  return serviceHandler<TResponse<IUserSearchResult[]>>({
+    method: "GET",
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: `user/search/${searchTerm}`,
+  });
+}
+
+export async function assignManager(employeeId: number, managerId?: number) {
+  return serviceHandler<TResponse<TAllUserDetails>, {managerId?: number}>({
+    method: "PUT",
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: `user/${employeeId}/assign-manager`,
+    body: {
+      managerId: managerId || undefined,
     },
   });
 }
