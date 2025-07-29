@@ -30,11 +30,11 @@ export const Autocomplete = ({
   label,
 }: AutocompleteProps) => {
   return (
-    <div className="w-full flex-col gap-2">
+    <div className="flex w-full flex-col gap-1">
       {label && <label className="text-sm font-semibold text-textPrimary">{label}</label>}
       <Combobox value={value} onChange={onChange}>
         <div className="relative">
-          <div className="relative w-full cursor-pointer rounded-md border border-border bg-white py-3 pl-4 pr-10 text-left text-sm text-textPrimary shadow-sm transition hover:border-gray-400 focus:outline-none focus:ring-1 focus:ring-primary">
+          <div className="relative w-full cursor-pointer rounded-md border border-border bg-white py-2 pl-4 pr-10 text-left text-sm text-textPrimary shadow-sm transition hover:border-gray-400 focus:outline-none focus:ring-1 focus:ring-primary">
             <Combobox.Input
               className="w-full border-none bg-transparent text-sm focus:outline-none"
               displayValue={(option: Option) => (loading ? "Please wait..." : option?.label || "")}

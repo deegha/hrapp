@@ -52,6 +52,11 @@ export function UserProfile() {
                 value={user.employeeId?.toString() ? `EMP-${user.employeeId?.toString()}` : "N/A"}
               />
 
+              <ProfileRow
+                label="Managed by"
+                value={user.manager ? `${user.manager.firstName} ${user.manager.lastName}` : "N/A"}
+              />
+
               <ProfileRow label="Joined At" value={new Date(user.createdAt).toLocaleDateString()} />
             </div>
           )}

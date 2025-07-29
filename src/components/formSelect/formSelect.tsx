@@ -30,7 +30,7 @@ export const FormSelect = ({
           return (
             <Listbox value={selected} onChange={(val) => field.onChange(val?.value)}>
               <div className="relative">
-                <Listbox.Button className="relative w-full cursor-default rounded-md border border-border py-2 pl-3 pr-10 text-left text-sm">
+                <Listbox.Button className="relative w-full cursor-pointer rounded-md border border-border bg-white py-2 pl-4 pr-10 text-left text-sm text-textPrimary shadow-sm transition hover:border-gray-400 focus:outline-none focus:ring-1 focus:ring-primary">
                   <span className="block truncate">{selected?.label || `Select ${label}`}</span>
                   <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
                     <ChevronDown className="size-4 text-gray-400" />
