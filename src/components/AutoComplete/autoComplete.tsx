@@ -11,6 +11,7 @@ type Option = {
 };
 
 type AutocompleteProps = {
+  label?: string;
   options: Option[];
   value: Option | null;
   onChange: (value: Option) => void;
@@ -26,9 +27,11 @@ export const Autocomplete = ({
   onSearch,
   placeholder = "Search...",
   loading,
+  label,
 }: AutocompleteProps) => {
   return (
-    <div className="w-full">
+    <div className="w-full flex-col gap-2">
+      {label && <label className="text-sm font-semibold text-textPrimary">{label}</label>}
       <Combobox value={value} onChange={onChange}>
         <div className="relative">
           <div className="relative w-full cursor-pointer rounded-md border border-border bg-white py-3 pl-4 pr-10 text-left text-sm text-textPrimary shadow-sm transition hover:border-gray-400 focus:outline-none focus:ring-1 focus:ring-primary">

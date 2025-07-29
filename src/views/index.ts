@@ -9,3 +9,4 @@ export {UserRole} from "./user/userRole";
 export {EmploymentType} from "./user/employmentType";
 export {Users} from "./user/users";
 export {UserDetails} from "./user/userDetails";
+export {UserManager} from "./user/manager";
