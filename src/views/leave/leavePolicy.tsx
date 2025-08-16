@@ -1,13 +1,18 @@
 import {Button, PageLayout, PolicySection, InputField} from "@/components";
-import {useState, useEffect} from "react";
+import {useState, useEffect, useMemo} from "react";
 import useSWR from "swr";
-import {fetchLeavePolicies, updateLeavePolicy, createLeaveType, deleteLeaveType} from "@/services";
+import {
+  fetchLeavePolicies,
+  updateLeavePolicy,
+  createLeaveType,
+  deleteLeaveType,
+  fetchEmploymentTypes,
+} from "@/services";
 import {TLeavePolicy, TCreateLeaveTypePayload} from "@/types";
 import {useNotificationStore} from "@/store/notificationStore";
 import {Listbox} from "@headlessui/react";
 import {ChevronDown, Check, X, Trash2} from "react-feather";
 import clsx from "clsx";
-import {EMPLOYMENT_TYPES, EmploymentType} from "@/constants/employmentTypes";
 
 // Custom dropdown without text truncation
 const PolicyDropdown = ({
@@ -73,6 +78,10 @@ export function LeavePolicies() {
   // Local state for temporary changes during editing
   const [tempPolicies, setTempPolicies] = useState<TLeavePolicy[]>([]);
 
+  // Fetch employment types
+  const {data: employmentTypesData} = useSWR("employment-types", fetchEmploymentTypes);
+  const employmentTypes = useMemo(() => employmentTypesData?.data || [], [employmentTypesData]);
+
   // Create leave type modal state
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [createFormData, setCreateFormData] = useState<TCreateLeaveTypePayload>({
@@ -80,11 +89,7 @@ export function LeavePolicies() {
     daysPerYear: 10,
     accrualType: "ALL_FROM_DAY_1",
     canCarryForward: false,
-    daysPerEmploymentType: {
-      [EMPLOYMENT_TYPES.FULLTIME]: 10,
-      [EMPLOYMENT_TYPES.PROBATION]: 5,
-      [EMPLOYMENT_TYPES.INTERN]: 1,
-    },
+    daysPerEmploymentType: {},
   });
   const [createLoading, setCreateLoading] = useState(false);
 
@@ -97,6 +102,20 @@ export function LeavePolicies() {
     const response = await fetchLeavePolicies();
     return response.data || [];
   });
+
+  // Initialize createFormData with default days for all employment types
+  useEffect(() => {
+    if (employmentTypes.length > 0) {
+      const defaultDays: Record<string, number> = {};
+      employmentTypes.forEach((type) => {
+        defaultDays[type.typeLabel] = 10; // Default 10 days
+      });
+      setCreateFormData((prev) => ({
+        ...prev,
+        daysPerEmploymentType: defaultDays,
+      }));
+    }
+  }, [employmentTypes]);
 
   useEffect(() => {
     if (data) {
@@ -120,7 +139,7 @@ export function LeavePolicies() {
 
   const handleEmploymentTypeDaysUpdate = (
     policyId: number,
-    employmentType: EmploymentType,
+    employmentType: string,
     days: number,
   ) => {
     setTempPolicies((prev) =>
@@ -191,16 +210,16 @@ export function LeavePolicies() {
       });
 
       // Reset form and close modal
+      const defaultDays: Record<string, number> = {};
+      employmentTypes.forEach((type) => {
+        defaultDays[type.typeLabel] = 10; // Default 10 days
+      });
       setCreateFormData({
         name: "",
         daysPerYear: 10,
         accrualType: "ALL_FROM_DAY_1",
         canCarryForward: false,
-        daysPerEmploymentType: {
-          [EMPLOYMENT_TYPES.FULLTIME]: 10,
-          [EMPLOYMENT_TYPES.PROBATION]: 5,
-          [EMPLOYMENT_TYPES.INTERN]: 1,
-        },
+        daysPerEmploymentType: defaultDays,
       });
       setShowCreateModal(false);
 
@@ -266,63 +285,42 @@ export function LeavePolicies() {
 
   // Transform policies to display format with employment type columns
   const entitlements = displayPolicies.map((policy) => {
-    const fulltimeDays =
-      policy.daysPerEmploymentType?.[EMPLOYMENT_TYPES.FULLTIME] ?? policy.daysPerYear;
-    const probationDays =
-      policy.daysPerEmploymentType?.[EMPLOYMENT_TYPES.PROBATION] ?? policy.daysPerYear;
-    const internDays =
-      policy.daysPerEmploymentType?.[EMPLOYMENT_TYPES.INTERN] ?? policy.daysPerYear;
+    // Generate employment type days dynamically
+    const employmentTypeDays = employmentTypes.map((empType) => {
+      const days = policy.daysPerEmploymentType?.[empType.typeLabel] ?? policy.daysPerYear;
+      return {typeLabel: empType.typeLabel, days};
+    });
 
     return {
       id: policy.id,
       item: policy.name,
       value: edit
         ? ""
-        : `Fulltime: ${fulltimeDays}, Probation: ${probationDays}, Intern: ${internDays} days per year`,
+        : employmentTypeDays.map((emp) => `${emp.typeLabel}: ${emp.days}`).join(", ") +
+          " days per year",
       editValue: edit ? (
-        <div className="flex gap-4">
-          <div className="flex flex-col">
-            <label className="mb-1 text-xs font-medium text-gray-600">Fulltime</label>
-            <InputField
-              value={fulltimeDays.toString()}
-              onChange={(e) =>
-                handleEmploymentTypeDaysUpdate(
-                  policy.id,
-                  EMPLOYMENT_TYPES.FULLTIME,
-                  parseInt(e.target.value) || 0,
-                )
-              }
-              className="w-20"
-            />
-          </div>
-          <div className="flex flex-col">
-            <label className="mb-1 text-xs font-medium text-gray-600">Probation</label>
-            <InputField
-              value={probationDays.toString()}
-              onChange={(e) =>
-                handleEmploymentTypeDaysUpdate(
-                  policy.id,
-                  EMPLOYMENT_TYPES.PROBATION,
-                  parseInt(e.target.value) || 0,
-                )
-              }
-              className="w-20"
-            />
-          </div>
-          <div className="flex flex-col">
-            <label className="mb-1 text-xs font-medium text-gray-600">Intern</label>
-            <InputField
-              value={internDays.toString()}
-              onChange={(e) =>
-                handleEmploymentTypeDaysUpdate(
-                  policy.id,
-                  EMPLOYMENT_TYPES.INTERN,
-                  parseInt(e.target.value) || 0,
-                )
-              }
-              className="w-20"
-            />
-          </div>
+        <div className="flex flex-wrap gap-4">
+          {employmentTypes.map((empType) => {
+            const days = policy.daysPerEmploymentType?.[empType.typeLabel] ?? policy.daysPerYear;
+            return (
+              <div key={empType.typeLabel} className="flex flex-col">
+                <label className="mb-1 text-xs font-medium text-gray-600">
+                  {empType.typeLabel}
+                </label>
+                <InputField
+                  value={days.toString()}
+                  onChange={(e) =>
+                    handleEmploymentTypeDaysUpdate(
+                      policy.id,
+                      empType.typeLabel,
+                      parseInt(e.target.value) || 0,
+                    )
+                  }
+                  className="w-20"
+                />
+              </div>
+            );
+          })}
         </div>
       ) : undefined,
       action: !edit ? (
@@ -472,67 +470,28 @@ export function LeavePolicies() {
                     Days Per Employment Type
                   </label>
                   <div className="grid grid-cols-3 gap-3">
-                    <div>
-                      <label className="mb-1 block text-xs font-medium text-gray-600">
-                        Fulltime
-                      </label>
-                      <InputField
-                        value={
-                          createFormData.daysPerEmploymentType?.[
-                            EMPLOYMENT_TYPES.FULLTIME
-                          ]?.toString() || "10"
-                        }
-                        onChange={(e) =>
-                          setCreateFormData((prev) => ({
-                            ...prev,
-                            daysPerEmploymentType: {
-                              ...prev.daysPerEmploymentType,
-                              [EMPLOYMENT_TYPES.FULLTIME]: parseInt(e.target.value) || 0,
-                            },
-                          }))
-                        }
-                      />
-                    </div>
-                    <div>
-                      <label className="mb-1 block text-xs font-medium text-gray-600">
-                        Probation
-                      </label>
-                      <InputField
-                        value={
-                          createFormData.daysPerEmploymentType?.[
-                            EMPLOYMENT_TYPES.PROBATION
-                          ]?.toString() || "5"
-                        }
-                        onChange={(e) =>
-                          setCreateFormData((prev) => ({
-                            ...prev,
-                            daysPerEmploymentType: {
-                              ...prev.daysPerEmploymentType,
-                              [EMPLOYMENT_TYPES.PROBATION]: parseInt(e.target.value) || 0,
-                            },
-                          }))
-                        }
-                      />
-                    </div>
-                    <div>
-                      <label className="mb-1 block text-xs font-medium text-gray-600">Intern</label>
-                      <InputField
-                        value={
-                          createFormData.daysPerEmploymentType?.[
-                            EMPLOYMENT_TYPES.INTERN
-                          ]?.toString() || "1"
-                        }
-                        onChange={(e) =>
-                          setCreateFormData((prev) => ({
-                            ...prev,
-                            daysPerEmploymentType: {
-                              ...prev.daysPerEmploymentType,
-                              [EMPLOYMENT_TYPES.INTERN]: parseInt(e.target.value) || 0,
-                            },
-                          }))
-                        }
-                      />
-                    </div>
+                    {employmentTypes.map((empType) => (
+                      <div key={empType.typeLabel}>
+                        <label className="mb-1 block text-xs font-medium text-gray-600">
+                          {empType.typeLabel}
+                        </label>
+                        <InputField
+                          value={
+                            createFormData.daysPerEmploymentType?.[empType.typeLabel]?.toString() ||
+                            "10"
+                          }
+                          onChange={(e) =>
+                            setCreateFormData((prev) => ({
+                              ...prev,
+                              daysPerEmploymentType: {
+                                ...prev.daysPerEmploymentType,
+                                [empType.typeLabel]: parseInt(e.target.value) || 0,
+                              },
+                            }))
+                          }
+                        />
+                      </div>
+                    ))}
                   </div>
                 </div>
 
