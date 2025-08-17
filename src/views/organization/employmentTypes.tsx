@@ -88,21 +88,48 @@ export function EmploymentTypes() {
           {employmentTypes.map((type) => (
             <div
               key={type.id}
-              className="flex cursor-pointer justify-between border-t border-border py-3"
+              className="group flex cursor-pointer justify-between border-t border-border py-4 transition-colors duration-200 hover:bg-gray-50/50"
             >
-              <div>
-                <p className="mb-2 text-sm font-semibold">{type.typeLabel}</p>
-                <div className="flex items-center gap-4 text-sm text-textSecondary">
+              <div className="flex-1">
+                <div className="mb-3 flex items-center gap-3">
+                  <h3 className="text-base font-semibold text-textPrimary">{type.typeLabel}</h3>
                   <span
-                    className={`inline-flex items-center rounded-md border px-2 py-1 text-xs font-medium shadow-sm ${
+                    className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium shadow-sm backdrop-blur-sm transition-all duration-200 ${
                       type.organizationId === null
-                        ? "border-blue-300 bg-blue-50 text-blue-800"
-                        : "border-emerald-300 bg-emerald-50 text-emerald-800"
+                        ? "border-primary/30 from-primary/15 to-primary/5 hover:shadow-primary/20 bg-gradient-to-r text-primary"
+                        : "border-secondary/30 from-secondary/15 to-secondary/5 hover:shadow-secondary/20 bg-gradient-to-r text-secondary"
                     }`}
                   >
+                    <div
+                      className={`size-2 rounded-full ${
+                        type.organizationId === null ? "bg-primary/60" : "bg-secondary/60"
+                      }`}
+                    />
                     {type.organizationId === null ? "System" : "Custom"}
                   </span>
-                  <span>Created: {new Date(type.createdAt).toLocaleDateString()}</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-textSecondary">
+                  <svg
+                    className="size-4 opacity-60"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
+                  </svg>
+                  <span>
+                    Created{" "}
+                    {new Date(type.createdAt).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                    })}
+                  </span>
                 </div>
               </div>
               <div className="text-sm">
