@@ -94,10 +94,10 @@ export function EmploymentTypes() {
                 <p className="mb-2 text-sm font-semibold">{type.typeLabel}</p>
                 <div className="flex items-center gap-4 text-sm text-textSecondary">
                   <span
-                    className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium ${
+                    className={`inline-flex items-center rounded-md border px-2 py-1 text-xs font-medium shadow-sm ${
                       type.organizationId === null
-                        ? "border-blue-200 bg-blue-50 text-blue-700"
-                        : "border-green-200 bg-green-50 text-green-700"
+                        ? "border-blue-300 bg-blue-50 text-blue-800"
+                        : "border-emerald-300 bg-emerald-50 text-emerald-800"
                     }`}
                   >
                     {type.organizationId === null ? "System" : "Custom"}
@@ -107,12 +107,13 @@ export function EmploymentTypes() {
               </div>
               <div className="text-sm">
                 {type.organizationId !== null && (
-                  <Button variant="danger" onClick={() => confirmDelete(type.id)}>
-                    <div className="flex items-center gap-1">
-                      <Trash size={14} />
-                      Delete
-                    </div>
-                  </Button>
+                  <button
+                    onClick={() => confirmDelete(type.id)}
+                    className="flex items-center justify-center rounded-md p-2 text-red-500 hover:bg-red-50 hover:text-red-700"
+                    title="Delete employment type"
+                  >
+                    <Trash size={16} />
+                  </button>
                 )}
               </div>
             </div>
