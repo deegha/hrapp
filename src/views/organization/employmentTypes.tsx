@@ -1,5 +1,11 @@
 import {useState} from "react";
-import {Button, PageLayout, InputField, NoDataFoundComponent} from "@/components";
+import {
+  Button,
+  PageLayout,
+  NoDataFoundComponent,
+  EmploymentTypesShimmer,
+  ErrorDisplay,
+} from "@/components";
 import useSWR from "swr";
 import {
   fetchEmploymentTypes,
@@ -7,10 +13,10 @@ import {
   deleteEmploymentType,
 } from "@/services/organizationService";
 import {TCreateEmploymentTypePayload} from "@/types/organization";
-import {useForm} from "react-hook-form";
 import {useNotificationStore} from "@/store/notificationStore";
 import {useConfirmationModalStore} from "@/store/useConfirmationModalStore";
 import {Trash} from "react-feather";
+import {CreateEmploymentTypeModal} from "./createEmploymentTypeModal";
 
 export function EmploymentTypes() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -18,13 +24,6 @@ export function EmploymentTypes() {
   const {openModal} = useConfirmationModalStore();
 
   const {data, error, isLoading, mutate} = useSWR("employment-types", fetchEmploymentTypes);
-
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: {errors, isSubmitting},
-  } = useForm<TCreateEmploymentTypePayload>();
 
   const employmentTypes = data?.data || [];
 
@@ -36,7 +35,6 @@ export function EmploymentTypes() {
         type: "success",
       });
       setIsCreateModalOpen(false);
-      reset();
       mutate();
     } catch (error) {
       showNotification({
@@ -72,7 +70,13 @@ export function EmploymentTypes() {
     });
   };
 
-  if (error) return <div>Error loading employment types</div>;
+  if (error) {
+    return (
+      <PageLayout pageName="Employment Types">
+        <ErrorDisplay message={(error as Error).message || "Error loading employment types"} />
+      </PageLayout>
+    );
+  }
 
   return (
     <PageLayout
@@ -80,39 +84,43 @@ export function EmploymentTypes() {
       pageName="Employment Types"
     >
       {isLoading ? (
-        <div>Loading...</div>
+        <EmploymentTypesShimmer />
       ) : employmentTypes.length === 0 ? (
         <NoDataFoundComponent />
       ) : (
-        <div className="flex flex-col gap-5">
+        <div className="flex flex-col">
           {employmentTypes.map((type) => (
             <div
               key={type.id}
+              onClick={() => {}}
               className="flex cursor-pointer justify-between border-t border-border py-3"
             >
               <div>
-                <p className="mb-2 text-sm font-semibold">{type.typeLabel}</p>
-                <div className="flex items-center gap-4 text-sm text-textSecondary">
-                  <span
-                    className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium ${
-                      type.organizationId === null
-                        ? "border-blue-200 bg-blue-50 text-blue-700"
-                        : "border-green-200 bg-green-50 text-green-700"
-                    }`}
-                  >
-                    {type.organizationId === null ? "System" : "Custom"}
-                  </span>
-                  <span>Created: {new Date(type.createdAt).toLocaleDateString()}</span>
+                <p className="text-sm font-semibold">{type.typeLabel}</p>
+                <div className="flex gap-2 text-sm text-textSecondary">
+                  <div className="text-xs text-textSecondary">
+                    Created{" "}
+                    {new Date(type.createdAt).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                    })}
+                  </div>
                 </div>
               </div>
               <div className="text-sm">
-                {type.organizationId !== null && (
-                  <Button variant="danger" onClick={() => confirmDelete(type.id)}>
-                    <div className="flex items-center gap-1">
-                      <Trash size={14} />
-                      Delete
-                    </div>
-                  </Button>
+                {type.organizationId === null ? (
+                  <div className="inline-block rounded-md bg-primary px-[6px] py-[2px] text-xxs font-medium text-white">
+                    System
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => confirmDelete(type.id)}
+                    className="flex items-center justify-center rounded-md p-2 text-red-500 hover:bg-red-50 hover:text-red-700"
+                    title="Delete employment type"
+                  >
+                    <Trash size={16} />
+                  </button>
                 )}
               </div>
             </div>
@@ -120,47 +128,11 @@ export function EmploymentTypes() {
         </div>
       )}
 
-      {/* Create Modal */}
-      {isCreateModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/30 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
-            <h2 className="mb-4 text-lg font-semibold text-gray-800">Create New Employment Type</h2>
-            <form onSubmit={handleSubmit(onCreateSubmit)} className="space-y-4">
-              <InputField
-                label="Type Label"
-                {...register("typeLabel", {
-                  required: "Type label is required",
-                  minLength: {
-                    value: 1,
-                    message: "Type label must be at least 1 character",
-                  },
-                  maxLength: {
-                    value: 50,
-                    message: "Type label cannot exceed 50 characters",
-                  },
-                })}
-                error={errors.typeLabel?.message}
-                placeholder="e.g., CONTRACTOR, PART_TIME"
-              />
-              <div className="flex justify-end space-x-3">
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => {
-                    setIsCreateModalOpen(false);
-                    reset();
-                  }}
-                >
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? "Creating..." : "Create"}
-                </Button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <CreateEmploymentTypeModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSubmit={onCreateSubmit}
+      />
     </PageLayout>
   );
 }
