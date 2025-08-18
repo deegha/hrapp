@@ -84,56 +84,32 @@ export function EmploymentTypes() {
       ) : employmentTypes.length === 0 ? (
         <NoDataFoundComponent />
       ) : (
-        <div className="flex flex-col gap-5">
+        <div className="flex flex-col">
           {employmentTypes.map((type) => (
             <div
               key={type.id}
-              className="group flex cursor-pointer justify-between border-t border-border py-4 transition-colors duration-200 hover:bg-gray-50/50"
+              onClick={() => {}}
+              className="flex cursor-pointer justify-between border-t border-border py-3"
             >
-              <div className="flex-1">
-                <div className="mb-3 flex items-center gap-3">
-                  <h3 className="text-base font-semibold text-textPrimary">{type.typeLabel}</h3>
-                  <span
-                    className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium shadow-sm backdrop-blur-sm transition-all duration-200 ${
-                      type.organizationId === null
-                        ? "border-primary/30 from-primary/15 to-primary/5 hover:shadow-primary/20 bg-gradient-to-r text-primary"
-                        : "border-secondary/30 from-secondary/15 to-secondary/5 hover:shadow-secondary/20 bg-gradient-to-r text-secondary"
-                    }`}
-                  >
-                    <div
-                      className={`size-2 rounded-full ${
-                        type.organizationId === null ? "bg-primary/60" : "bg-secondary/60"
-                      }`}
-                    />
-                    {type.organizationId === null ? "System" : "Custom"}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-textSecondary">
-                  <svg
-                    className="size-4 opacity-60"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                    />
-                  </svg>
-                  <span>
+              <div>
+                <p className="text-sm font-semibold">{type.typeLabel}</p>
+                <div className="flex gap-2 text-sm text-textSecondary">
+                  <div className="text-xs text-textSecondary">
                     Created{" "}
                     {new Date(type.createdAt).toLocaleDateString("en-US", {
                       year: "numeric",
                       month: "short",
                       day: "numeric",
                     })}
-                  </span>
+                  </div>
                 </div>
               </div>
               <div className="text-sm">
-                {type.organizationId !== null && (
+                {type.organizationId === null ? (
+                  <div className="inline-block rounded-md bg-primary px-[6px] py-[2px] text-xxs font-medium text-white">
+                    System
+                  </div>
+                ) : (
                   <button
                     onClick={() => confirmDelete(type.id)}
                     className="flex items-center justify-center rounded-md p-2 text-red-500 hover:bg-red-50 hover:text-red-700"
