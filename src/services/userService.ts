@@ -158,13 +158,13 @@ export async function searchUserService(searchTerm: string) {
   });
 }
 
-export async function assignManager(employeeId: number, managerId?: number) {
-  return serviceHandler<TResponse<TAllUserDetails>, {managerId?: number}>({
+export async function assignManager(employeeId: number, managerId: number | null) {
+  return serviceHandler<TResponse<TAllUserDetails>, {managerId: number | null}>({
     method: "PUT",
     baseURL: process.env.NEXT_PUBLIC_API as string,
     resource: `user/${employeeId}/assign-manager`,
     body: {
-      managerId: managerId || undefined,
+      managerId,
     },
   });
 }

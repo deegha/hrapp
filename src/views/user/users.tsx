@@ -19,6 +19,16 @@ export function Users({users}: IUsers) {
               <span>EMPID: {user.employeeId}</span>
               <span>{user.email}</span>
               {user.EmploymentType && <span>Type: {user.EmploymentType.typeLabel}</span>}
+              {user.manager && (
+                <span>
+                  Managed by: {user.manager.firstName} {user.manager.lastName}
+                </span>
+              )}
+              {user.isManager && (
+                <span className="rounded bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800">
+                  Manager
+                </span>
+              )}
             </>
           }
           status={user.UserStatus?.statusLabel}

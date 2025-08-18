@@ -8,10 +8,17 @@ export type TUser = {
   updatedAt: string;
   userStatusId: number;
   employmentTypeId?: number;
+  isManager?: boolean;
   UserStatus: TUserStatus;
   EmploymentType?: {
     id: number;
     typeLabel: string;
+  };
+  manager?: {
+    id: number;
+    firstName: string;
+    lastName: string;
+    email: string;
   };
   activityLogs?: {
     id: number;
@@ -62,13 +69,7 @@ export type TAllUserDetails = TUser & {
     teamName: string;
     division: number;
   }[];
-  managerId?: number;
-  manager?: {
-    firstName: string;
-    lastName: string;
-    employeeId: number;
-    id: number;
-  };
+  isManager: boolean;
 };
 export interface IUserSearchResult {
   employeeId: number | null;

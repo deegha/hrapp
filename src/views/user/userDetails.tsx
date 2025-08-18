@@ -124,7 +124,7 @@ export function UserDetails() {
   const doAssignManager = async (managerId?: string) => {
     try {
       setLoadingManagerAssigning(true);
-      await assignManager(user.employeeId, managerId ? parseInt(managerId) : undefined);
+      await assignManager(user.employeeId, managerId ? parseInt(managerId) : null);
       await refreshUserDetails();
       setSearchTerm("");
     } catch (error) {
@@ -141,7 +141,7 @@ export function UserDetails() {
 
   const manager = {
     label: user.manager ? `${user.manager.firstName} ${user.manager.lastName}` : "",
-    value: user.manager ? user.manager.employeeId.toString() : "",
+    value: user.manager ? user.manager.id.toString() : "",
   };
 
   return (
@@ -150,7 +150,14 @@ export function UserDetails() {
         <h1 className="text-[32px] font-semibold uppercase">
           {user.firstName} {user.lastName} (EMP-{user.employeeId})
         </h1>
-        <StatusTag status={user.UserStatus?.statusLabel} />
+        <div className="flex items-center gap-2">
+          {user.isManager && (
+            <span className="rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-800">
+              Manager
+            </span>
+          )}
+          <StatusTag status={user.UserStatus?.statusLabel} />
+        </div>
       </div>
       <div className="flex flex-col gap-3">
         <h2>User Details</h2>
@@ -171,7 +178,7 @@ export function UserDetails() {
           value={
             user.manager ? (
               <div className="flex items-center gap-2">
-                {user.manager.firstName} {user.manager.lastName} (EMP-{user.manager.employeeId})
+                {user.manager.firstName} {user.manager.lastName}
                 <div
                   onClick={() => doAssignManager()}
                   className="cursor-pointer font-bold text-red-500 hover:text-red-700"
