@@ -13,7 +13,16 @@ export function Users({users}: IUsers) {
         <ItemsList
           onClick={() => setActiveUser(user.employeeId.toString())}
           key={user.employeeId}
-          title={`${user.firstName} ${user.lastName}`}
+          title={
+            <div className="flex items-center gap-2">
+              <span>{`${user.firstName} ${user.lastName}`}</span>
+              {user.isManager && (
+                <span className="inline-block rounded-md bg-secondary px-[6px] py-[2px] text-xxs font-medium text-white">
+                  Manager
+                </span>
+              )}
+            </div>
+          }
           content={
             <>
               <span>EMPID: {user.employeeId}</span>
@@ -22,11 +31,6 @@ export function Users({users}: IUsers) {
               {user.manager && (
                 <span>
                   Managed by: {user.manager.firstName} {user.manager.lastName}
-                </span>
-              )}
-              {user.isManager && (
-                <span className="rounded bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800">
-                  Manager
                 </span>
               )}
             </>

@@ -147,15 +147,17 @@ export function UserDetails() {
   return (
     <div className="flex flex-col gap-10">
       <div className="flex items-center justify-between">
-        <h1 className="text-[32px] font-semibold uppercase">
-          {user.firstName} {user.lastName} (EMP-{user.employeeId})
-        </h1>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
+          <h1 className="text-[32px] font-semibold uppercase">
+            {user.firstName} {user.lastName} (EMP-{user.employeeId})
+          </h1>
           {user.isManager && (
-            <span className="rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-800">
+            <span className="inline-block rounded-md bg-secondary px-[6px] py-[2px] text-xxs font-medium text-white">
               Manager
             </span>
           )}
+        </div>
+        <div className="flex items-center gap-2">
           <StatusTag status={user.UserStatus?.statusLabel} />
         </div>
       </div>
