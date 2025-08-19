@@ -26,4 +26,5 @@ export {
   updateLeavePolicy,
   createLeaveType,
   deleteLeaveType,
+  fetchEmploymentTypes,
 } from "./organizationService";

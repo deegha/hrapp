@@ -5,6 +5,8 @@ import {
   TLeavePolicy,
   TUpdateLeavePolicyPayload,
   TCreateLeaveTypePayload,
+  TEmploymentType,
+  TCreateEmploymentTypePayload,
 } from "@/types/organization";
 
 export async function fetchLeaveTypes() {
@@ -47,5 +49,30 @@ export async function deleteLeaveType(leaveTypeId: number) {
     body: {leaveTypeId},
     baseURL: process.env.NEXT_PUBLIC_API as string,
     resource: "organization/leave-type",
+  });
+}
+
+export async function fetchEmploymentTypes() {
+  return await serviceHandler<TResponse<TEmploymentType[]>>({
+    method: "GET",
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: "organization/employment-types",
+  });
+}
+
+export async function createEmploymentType(employmentType: TCreateEmploymentTypePayload) {
+  return await serviceHandler<TResponse<TEmploymentType>, TCreateEmploymentTypePayload>({
+    method: "POST",
+    body: employmentType,
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: "organization/employment-types",
+  });
+}
+
+export async function deleteEmploymentType(id: number) {
+  return await serviceHandler<TResponse<{message: string}>>({
+    method: "DELETE",
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: `organization/employment-types/${id}`,
   });
 }
