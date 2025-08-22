@@ -2,7 +2,7 @@ import {TGenericStatus} from "./api";
 
 export type TApproval = {
   id: number;
-  type: "USER" | "LEAVEREQUEST";
+  type: "USER" | "LEAVEREQUEST" | "DEPARTMENT_ASSIGNMENT";
   title: string;
   status: TGenericStatus;
   targetId: number;

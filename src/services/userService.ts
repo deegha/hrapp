@@ -207,3 +207,14 @@ export async function requestDepartmentAssignmentForUser(employeeId: number, dep
     },
   });
 }
+
+export async function requestDepartmentRemovalForUser(employeeId: number) {
+  return serviceHandler<TResponse<{message: string; approvalId: number}>, {employeeId: number}>({
+    method: "POST",
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: "user/request-department-removal",
+    body: {
+      employeeId,
+    },
+  });
+}
