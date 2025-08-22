@@ -21,20 +21,6 @@ export function ApprovalDetailsDepartment() {
 
   const userRequest = data.data;
 
-  // Extract department and employee details from title
-  // Format examples:
-  // "FirstName LastName requests to assign FirstName LastName to department "DeptName" (Employee ID: X, Department ID: Y)"
-  // "FirstName LastName requests to remove FirstName LastName from department "DeptName" (Employee ID: X, Department ID: Y, Action: REMOVE)"
-
-  const titleMatch = approval.title.match(
-    /Employee ID: (\d+), Department ID: (\d+)(?:, Action: (REMOVE))?/,
-  );
-  const isRemovalRequest = titleMatch?.[3] === "REMOVE";
-  const departmentName =
-    approval.title.match(/(?:to|from) department "([^"]+)"/)?.[1] || "Unknown Department";
-
-  const actionPastTense = isRemovalRequest ? "removed from" : "assigned to";
-
   return (
     <div className="flex flex-col gap-10">
       <div className="flex items-center justify-between">
@@ -48,18 +34,7 @@ export function ApprovalDetailsDepartment() {
       </div>
 
       <div className="flex flex-col gap-3">
-        <h2>Request Details</h2>
-        <Detail
-          label={"Request Type"}
-          value={`Department ${isRemovalRequest ? "Removal" : "Assignment"}`}
-        />
-        <Detail label={"Department"} value={departmentName} />
-        <Detail label={"Action"} value={`User will be ${actionPastTense} "${departmentName}"`} />
-      </div>
-
-      <div className="flex flex-col gap-3">
         <h2>Employee Details</h2>
-        <Detail label={"Employee ID"} value={`EMP-${userRequest.employeeId}`} />
         <Detail label={"First Name"} value={userRequest.firstName} />
         <Detail label={"Last Name"} value={userRequest.lastName} />
         <Detail label={"Email"} value={userRequest.email} />
@@ -80,7 +55,7 @@ export function ApprovalDetailsDepartment() {
             loading={loading === "APPROVED" ? true : false}
           >
             <div className="flex items-center gap-1">
-              <Check size={14} /> Approve {isRemovalRequest ? "Removal" : "Assignment"}
+              <Check size={14} /> Approve
             </div>
           </Button>
 

@@ -35,7 +35,6 @@ export function approveRequest(
   let requestBody: {
     approvalRequestId: number;
     itemId?: number;
-    approverId?: number;
     approveReject: string;
     rejectedReason?: string;
   } = {
@@ -51,7 +50,6 @@ export function approveRequest(
     resource = `user/approve-department-assignment`;
     requestBody = {
       approvalRequestId,
-      approverId: itemId, // For department assignment, itemId is the approverId (employeeId)
       approveReject,
     };
   } else {
