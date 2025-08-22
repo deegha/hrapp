@@ -7,6 +7,7 @@ import {
   fetchEmploymentTypes,
   assignManager,
 } from "@/services/userService";
+import {fetchDepartments} from "@/services/organizationService";
 import {usePagination} from "@/hooks/usePagination";
 import {useNotificationStore} from "@/store/notificationStore";
 import {mutate} from "swr";
@@ -15,6 +16,8 @@ import useSWR from "swr";
 import {useState} from "react";
 import {roles} from "@/utils/staticValues";
 import {useUserSearch} from "@/hooks/useUserSearch";
+import {useDepartmentAssignment} from "@/hooks/useDepartmentAssignment";
+import {UserDepartment} from "./department";
 
 export function UserDetails() {
   const {openModal} = useConfirmationModalStore();
@@ -23,8 +26,15 @@ export function UserDetails() {
   const {unsetUser, user, setActiveUser} = useUserStore();
   const [isUpdatingEmploymentType, setIsUpdatingEmploymentType] = useState(false);
   const {data: employmentTypesData} = useSWR("fetch-employment-types", fetchEmploymentTypes);
+  const {data: departmentsData} = useSWR("departments", fetchDepartments);
   const {searchResults, setSearchTerm, loading} = useUserSearch();
   const [loadingManagerAssigning, setLoadingManagerAssigning] = useState(false);
+  const {
+    loading: loadingDepartmentAssigning,
+    assignDepartment,
+    removeDepartment,
+    canRemoveDepartment,
+  } = useDepartmentAssignment();
 
   const getNextEmploymentType = () => {
     if (!user.EmploymentType || !employmentTypesData?.data) return null;
@@ -115,10 +125,6 @@ export function UserDetails() {
   const refreshUserDetails = async () => {
     await setActiveUser(user.employeeId.toString());
     mutate(`fetch-users${activePage}`);
-    showNotification({
-      type: "success",
-      message: "Successfully updated manager",
-    });
   };
 
   const doAssignManager = async (managerId?: string) => {
@@ -135,6 +141,14 @@ export function UserDetails() {
     } finally {
       setLoadingManagerAssigning(false);
     }
+  };
+
+  const handleAssignDepartment = async (departmentId: string) => {
+    await assignDepartment(user.employeeId, departmentId, refreshUserDetails);
+  };
+
+  const handleRemoveDepartment = async () => {
+    await removeDepartment(user.employeeId, refreshUserDetails);
   };
 
   const userLevel = roles[user?.userLevel as keyof typeof roles] || user?.userLevel;
@@ -170,6 +184,7 @@ export function UserDetails() {
         {user.EmploymentType && (
           <Detail label={"Employment Type"} value={user.EmploymentType.typeLabel} />
         )}
+        {user.Department && <Detail label={"Department"} value={user.Department.departmentName} />}
       </div>
 
       <div className="flex flex-col gap-3">
@@ -204,6 +219,18 @@ export function UserDetails() {
               />
             )
           }
+        />
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <h2>User Department</h2>
+        <UserDepartment
+          currentDepartment={user.Department}
+          departments={departmentsData?.data || []}
+          onAssignDepartment={handleAssignDepartment}
+          onRemoveDepartment={handleRemoveDepartment}
+          loading={loadingDepartmentAssigning}
+          canRemove={canRemoveDepartment()}
         />
       </div>
 
