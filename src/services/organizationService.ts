@@ -7,6 +7,9 @@ import {
   TCreateLeaveTypePayload,
   TEmploymentType,
   TCreateEmploymentTypePayload,
+  TDepartment,
+  TCreateDepartmentPayload,
+  TUpdateDepartmentPayload,
 } from "@/types/organization";
 
 export async function fetchLeaveTypes() {
@@ -74,5 +77,81 @@ export async function deleteEmploymentType(id: number) {
     method: "DELETE",
     baseURL: process.env.NEXT_PUBLIC_API as string,
     resource: `organization/employment-types/${id}`,
+  });
+}
+
+export async function fetchDepartments() {
+  return await serviceHandler<TResponse<TDepartment[]>>({
+    method: "GET",
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: "organization/departments",
+  });
+}
+
+export async function createDepartment(department: TCreateDepartmentPayload) {
+  return await serviceHandler<TResponse<TDepartment>, TCreateDepartmentPayload>({
+    method: "POST",
+    body: department,
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: "organization/departments",
+  });
+}
+
+export async function updateDepartment(id: number, department: TUpdateDepartmentPayload) {
+  return await serviceHandler<TResponse<TDepartment>, TUpdateDepartmentPayload>({
+    method: "PUT",
+    body: department,
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: `organization/departments/${id}`,
+  });
+}
+
+export async function deleteDepartment(id: number) {
+  return await serviceHandler<TResponse<{message: string}>>({
+    method: "DELETE",
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: `organization/departments/${id}`,
+  });
+}
+
+export async function assignDepartment(payload: {employeeId: number; departmentId: number}) {
+  return await serviceHandler<
+    TResponse<{message: string}>,
+    {employeeId: number; departmentId: number}
+  >({
+    method: "PUT",
+    body: payload,
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: "user/assign-department",
+  });
+}
+
+export async function requestDepartmentAssignment(payload: {
+  employeeId: number;
+  departmentId: number;
+}) {
+  return await serviceHandler<
+    TResponse<{message: string; approvalId: number}>,
+    {employeeId: number; departmentId: number}
+  >({
+    method: "POST",
+    body: payload,
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: "user/request-department-assignment",
+  });
+}
+
+export async function approveDepartmentAssignment(payload: {
+  approvalRequestId: number;
+  approveReject: "APPROVED" | "REJECT";
+}) {
+  return await serviceHandler<
+    TResponse<{message: string}>,
+    {approvalRequestId: number; approveReject: "APPROVED" | "REJECT"}
+  >({
+    method: "PUT",
+    body: payload,
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: "user/approve-department-assignment",
   });
 }
