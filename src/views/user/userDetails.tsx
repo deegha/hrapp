@@ -6,6 +6,7 @@ import {
   updateEmploymentType,
   fetchEmploymentTypes,
   assignManager,
+  fetchUserPendingApprovals,
 } from "@/services/userService";
 import {fetchDepartments} from "@/services/organizationService";
 import {usePagination} from "@/hooks/usePagination";
@@ -27,6 +28,10 @@ export function UserDetails() {
   const [isUpdatingEmploymentType, setIsUpdatingEmploymentType] = useState(false);
   const {data: employmentTypesData} = useSWR("fetch-employment-types", fetchEmploymentTypes);
   const {data: departmentsData} = useSWR("departments", fetchDepartments);
+  const {data: userPendingApprovalsData} = useSWR(
+    user?.employeeId ? `user-pending-approvals-${user.employeeId}` : null,
+    () => (user?.employeeId ? fetchUserPendingApprovals(user.employeeId) : null),
+  );
   const {searchResults, setSearchTerm, loading} = useUserSearch();
   const [loadingManagerAssigning, setLoadingManagerAssigning] = useState(false);
   const {
@@ -232,6 +237,8 @@ export function UserDetails() {
           onRemoveDepartment={handleRemoveDepartment}
           loading={loadingDepartmentAssigning}
           canRemove={canRemoveDepartment()}
+          userId={user.employeeId}
+          approvals={userPendingApprovalsData?.data || []}
         />
       </div>
 

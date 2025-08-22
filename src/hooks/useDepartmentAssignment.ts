@@ -7,7 +7,7 @@ import {
 } from "@/services/userService";
 import {useNotificationStore} from "@/store/notificationStore";
 import {useConfirmationModalStore} from "@/store/useConfirmationModalStore";
-import useSWR from "swr";
+import useSWR, {mutate} from "swr";
 
 export function useDepartmentAssignment() {
   const [loading, setLoading] = useState(false);
@@ -15,16 +15,31 @@ export function useDepartmentAssignment() {
   const {openModal} = useConfirmationModalStore();
   const {data: userPermissionData} = useSWR("my-permissions", fetchMyPermissions);
 
+  // Helper function to revalidate user pending approvals and show success notification
+  const revalidateAndNotify = async (employeeId: number, message: string) => {
+    await mutate(`user-pending-approvals-${employeeId}`);
+    showNotification({
+      type: "success",
+      message,
+    });
+  };
+
+  // Check user permissions
+  const getUserPermissionStatus = () => {
+    const userPermission = userPermissionData?.data?.permission;
+    const isAdmin = userPermission === "ADMIN_USER" || userPermission === "SUPER_USER";
+    const isL2Admin = userPermission === "ADMIN_USER_L2";
+    return {isAdmin, isL2Admin, hasPermission: isAdmin || isL2Admin};
+  };
+
   const assignDepartment = async (
     employeeId: number,
     departmentId: string,
     onSuccess: () => void,
   ) => {
-    const userPermission = userPermissionData?.data?.permission;
-    const isAdmin = userPermission === "ADMIN_USER" || userPermission === "SUPER_USER";
-    const isL2Admin = userPermission === "ADMIN_USER_L2";
+    const {isAdmin, isL2Admin, hasPermission} = getUserPermissionStatus();
 
-    if (!isAdmin && !isL2Admin) {
+    if (!hasPermission) {
       showNotification({
         type: "error",
         message: "You don't have permission to assign departments",
@@ -46,10 +61,10 @@ export function useDepartmentAssignment() {
       } else if (isL2Admin) {
         // L2 Admin creates a request
         await requestDepartmentAssignmentForUser(employeeId, parseInt(departmentId));
-        showNotification({
-          type: "success",
-          message: "Department assignment request created. Waiting for admin approval.",
-        });
+        await revalidateAndNotify(
+          employeeId,
+          "Department assignment request created. Waiting for admin approval.",
+        );
       }
     } catch (error) {
       showNotification({
@@ -62,17 +77,7 @@ export function useDepartmentAssignment() {
   };
 
   const removeDepartment = async (employeeId: number, onSuccess: () => void) => {
-    const userPermission = userPermissionData?.data?.permission;
-    const isAdmin = userPermission === "ADMIN_USER" || userPermission === "SUPER_USER";
-    const isL2Admin = userPermission === "ADMIN_USER_L2";
-
-    if (!isAdmin && !isL2Admin) {
-      showNotification({
-        type: "error",
-        message: "You don't have permission to remove department assignments",
-      });
-      return;
-    }
+    const {isAdmin, isL2Admin} = getUserPermissionStatus();
 
     const title = isAdmin ? "Remove Department" : "Request Department Removal";
     const description = isAdmin
@@ -97,10 +102,10 @@ export function useDepartmentAssignment() {
           } else if (isL2Admin) {
             // L2 Admin creates a request
             await requestDepartmentRemovalForUser(employeeId);
-            showNotification({
-              type: "success",
-              message: "Department removal request created. Waiting for admin approval.",
-            });
+            await revalidateAndNotify(
+              employeeId,
+              "Department removal request created. Waiting for admin approval.",
+            );
           }
         } catch (error) {
           showNotification({
@@ -114,13 +119,9 @@ export function useDepartmentAssignment() {
     });
   };
 
-  const canRemoveDepartment = () => {
-    const userPermission = userPermissionData?.data?.permission;
-    return (
-      userPermission === "ADMIN_USER" ||
-      userPermission === "SUPER_USER" ||
-      userPermission === "ADMIN_USER_L2"
-    );
+  const canRemoveDepartment = (): boolean => {
+    const {hasPermission} = getUserPermissionStatus();
+    return hasPermission;
   };
 
   return {

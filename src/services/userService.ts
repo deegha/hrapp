@@ -8,7 +8,7 @@ import {
   TUpdateUser,
   IUserSearchResult,
 } from "@/types/user";
-import {TResponse, TGenericFilters} from "@/types";
+import {TResponse, TGenericFilters, TApproval} from "@/types";
 import {TResponseWithPagination} from "@/types/api";
 
 export type TLoginApiResponse = {
@@ -216,5 +216,13 @@ export async function requestDepartmentRemovalForUser(employeeId: number) {
     body: {
       employeeId,
     },
+  });
+}
+
+export async function fetchUserPendingApprovals(userId: number) {
+  return serviceHandler<TResponse<TApproval[]>>({
+    method: "GET",
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: `user/${userId}/pending-approvals`,
   });
 }

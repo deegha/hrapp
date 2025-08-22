@@ -6,6 +6,7 @@ export type TApproval = {
   title: string;
   status: TGenericStatus;
   targetId: number;
+  data?: Record<string, unknown>; // JSON field for additional approval data
   createdAt: Date;
   updatedAt: Date;
 };
