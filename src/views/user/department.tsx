@@ -1,6 +1,7 @@
-import {Detail} from "@/components";
+import {Detail, Autocomplete} from "@/components";
 import {XCircle} from "react-feather";
 import {TDepartment} from "@/types/organization";
+import {useState} from "react";
 
 export interface IProps {
   currentDepartment?: {
@@ -22,6 +23,22 @@ export function UserDepartment({
   loading,
   canRemove,
 }: IProps) {
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const departmentOptions = departments
+    .filter((dept) => dept.departmentName.toLowerCase().includes(searchTerm.toLowerCase()))
+    .map((dept) => ({
+      label: dept.departmentName,
+      value: dept.id.toString(),
+    }));
+
+  const currentDepartmentOption = currentDepartment
+    ? {
+        label: currentDepartment.departmentName,
+        value: currentDepartment.id.toString(),
+      }
+    : null;
+
   return (
     <Detail
       loading={loading}
@@ -40,27 +57,18 @@ export function UserDepartment({
             )}
           </div>
         ) : (
-          <div className="flex flex-col gap-2">
-            <select
-              disabled={loading}
-              onChange={(e) => {
-                if (e.target.value) {
-                  onAssignDepartment(e.target.value);
-                }
-              }}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-blue-500"
-              defaultValue=""
-            >
-              <option value="" disabled>
-                Select department...
-              </option>
-              {departments?.map((dept) => (
-                <option key={dept.id} value={dept.id}>
-                  {dept.departmentName}
-                </option>
-              ))}
-            </select>
-          </div>
+          <Autocomplete
+            loading={loading}
+            value={currentDepartmentOption}
+            options={departmentOptions}
+            onSearch={(term) => setSearchTerm(term)}
+            onChange={(option) => {
+              if (!option) return;
+              onAssignDepartment(option.value);
+              setSearchTerm("");
+            }}
+            placeholder="Select department..."
+          />
         )
       }
     />

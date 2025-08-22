@@ -37,7 +37,7 @@ export function useDepartmentAssignment() {
       if (isAdmin) {
         // Admin can directly assign
         await assignDepartmentToUser(employeeId, parseInt(departmentId));
-        onSuccess();
+        await onSuccess();
         showNotification({
           type: "success",
           message: "Department assigned successfully",
@@ -79,7 +79,7 @@ export function useDepartmentAssignment() {
         try {
           setLoading(true);
           await assignDepartmentToUser(employeeId, null);
-          onSuccess();
+          await onSuccess();
           showNotification({
             type: "success",
             message: "Department removed successfully",

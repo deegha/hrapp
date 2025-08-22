@@ -225,6 +225,7 @@ export function UserDetails() {
       <div className="flex flex-col gap-3">
         <h2>User Department</h2>
         <UserDepartment
+          key={`department-${user.employeeId}-${user.Department?.id || "none"}`}
           currentDepartment={user.Department}
           departments={departmentsData?.data || []}
           onAssignDepartment={handleAssignDepartment}
