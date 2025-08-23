@@ -7,6 +7,7 @@ import {
   fetchEmploymentTypes,
   assignManager,
   fetchUserPendingApprovals,
+  fetchMyPermissions,
 } from "@/services/userService";
 import {fetchDepartments} from "@/services/organizationService";
 import {usePagination} from "@/hooks/usePagination";
@@ -28,6 +29,7 @@ export function UserDetails() {
   const [isUpdatingEmploymentType, setIsUpdatingEmploymentType] = useState(false);
   const {data: employmentTypesData} = useSWR("fetch-employment-types", fetchEmploymentTypes);
   const {data: departmentsData} = useSWR("departments", fetchDepartments);
+  const {data: userPermissionData} = useSWR("my-permissions", fetchMyPermissions);
   const {data: userPendingApprovalsData} = useSWR(
     user?.employeeId ? `user-pending-approvals-${user.employeeId}` : null,
     () => (user?.employeeId ? fetchUserPendingApprovals(user.employeeId) : null),
@@ -163,6 +165,9 @@ export function UserDetails() {
     value: user.manager ? user.manager.id.toString() : "",
   };
 
+  const userPermission = userPermissionData?.data?.permission;
+  const isAdmin = userPermission === "ADMIN_USER" || userPermission === "SUPER_USER";
+
   return (
     <div className="flex flex-col gap-10">
       <div className="flex items-center justify-between">
@@ -201,14 +206,17 @@ export function UserDetails() {
             user.manager ? (
               <div className="flex items-center gap-2">
                 {user.manager.firstName} {user.manager.lastName}
-                <div
-                  onClick={() => doAssignManager()}
-                  className="cursor-pointer font-bold text-red-500 hover:text-red-700"
-                >
-                  <XCircle size={12} />
-                </div>
+                {isAdmin && (
+                  <div
+                    onClick={() => doAssignManager()}
+                    className="cursor-pointer font-bold text-red-500 hover:text-red-700"
+                    title="Remove manager"
+                  >
+                    <XCircle size={12} />
+                  </div>
+                )}
               </div>
-            ) : (
+            ) : isAdmin ? (
               <Autocomplete
                 loading={loading}
                 value={{
@@ -222,6 +230,8 @@ export function UserDetails() {
                   doAssignManager(option.value);
                 }}
               />
+            ) : (
+              <span className="text-sm text-textSecondary">No manager assigned</span>
             )
           }
         />
