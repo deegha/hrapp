@@ -1,6 +1,3 @@
-// components/Dropdown.tsx
-"use client";
-
 import {Fragment} from "react";
 import {Listbox, Transition} from "@headlessui/react";
 import {ChevronDown, Check, Info} from "react-feather";

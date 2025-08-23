@@ -24,5 +24,6 @@ export {ItemsList} from "./ItemsList/itemsList";
 export {ConfirmationsModal} from "./confirmationsModal/confirmationsModal";
 export {Detail} from "./userDetail/userDetail";
 export {Shimmer} from "./shimmer/shimmer";
+export {Autocomplete} from "./AutoComplete/autoComplete";
 export {EmploymentTypesShimmer} from "./shimmer/employmentTypesShimmer";
 export {ErrorDisplay} from "./error/errorDisplay";

@@ -8,6 +8,8 @@ export {
   fetchUsers,
   fetchUser,
   updateMyProfile,
+  searchUserService,
+  assignManager,
 } from "./userService";
 export {getNavigationItems} from "./uiService";
 export {
