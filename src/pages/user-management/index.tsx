@@ -2,7 +2,6 @@ import {Button, Layout, PageLayout, NoDataFoundComponent, Pagination, Drawer} fr
 import {Users, UserDetails} from "@/views";
 import {useRouter} from "next/router";
 import {fetchUsers} from "@/services";
-import {fetchMyPermissions} from "@/services/userService";
 import useSWR from "swr";
 import {usePagination} from "@/hooks/usePagination";
 import {useUserStore} from "@/store/useUserStore";
@@ -15,7 +14,6 @@ export default function UserManagement() {
   const {data: users} = useSWR(`fetch-users${activePage}`, () =>
     fetchUsers({page: parseInt(activePage), limit: 10}),
   );
-  const {data: userPermissionData} = useSWR("my-permissions", fetchMyPermissions);
 
   useEffect(() => unsetUser, [unsetUser]);
 
@@ -23,18 +21,13 @@ export default function UserManagement() {
     router.push("./user-management/create-user");
   }
 
-  const userPermission = userPermissionData?.data?.permission;
-  const canCreateUser = userPermission === "ADMIN_USER" || userPermission === "SUPER_USER";
-
   return (
     <Layout>
       <Drawer open={user?.employeeId ? true : false} close={unsetUser}>
         <UserDetails />
       </Drawer>
       <PageLayout
-        actionButton={
-          canCreateUser ? <Button onClick={handleCreateUser}>CREATE USER</Button> : undefined
-        }
+        actionButton={<Button onClick={handleCreateUser}>CREATE USER</Button>}
         pageName="User Management"
       >
         {users?.data.data.length === 0 ? (
