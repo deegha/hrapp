@@ -3,7 +3,11 @@ import useSWR from "swr";
 import {approvalService} from "@/services/approvalService";
 import {usePagination} from "@/hooks/usePagination";
 import {useApprovalStore} from "@/store/approvalStore";
-import {ApprovalDetailsLeave, ApprovalDetailsUser} from "@/views/approvals";
+import {
+  ApprovalDetailsLeave,
+  ApprovalDetailsUser,
+  ApprovalDetailsDepartment,
+} from "@/views/approvals";
 import moment from "moment";
 
 export default function Home() {
@@ -20,7 +24,13 @@ export default function Home() {
     <Layout>
       <PageLayout pageName="Approvals">
         <Drawer open={approval?.id ? true : false} close={unsetApproval}>
-          {approval.type === "LEAVEREQUEST" ? <ApprovalDetailsLeave /> : <ApprovalDetailsUser />}
+          {approval.type === "LEAVEREQUEST" ? (
+            <ApprovalDetailsLeave />
+          ) : approval.type === "DEPARTMENT_ASSIGNMENT" ? (
+            <ApprovalDetailsDepartment />
+          ) : (
+            <ApprovalDetailsUser />
+          )}
         </Drawer>
 
         <div className="flex flex-col gap-5">

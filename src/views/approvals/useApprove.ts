@@ -9,7 +9,7 @@ import {useConfirmationModalStore} from "@/store/useConfirmationModalStore";
 
 type ApprovalAction = "APPROVED" | "REJECTED";
 
-function getComs(type: "USER" | "LEAVEREQUEST") {
+function getComs(type: "USER" | "LEAVEREQUEST" | "DEPARTMENT_ASSIGNMENT") {
   if (type === "USER")
     return {
       REJECTED: {
@@ -23,6 +23,22 @@ function getComs(type: "USER" | "LEAVEREQUEST") {
       APPROVED: {
         ERROR: "Couldn't approve the user request",
         SUCCESS: "User approved successfully",
+      },
+    };
+
+  if (type === "DEPARTMENT_ASSIGNMENT")
+    return {
+      REJECTED: {
+        CONFIRMATION_MODAL: {
+          TITLE: "Reject department assignment request?",
+          DESCRIPTION: "Are you sure you want to reject this department assignment request?",
+        },
+        ERROR: "Couldn't reject the department assignment request",
+        SUCCESS: "Department assignment request rejected successfully",
+      },
+      APPROVED: {
+        ERROR: "Couldn't approve the department assignment request",
+        SUCCESS: "Department assignment request approved successfully",
       },
     };
 

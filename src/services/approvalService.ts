@@ -28,20 +28,38 @@ type TApprove = {
 };
 
 export function approveRequest(
-  type: "USER" | "LEAVEREQUEST",
+  type: "USER" | "LEAVEREQUEST" | "DEPARTMENT_ASSIGNMENT",
   {approvalRequestId, itemId, approveReject, rejectedReason}: TApprove,
 ) {
-  const resource = type === "LEAVEREQUEST" ? `leave-approval` : `user-approval`;
+  let resource: string;
+  let requestBody: {
+    approvalRequestId: number;
+    itemId?: number;
+    approveReject: string;
+    rejectedReason?: string;
+  } = {
+    approvalRequestId,
+    itemId,
+    approveReject,
+    rejectedReason,
+  };
 
-  const response = serviceHandler<TResponse<LeaveRequest>, TApprove>({
+  if (type === "LEAVEREQUEST") {
+    resource = `leave-approval`;
+  } else if (type === "DEPARTMENT_ASSIGNMENT") {
+    resource = `user/approve-department-assignment`;
+    requestBody = {
+      approvalRequestId,
+      approveReject,
+    };
+  } else {
+    resource = `user-approval`;
+  }
+
+  const response = serviceHandler<TResponse<LeaveRequest>, typeof requestBody>({
     method: "PUT",
     baseURL: process.env.NEXT_PUBLIC_API as string,
-    body: {
-      approvalRequestId,
-      itemId,
-      approveReject,
-      rejectedReason,
-    },
+    body: requestBody,
     resource: resource,
   });
 

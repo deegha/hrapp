@@ -9,4 +9,9 @@ export type {
   TLeavePolicy,
   TUpdateLeavePolicyPayload,
   TCreateLeaveTypePayload,
+  TEmploymentType,
+  TCreateEmploymentTypePayload,
+  TDepartment,
+  TCreateDepartmentPayload,
+  TUpdateDepartmentPayload,
 } from "./organization";

@@ -8,7 +8,7 @@ import {
   TUpdateUser,
   IUserSearchResult,
 } from "@/types/user";
-import {TResponse, TGenericFilters} from "@/types";
+import {TResponse, TGenericFilters, TApproval} from "@/types";
 import {TResponseWithPagination} from "@/types/api";
 
 export type TLoginApiResponse = {
@@ -166,5 +166,63 @@ export async function assignManager(employeeId: number, managerId: number | null
     body: {
       managerId,
     },
+  });
+}
+
+export async function assignDepartmentToUser(employeeId: number, departmentId: number | null) {
+  if (departmentId === null) {
+    // Remove department assignment
+    return serviceHandler<TResponse<{message: string}>, {employeeId: number}>({
+      method: "DELETE",
+      baseURL: process.env.NEXT_PUBLIC_API as string,
+      resource: "user/remove-department",
+      body: {
+        employeeId,
+      },
+    });
+  }
+
+  return serviceHandler<TResponse<{message: string}>, {employeeId: number; departmentId: number}>({
+    method: "PUT",
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: "user/assign-department",
+    body: {
+      employeeId,
+      departmentId,
+    },
+  });
+}
+
+export async function requestDepartmentAssignmentForUser(employeeId: number, departmentId: number) {
+  return serviceHandler<
+    TResponse<{message: string; approvalId: number}>,
+    {employeeId: number; departmentId: number}
+  >({
+    method: "POST",
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: "user/request-department-assignment",
+    body: {
+      employeeId,
+      departmentId,
+    },
+  });
+}
+
+export async function requestDepartmentRemovalForUser(employeeId: number) {
+  return serviceHandler<TResponse<{message: string; approvalId: number}>, {employeeId: number}>({
+    method: "POST",
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: "user/request-department-removal",
+    body: {
+      employeeId,
+    },
+  });
+}
+
+export async function fetchUserPendingApprovals(userId: number) {
+  return serviceHandler<TResponse<TApproval[]>>({
+    method: "GET",
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: `user/${userId}/pending-approvals`,
   });
 }

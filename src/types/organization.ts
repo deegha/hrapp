@@ -44,3 +44,19 @@ export type TEmploymentType = {
 export type TCreateEmploymentTypePayload = {
   typeLabel: string;
 };
+
+export type TDepartment = {
+  id: number;
+  departmentName: string;
+  organizationId: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type TCreateDepartmentPayload = {
+  departmentName: string;
+};
+
+export type TUpdateDepartmentPayload = {
+  departmentName: string;
+};
