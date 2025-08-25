@@ -44,7 +44,10 @@ export function Departments() {
       mutate();
     } catch (error) {
       showNotification({
-        message: (error as Error).message || "Failed to create department",
+        message:
+          typeof error === "string"
+            ? error
+            : (error as Error).message || "Failed to create department",
         type: "error",
       });
     }
@@ -64,7 +67,10 @@ export function Departments() {
       mutate();
     } catch (error) {
       showNotification({
-        message: (error as Error).message || "Failed to update department",
+        message:
+          typeof error === "string"
+            ? error
+            : (error as Error).message || "Failed to update department",
         type: "error",
       });
     }
@@ -80,7 +86,10 @@ export function Departments() {
       mutate();
     } catch (error) {
       showNotification({
-        message: (error as Error).message || "Failed to delete department",
+        message:
+          typeof error === "string"
+            ? error
+            : (error as Error).message || "Failed to delete department",
         type: "error",
       });
     }
