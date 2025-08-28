@@ -8,11 +8,16 @@ export type TUser = {
   updatedAt: string;
   userStatusId: number;
   employmentTypeId?: number;
+  departmentId?: number;
   isManager?: boolean;
   UserStatus: TUserStatus;
   EmploymentType?: {
     id: number;
     typeLabel: string;
+  };
+  Department?: {
+    id: number;
+    departmentName: string;
   };
   manager?: {
     id: number;

@@ -6,7 +6,10 @@ import {
   updateEmploymentType,
   fetchEmploymentTypes,
   assignManager,
+  fetchUserPendingApprovals,
+  fetchMyPermissions,
 } from "@/services/userService";
+import {fetchDepartments} from "@/services/organizationService";
 import {usePagination} from "@/hooks/usePagination";
 import {useNotificationStore} from "@/store/notificationStore";
 import {mutate} from "swr";
@@ -15,6 +18,8 @@ import useSWR from "swr";
 import {useState} from "react";
 import {roles} from "@/utils/staticValues";
 import {useUserSearch} from "@/hooks/useUserSearch";
+import {useDepartmentAssignment} from "@/hooks/useDepartmentAssignment";
+import {UserDepartment} from "./department";
 
 export function UserDetails() {
   const {openModal} = useConfirmationModalStore();
@@ -23,8 +28,20 @@ export function UserDetails() {
   const {unsetUser, user, setActiveUser} = useUserStore();
   const [isUpdatingEmploymentType, setIsUpdatingEmploymentType] = useState(false);
   const {data: employmentTypesData} = useSWR("fetch-employment-types", fetchEmploymentTypes);
+  const {data: departmentsData} = useSWR("departments", fetchDepartments);
+  const {data: userPermissionData} = useSWR("my-permissions", fetchMyPermissions);
+  const {data: userPendingApprovalsData} = useSWR(
+    user?.employeeId ? `user-pending-approvals-${user.employeeId}` : null,
+    () => (user?.employeeId ? fetchUserPendingApprovals(user.employeeId) : null),
+  );
   const {searchResults, setSearchTerm, loading} = useUserSearch();
   const [loadingManagerAssigning, setLoadingManagerAssigning] = useState(false);
+  const {
+    loading: loadingDepartmentAssigning,
+    assignDepartment,
+    removeDepartment,
+    canRemoveDepartment,
+  } = useDepartmentAssignment();
 
   const getNextEmploymentType = () => {
     if (!user.EmploymentType || !employmentTypesData?.data) return null;
@@ -115,10 +132,6 @@ export function UserDetails() {
   const refreshUserDetails = async () => {
     await setActiveUser(user.employeeId.toString());
     mutate(`fetch-users${activePage}`);
-    showNotification({
-      type: "success",
-      message: "Successfully updated manager",
-    });
   };
 
   const doAssignManager = async (managerId?: string) => {
@@ -137,12 +150,23 @@ export function UserDetails() {
     }
   };
 
+  const handleAssignDepartment = async (departmentId: string) => {
+    await assignDepartment(user.employeeId, departmentId, refreshUserDetails);
+  };
+
+  const handleRemoveDepartment = async () => {
+    await removeDepartment(user.employeeId, refreshUserDetails);
+  };
+
   const userLevel = roles[user?.userLevel as keyof typeof roles] || user?.userLevel;
 
   const manager = {
     label: user.manager ? `${user.manager.firstName} ${user.manager.lastName}` : "",
     value: user.manager ? user.manager.id.toString() : "",
   };
+
+  const userPermission = userPermissionData?.data?.permission;
+  const isAdmin = userPermission === "ADMIN_USER" || userPermission === "SUPER_USER";
 
   return (
     <div className="flex flex-col gap-10">
@@ -170,6 +194,7 @@ export function UserDetails() {
         {user.EmploymentType && (
           <Detail label={"Employment Type"} value={user.EmploymentType.typeLabel} />
         )}
+        {user.Department && <Detail label={"Department"} value={user.Department.departmentName} />}
       </div>
 
       <div className="flex flex-col gap-3">
@@ -181,14 +206,17 @@ export function UserDetails() {
             user.manager ? (
               <div className="flex items-center gap-2">
                 {user.manager.firstName} {user.manager.lastName}
-                <div
-                  onClick={() => doAssignManager()}
-                  className="cursor-pointer font-bold text-red-500 hover:text-red-700"
-                >
-                  <XCircle size={12} />
-                </div>
+                {isAdmin && (
+                  <div
+                    onClick={() => doAssignManager()}
+                    className="cursor-pointer font-bold text-red-500 hover:text-red-700"
+                    title="Remove manager"
+                  >
+                    <XCircle size={12} />
+                  </div>
+                )}
               </div>
-            ) : (
+            ) : isAdmin ? (
               <Autocomplete
                 loading={loading}
                 value={{
@@ -202,8 +230,25 @@ export function UserDetails() {
                   doAssignManager(option.value);
                 }}
               />
+            ) : (
+              <span className="text-sm text-textSecondary">No manager assigned</span>
             )
           }
+        />
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <h2>User Department</h2>
+        <UserDepartment
+          key={`department-${user.employeeId}-${user.Department?.id || "none"}`}
+          currentDepartment={user.Department}
+          departments={departmentsData?.data || []}
+          onAssignDepartment={handleAssignDepartment}
+          onRemoveDepartment={handleRemoveDepartment}
+          loading={loadingDepartmentAssigning}
+          canRemove={canRemoveDepartment()}
+          userId={user.employeeId}
+          approvals={userPendingApprovalsData?.data || []}
         />
       </div>
 
