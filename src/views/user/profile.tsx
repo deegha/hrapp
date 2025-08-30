@@ -1,11 +1,24 @@
 import {PageLayout, Button, StatusTag, Shimmer} from "@/components";
 import {fetchUser} from "@/services";
 import {getAuthUser} from "@/utils/getAuthUser";
-import useSWR from "swr";
+import useSWR, {mutate} from "swr";
 import Link from "next/link";
 import {roles} from "@/utils/staticValues";
+import {DocumentUploader} from "@/components/documentUpload/documentUpload";
+import {PendingDocumentSave} from "@/components/documentUpload/pendingDocumentSave";
+import {createMyDocument, deleteMyDocument, downloadMyDocument} from "@/services/userService";
+import {useNotificationStore} from "@/store/notificationStore";
+import {useConfirmationModalStore} from "@/store/useConfirmationModalStore";
+import {useState} from "react";
+import {Trash} from "react-feather";
 
 export function UserProfile() {
+  const {showNotification} = useNotificationStore();
+  const {openModal} = useConfirmationModalStore();
+  const [uploadingDocument, setUploadingDocument] = useState(false);
+  const [documentTitle, setDocumentTitle] = useState("");
+  const [pendingDocumentUrl, setPendingDocumentUrl] = useState("");
+
   const {data: userData} = useSWR(`fetch-auth-user`, async () => {
     const userSummary = await getAuthUser();
 
@@ -17,6 +30,78 @@ export function UserProfile() {
   const user = userData?.data;
 
   const userLevel = roles[user?.userLevel as keyof typeof roles] || user?.userLevel;
+
+  const handleDocumentUpload = async (url: string) => {
+    // Extract filename without extension as default title
+    const filename = url.split("/").pop() || "";
+    const nameWithoutExtension = filename.split(".").slice(0, -1).join(".");
+    setDocumentTitle(nameWithoutExtension);
+    setPendingDocumentUrl(url);
+  };
+
+  const saveDocument = async () => {
+    if (!documentTitle.trim() || !pendingDocumentUrl) return;
+
+    try {
+      setUploadingDocument(true);
+      const response = await createMyDocument(documentTitle.trim(), pendingDocumentUrl);
+
+      if (response.error) {
+        showNotification({
+          type: "error",
+          message: "Failed to save document",
+        });
+        return;
+      }
+
+      await mutate("fetch-auth-user");
+      showNotification({
+        type: "success",
+        message: "Document uploaded successfully",
+      });
+
+      setDocumentTitle("");
+      setPendingDocumentUrl("");
+    } catch {
+      showNotification({
+        type: "error",
+        message: "Failed to save document",
+      });
+    } finally {
+      setUploadingDocument(false);
+    }
+  };
+
+  const handleDeleteDocument = (documentId: number, title: string) => {
+    openModal({
+      title: "Delete document?",
+      description: `Are you sure you want to delete "${title}"?`,
+      onConfirm: async () => {
+        try {
+          const response = await deleteMyDocument(documentId);
+
+          if (response.error) {
+            showNotification({
+              type: "error",
+              message: "Failed to delete document",
+            });
+            return;
+          }
+
+          await mutate("fetch-auth-user");
+          showNotification({
+            type: "success",
+            message: "Document deleted successfully",
+          });
+        } catch {
+          showNotification({
+            type: "error",
+            message: "Failed to delete document",
+          });
+        }
+      },
+    });
+  };
 
   return (
     <PageLayout
@@ -58,6 +143,102 @@ export function UserProfile() {
               />
 
               <ProfileRow label="Joined At" value={new Date(user.createdAt).toLocaleDateString()} />
+            </div>
+          )}
+        </div>
+
+        <div className="flex flex-col gap-5">
+          <h2 className="text-md font-bold">My Documents</h2>
+          {!user ? (
+            <Shimmer />
+          ) : (
+            <div className="flex flex-col gap-4">
+              {user.documents && user.documents.length > 0 && (
+                <div className="grid grid-cols-2 gap-4">
+                  {user.documents.map((doc) => {
+                    const pathname = (() => {
+                      try {
+                        return new URL(doc.fileUrl).pathname;
+                      } catch {
+                        return doc.fileUrl;
+                      }
+                    })();
+                    const isPDF = pathname.toLowerCase().endsWith(".pdf");
+                    return (
+                      <div key={doc.id} className="rounded-md border border-border p-2">
+                        {isPDF ? (
+                          <iframe
+                            src={doc.fileUrl}
+                            className="h-[300px] w-full"
+                            title={`Document ${doc.id}`}
+                          />
+                        ) : (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={doc.fileUrl}
+                            alt={`Document ${doc.id}`}
+                            className="h-32 w-full object-contain"
+                          />
+                        )}
+                        <div className="mt-2 flex items-center justify-between">
+                          <div className="flex flex-col gap-1">
+                            <div className="text-sm font-medium">{doc.title}</div>
+                            <button
+                              onClick={async () => {
+                                const ext = (() => {
+                                  try {
+                                    const p = new URL(doc.fileUrl).pathname;
+                                    return (p.split(".").pop() || "").toLowerCase();
+                                  } catch {
+                                    return (doc.fileUrl.split(".").pop() || "").toLowerCase();
+                                  }
+                                })();
+                                const safeExt = ext ? `.${ext}` : "";
+                                const name = `${doc.title}${safeExt}`;
+                                try {
+                                  await downloadMyDocument(doc.id, name);
+                                } catch {
+                                  showNotification({
+                                    type: "error",
+                                    message: "Failed to download document",
+                                  });
+                                }
+                              }}
+                              className="text-left text-xs text-blue-500 underline"
+                            >
+                              Download
+                            </button>
+                          </div>
+                          <button
+                            onClick={() => handleDeleteDocument(doc.id, doc.title)}
+                            className="text-red-500 transition hover:text-red-700"
+                          >
+                            <Trash size={16} />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              <div className="flex flex-col gap-3">
+                <h3 className="text-sm font-medium">Upload New Document</h3>
+                <DocumentUploader onUploadComplete={handleDocumentUpload} />
+
+                {pendingDocumentUrl && (
+                  <PendingDocumentSave
+                    title={documentTitle}
+                    onTitleChange={setDocumentTitle}
+                    loading={uploadingDocument}
+                    onSave={saveDocument}
+                    onCancel={() => {
+                      setDocumentTitle("");
+                      setPendingDocumentUrl("");
+                    }}
+                  />
+                )}
+              </div>
             </div>
           )}
         </div>
