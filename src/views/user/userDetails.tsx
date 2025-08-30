@@ -341,75 +341,52 @@ export function UserDetails() {
       <div className="flex flex-col gap-3">
         <h2>Documents</h2>
         {user.documents && user.documents.length > 0 && (
-          <div className="grid grid-cols-2 gap-4">
-            {user.documents.map((doc) => {
-              const pathname = (() => {
-                try {
-                  return new URL(doc.fileUrl).pathname;
-                } catch {
-                  return doc.fileUrl;
-                }
-              })();
-              const isPDF = pathname.toLowerCase().endsWith(".pdf");
-              return (
-                <div key={doc.id} className="rounded-md border border-border p-2">
-                  {isPDF ? (
-                    <iframe
-                      src={doc.fileUrl}
-                      className="h-[400px] w-full"
-                      title={`Document ${doc.id}`}
-                    />
-                  ) : (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={doc.fileUrl}
-                      alt={`Document ${doc.id}`}
-                      className="h-48 w-full object-contain"
-                    />
+          <div>
+            {user.documents.map((doc) => (
+              <div
+                key={doc.id}
+                className="flex items-center justify-between border-t border-border py-3"
+              >
+                <div className="min-w-0">
+                  <div className="truncate text-sm font-semibold">{doc.title}</div>
+                  {canUploadEmployeeDocs && (
+                    <button
+                      onClick={async () => {
+                        const ext = (() => {
+                          try {
+                            const p = new URL(doc.fileUrl).pathname;
+                            return (p.split(".").pop() || "").toLowerCase();
+                          } catch {
+                            return (doc.fileUrl.split(".").pop() || "").toLowerCase();
+                          }
+                        })();
+                        const safeExt = ext ? `.${ext}` : "";
+                        const name = `${doc.title}${safeExt}`;
+                        try {
+                          await downloadEmployeeDocument(user.employeeId, doc.id, name);
+                        } catch {
+                          showNotification({
+                            type: "error",
+                            message: "Failed to download document",
+                          });
+                        }
+                      }}
+                      className="text-left text-xs text-blue-500 underline"
+                    >
+                      Download
+                    </button>
                   )}
-                  <div className="mt-2 flex items-center justify-between">
-                    <div className="flex flex-col gap-1">
-                      <div className="text-sm font-medium">{doc.title}</div>
-                      {canUploadEmployeeDocs && (
-                        <button
-                          onClick={async () => {
-                            const ext = (() => {
-                              try {
-                                const p = new URL(doc.fileUrl).pathname;
-                                return (p.split(".").pop() || "").toLowerCase();
-                              } catch {
-                                return (doc.fileUrl.split(".").pop() || "").toLowerCase();
-                              }
-                            })();
-                            const safeExt = ext ? `.${ext}` : "";
-                            const name = `${doc.title}${safeExt}`;
-                            try {
-                              await downloadEmployeeDocument(user.employeeId, doc.id, name);
-                            } catch {
-                              showNotification({
-                                type: "error",
-                                message: "Failed to download document",
-                              });
-                            }
-                          }}
-                          className="text-left text-xs text-blue-500 underline"
-                        >
-                          Download
-                        </button>
-                      )}
-                    </div>
-                    {isAdmin && (
-                      <button
-                        onClick={() => handleDeleteDocument(doc.id, doc.title)}
-                        className="text-red-500 transition hover:text-red-700"
-                      >
-                        <Trash size={16} />
-                      </button>
-                    )}
-                  </div>
                 </div>
-              );
-            })}
+                {isAdmin && (
+                  <button
+                    onClick={() => handleDeleteDocument(doc.id, doc.title)}
+                    className="text-red-500 transition hover:text-red-700"
+                  >
+                    <Trash size={16} />
+                  </button>
+                )}
+              </div>
+            ))}
           </div>
         )}
 
