@@ -10,6 +10,7 @@ import {
 } from "@/types/user";
 import {TResponse, TGenericFilters, TApproval} from "@/types";
 import {TResponseWithPagination} from "@/types/api";
+import {downloadWithAuth} from "@/utils/download";
 
 export type TLoginApiResponse = {
   error: boolean;
@@ -225,4 +226,63 @@ export async function fetchUserPendingApprovals(userId: number) {
     baseURL: process.env.NEXT_PUBLIC_API as string,
     resource: `user/${userId}/pending-approvals`,
   });
+}
+
+export async function addUserDocument(employeeId: number, title: string, url: string) {
+  return serviceHandler<
+    TResponse<{id: number; title: string; fileUrl: string; createdAt: string}>,
+    {title: string; url: string}
+  >({
+    method: "POST",
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: `user/${employeeId}/documents`,
+    body: {
+      title,
+      url,
+    },
+  });
+}
+
+export async function deleteUserDocument(employeeId: number, documentId: number) {
+  return serviceHandler<TResponse<{success: boolean}>>({
+    method: "DELETE",
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: `user/${employeeId}/documents/${documentId}`,
+  });
+}
+
+export async function createMyDocument(title: string, url: string) {
+  return serviceHandler<
+    TResponse<{id: number; title: string; fileUrl: string; createdAt: string}>,
+    {title: string; url: string}
+  >({
+    method: "POST",
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: "my-documents",
+    body: {
+      title,
+      url,
+    },
+  });
+}
+
+export async function deleteMyDocument(documentId: number) {
+  return serviceHandler<TResponse<{success: boolean}>>({
+    method: "DELETE",
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: `my-documents/${documentId}`,
+  });
+}
+
+// Downloads
+export async function downloadEmployeeDocument(
+  employeeId: number,
+  documentId: number,
+  filename?: string,
+) {
+  return downloadWithAuth(`user/${employeeId}/documents/${documentId}/download`, filename);
+}
+
+export async function downloadMyDocument(documentId: number, filename?: string) {
+  return downloadWithAuth(`my-documents/${documentId}/download`, filename);
 }

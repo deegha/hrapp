@@ -64,6 +64,12 @@ export type TAllUserDetails = TUser & {
     salary: number;
     userId: number;
   } | null;
+  documents?: {
+    id: number;
+    title: string;
+    fileUrl: string;
+    createdAt: string;
+  }[];
   userLevel: string;
   skills: {
     id: number;
