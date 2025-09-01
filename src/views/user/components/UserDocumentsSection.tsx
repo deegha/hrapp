@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {Trash} from "react-feather";
 import {DocumentUploader} from "@/components/documentUpload/documentUpload";
 import {PendingDocumentSave} from "@/components/documentUpload/pendingDocumentSave";
@@ -37,6 +37,7 @@ export function UserDocumentsSection({
   const [uploadingDocument, setUploadingDocument] = useState(false);
   const [documentTitle, setDocumentTitle] = useState("");
   const [pendingDocumentUrl, setPendingDocumentUrl] = useState("");
+  const [uploaderKey, setUploaderKey] = useState(0);
 
   const handleDocumentUpload = async (url: string) => {
     const filename = url.split("/").pop() || "";
@@ -58,12 +59,21 @@ export function UserDocumentsSection({
       showNotification({type: "success", message: "Document uploaded successfully"});
       setDocumentTitle("");
       setPendingDocumentUrl("");
+      // reset the uploader preview list
+      setUploaderKey((k) => k + 1);
     } catch {
       showNotification({type: "error", message: "Failed to save document"});
     } finally {
       setUploadingDocument(false);
     }
   };
+
+  // Clear any pending upload when switching users
+  useEffect(() => {
+    setDocumentTitle("");
+    setPendingDocumentUrl("");
+    setUploaderKey((k) => k + 1);
+  }, [userId]);
 
   const handleDeleteDocument = (documentId: number, title: string) => {
     openModal({
@@ -145,7 +155,7 @@ export function UserDocumentsSection({
       {canUpload && (
         <div className="flex flex-col gap-3">
           <h3>Upload New Document</h3>
-          <DocumentUploader onUploadComplete={handleDocumentUpload} />
+          <DocumentUploader key={uploaderKey} onUploadComplete={handleDocumentUpload} />
 
           {pendingDocumentUrl && (
             <PendingDocumentSave
@@ -156,6 +166,7 @@ export function UserDocumentsSection({
               onCancel={() => {
                 setDocumentTitle("");
                 setPendingDocumentUrl("");
+                setUploaderKey((k) => k + 1);
               }}
             />
           )}

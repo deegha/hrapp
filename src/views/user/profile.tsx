@@ -18,6 +18,7 @@ export function UserProfile() {
   const [uploadingDocument, setUploadingDocument] = useState(false);
   const [documentTitle, setDocumentTitle] = useState("");
   const [pendingDocumentUrl, setPendingDocumentUrl] = useState("");
+  const [uploaderKey, setUploaderKey] = useState(0);
 
   const {data: userData} = useSWR(`fetch-auth-user`, async () => {
     const userSummary = await getAuthUser();
@@ -62,6 +63,7 @@ export function UserProfile() {
 
       setDocumentTitle("");
       setPendingDocumentUrl("");
+      setUploaderKey((k) => k + 1);
     } catch {
       showNotification({
         type: "error",
@@ -201,7 +203,7 @@ export function UserProfile() {
 
               <div className="flex flex-col gap-3">
                 <h3 className="text-sm font-medium">Upload New Document</h3>
-                <DocumentUploader onUploadComplete={handleDocumentUpload} />
+                <DocumentUploader key={uploaderKey} onUploadComplete={handleDocumentUpload} />
 
                 {pendingDocumentUrl && (
                   <PendingDocumentSave
@@ -212,6 +214,7 @@ export function UserProfile() {
                     onCancel={() => {
                       setDocumentTitle("");
                       setPendingDocumentUrl("");
+                      setUploaderKey((k) => k + 1);
                     }}
                   />
                 )}
