@@ -9,20 +9,35 @@ import {useConfirmationModalStore} from "@/store/useConfirmationModalStore";
 
 type ApprovalAction = "APPROVED" | "REJECTED";
 
-function getComs(type: "USER" | "LEAVEREQUEST" | "DEPARTMENT_ASSIGNMENT") {
-  if (type === "USER")
+function getComs(type: "USER" | "LEAVEREQUEST" | "DEPARTMENT_ASSIGNMENT" | "USER_UPDATE") {
+  if (type === "USER" || type === "USER_UPDATE")
     return {
       REJECTED: {
         CONFIRMATION_MODAL: {
-          TITLE: "Reject user request?",
-          DESCRIPTION: "Are you sure you want to reject this user request?",
+          TITLE: type === "USER_UPDATE" ? "Reject user update?" : "Reject user request?",
+          DESCRIPTION:
+            type === "USER_UPDATE"
+              ? "Are you sure you want to reject this user update?"
+              : "Are you sure you want to reject this user request?",
         },
-        ERROR: "Couldn't reject the user request",
-        SUCCESS: "User creation rejected successfully",
+        ERROR:
+          type === "USER_UPDATE"
+            ? "Couldn't reject the user update"
+            : "Couldn't reject the user request",
+        SUCCESS:
+          type === "USER_UPDATE"
+            ? "User update rejected successfully"
+            : "User creation rejected successfully",
       },
       APPROVED: {
-        ERROR: "Couldn't approve the user request",
-        SUCCESS: "User approved successfully",
+        ERROR:
+          type === "USER_UPDATE"
+            ? "Couldn't approve the user update"
+            : "Couldn't approve the user request",
+        SUCCESS:
+          type === "USER_UPDATE"
+            ? "User update approved successfully"
+            : "User approved successfully",
       },
     };
 

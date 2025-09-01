@@ -286,3 +286,22 @@ export async function downloadEmployeeDocument(
 export async function downloadMyDocument(documentId: number, filename?: string) {
   return downloadWithAuth(`my-documents/${documentId}/download`, filename);
 }
+
+// Admin / L2 User Update
+export async function updateUserByAdmin(employeeId: number, user: TUpdateUser) {
+  return serviceHandler<TResponse<{message: string; user: unknown}>, TUpdateUser>({
+    method: "PUT",
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: `user/${employeeId}`,
+    body: user,
+  });
+}
+
+export async function requestUserUpdate(employeeId: number, user: TUpdateUser) {
+  return serviceHandler<TResponse<{message: string; approvalId: number}>, TUpdateUser>({
+    method: "POST",
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: `user/${employeeId}/update-request`,
+    body: user,
+  });
+}

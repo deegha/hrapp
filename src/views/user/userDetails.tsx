@@ -21,12 +21,14 @@ import {UserManagerSection} from "@/views/user/components/UserManagerSection";
 import {UserDocumentsSection} from "@/views/user/components/UserDocumentsSection";
 import {EmploymentTypePromotion} from "@/views/user/components/EmploymentTypePromotion";
 import {UserActivityLogs} from "@/views/user/components/UserActivityLogs";
+import {useRouter} from "next/router";
 
 export function UserDetails() {
   const {openModal} = useConfirmationModalStore();
   const {activePage} = usePagination();
   const {showNotification} = useNotificationStore();
   const {unsetUser, user, setActiveUser} = useUserStore();
+  const router = useRouter();
 
   const {data: employmentTypesData} = useSWR("fetch-employment-types", fetchEmploymentTypes);
   const {data: departmentsData} = useSWR("departments", fetchDepartments);
@@ -91,6 +93,7 @@ export function UserDetails() {
 
   const userPermission = userPermissionData?.data?.permission;
   const isAdmin = userPermission === "ADMIN_USER" || userPermission === "SUPER_USER";
+  const canEdit = isAdmin || userPermission === "ADMIN_USER_L2";
   const canUploadEmployeeDocs = isAdmin || userPermission === "ADMIN_USER_L2";
 
   return (
@@ -154,11 +157,14 @@ export function UserDetails() {
 
       <UserActivityLogs logs={user.activityLogs} />
       <div className="flex w-full gap-3">
-        {/* <Button variant="secondary">
-          <div className="flex gap-1 items-center">
-            <Edit size={14} /> Edit
-          </div>
-        </Button> */}
+        {canEdit && (
+          <Button
+            variant="secondary"
+            onClick={() => router.push(`/user-management/${user.employeeId}/edit`)}
+          >
+            Edit
+          </Button>
+        )}
 
         <EmploymentTypePromotion
           employeeId={user.employeeId}
