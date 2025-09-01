@@ -19,7 +19,37 @@ export function ApprovalDetailsUserUpdate() {
   if (!data) return <div>No data found</div>;
 
   const userRequest = data.data;
-  const changes = (approval.data || ({} as Record<string, unknown>)) as Record<string, unknown>;
+  const approvalData = (approval.data || {}) as {changes?: Record<string, unknown>};
+  const changes = (approvalData?.changes || {}) as Record<string, unknown>;
+
+  type UserChanges = {
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+  };
+
+  const FIELDS = [
+    {key: "firstName", label: "First Name", order: 1},
+    {key: "lastName", label: "Last Name", order: 2},
+    {key: "email", label: "Email", order: 3},
+  ] as const;
+
+  type FieldKey = (typeof FIELDS)[number]["key"];
+
+  const normalize = (v?: unknown) => String(v ?? "").trim();
+
+  const computeChangedEntries = (c: Partial<Record<FieldKey, unknown>>, u: UserChanges) => {
+    return FIELDS.filter(({key}) => c[key] !== undefined && c[key] !== null)
+      .filter(({key}) => normalize(c[key]) !== normalize(u[key]))
+      .sort((a, b) => a.order - b.order)
+      .map(({key, label}) => ({label, value: normalize(c[key])}));
+  };
+
+  const changedEntries = computeChangedEntries(changes as Partial<Record<FieldKey, unknown>>, {
+    firstName: userRequest.firstName,
+    lastName: userRequest.lastName,
+    email: userRequest.email,
+  });
 
   return (
     <div className="flex flex-col gap-10">
@@ -40,11 +70,11 @@ export function ApprovalDetailsUserUpdate() {
         <Detail label={"Email"} value={userRequest.email} />
       </div>
 
-      {Object.keys(changes).length > 0 && (
+      {changedEntries.length > 0 && (
         <div className="flex flex-col gap-3">
           <h2>Requested Changes</h2>
-          {Object.entries(changes).map(([key, value]) => (
-            <Detail key={key} label={key} value={String(value)} />
+          {changedEntries.map((item) => (
+            <Detail key={item.label} label={item.label} value={item.value} />
           ))}
         </div>
       )}
