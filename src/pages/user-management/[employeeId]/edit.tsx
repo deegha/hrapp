@@ -1,13 +1,14 @@
-import {Layout, PageLayout, Button, Shimmer, FormInput} from "@/components";
+import {Layout, PageLayout, Button, Shimmer, FormInput, FormSelect} from "@/components";
 import {FormProvider, useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
 import {editUserSchema} from "@/utils/formvalidations/userSchema";
 import {useRouter} from "next/router";
 import useSWR from "swr";
-import {fetchUser, fetchMyPermissions} from "@/services/userService";
+import {fetchUser, fetchMyPermissions, fetchEmploymentTypes} from "@/services/userService";
 import {TUpdateUser} from "@/types";
 import {useNotificationStore} from "@/store/notificationStore";
 import {requestUserUpdate, updateUserByAdmin} from "@/services/userService";
+import {roles, RoleKey} from "@/utils/staticValues";
 
 export default function EditUser() {
   const router = useRouter();
@@ -21,6 +22,7 @@ export default function EditUser() {
   );
 
   const {data: permissionData} = useSWR("my-permissions", fetchMyPermissions);
+  const {data: employmentTypesData} = useSWR("fetch-employment-types", fetchEmploymentTypes);
 
   if (!userData)
     return (
@@ -36,6 +38,8 @@ export default function EditUser() {
       firstName: userData.data.firstName,
       lastName: userData.data.lastName,
       email: userData.data.email,
+      userLevel: userData.data.userLevel,
+      employmentTypeId: userData.data.EmploymentType?.id,
     });
   }
 
@@ -78,6 +82,24 @@ export default function EditUser() {
             <FormInput name="firstName" label="First Name" />
             <FormInput name="lastName" label="Last Name" />
             <FormInput name="email" label="Email" type="email" />
+            <FormSelect
+              name="userLevel"
+              label="User Level"
+              options={Object.keys(roles).map((k) => ({
+                label: roles[k as RoleKey],
+                value: k,
+              }))}
+            />
+            <FormSelect
+              name="employmentTypeId"
+              label="Employment Type"
+              options={(employmentTypesData?.data || []).map(
+                (t: {id: number; typeLabel: string}) => ({
+                  label: t.typeLabel,
+                  value: t.id,
+                }),
+              )}
+            />
             <Button type="submit" disabled={!methods.formState.isValid}>
               Save Changes
             </Button>
