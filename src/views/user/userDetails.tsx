@@ -1,6 +1,6 @@
 import {StatusTag, Button, Detail} from "@/components";
 import {useConfirmationModalStore} from "@/store/useConfirmationModalStore";
-import {Trash} from "react-feather";
+import {Trash, Edit} from "react-feather";
 import {
   deleteUser,
   fetchEmploymentTypes,
@@ -162,7 +162,10 @@ export function UserDetails() {
             variant="secondary"
             onClick={() => router.push(`/user-management/${user.employeeId}/edit`)}
           >
-            Edit
+            <div className="flex items-center gap-1">
+              <Edit size={14} />
+              Edit
+            </div>
           </Button>
         )}
 
