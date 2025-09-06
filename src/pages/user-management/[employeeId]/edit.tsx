@@ -3,7 +3,7 @@ import {FormProvider, useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
 import {editUserSchema} from "@/utils/formvalidations/userSchema";
 import {useRouter} from "next/router";
-import useSWR from "swr";
+import useSWR, {mutate} from "swr";
 import {fetchUser, fetchMyPermissions, fetchEmploymentTypes} from "@/services/userService";
 import {TUpdateUser} from "@/types";
 import {useNotificationStore} from "@/store/notificationStore";
@@ -60,6 +60,7 @@ export default function EditUser() {
           showNotification({type: "error", message: "Failed to update user"});
           return;
         }
+        await mutate(`fetch-user-${employeeId}`);
         showNotification({type: "success", message: "User updated successfully"});
       } else {
         const resp = await requestUserUpdate(parseInt(employeeId, 10), payload);
@@ -67,6 +68,7 @@ export default function EditUser() {
           showNotification({type: "error", message: "Failed to request update"});
           return;
         }
+        await mutate(`fetch-user-${employeeId}`);
         showNotification({type: "success", message: "Update request sent for approval"});
       }
     } catch {
