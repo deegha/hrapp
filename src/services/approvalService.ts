@@ -28,7 +28,7 @@ type TApprove = {
 };
 
 export function approveRequest(
-  type: "USER" | "LEAVEREQUEST" | "DEPARTMENT_ASSIGNMENT",
+  type: "USER" | "LEAVEREQUEST" | "DEPARTMENT_ASSIGNMENT" | "USER_UPDATE",
   {approvalRequestId, itemId, approveReject, rejectedReason}: TApprove,
 ) {
   let resource: string;
@@ -48,6 +48,12 @@ export function approveRequest(
     resource = `leave-approval`;
   } else if (type === "DEPARTMENT_ASSIGNMENT") {
     resource = `user/approve-department-assignment`;
+    requestBody = {
+      approvalRequestId,
+      approveReject,
+    };
+  } else if (type === "USER_UPDATE") {
+    resource = `user/approve-update`;
     requestBody = {
       approvalRequestId,
       approveReject,

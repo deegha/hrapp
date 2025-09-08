@@ -7,6 +7,7 @@ import {
   ApprovalDetailsLeave,
   ApprovalDetailsUser,
   ApprovalDetailsDepartment,
+  ApprovalDetailsUserUpdate,
 } from "@/views/approvals";
 import moment from "moment";
 
@@ -28,6 +29,8 @@ export default function Home() {
             <ApprovalDetailsLeave />
           ) : approval.type === "DEPARTMENT_ASSIGNMENT" ? (
             <ApprovalDetailsDepartment />
+          ) : approval.type === "USER_UPDATE" ? (
+            <ApprovalDetailsUserUpdate />
           ) : (
             <ApprovalDetailsUser />
           )}

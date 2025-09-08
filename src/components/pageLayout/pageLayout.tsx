@@ -6,12 +6,14 @@ interface IProps {
   pageName: string;
   actionButton?: React.ReactNode;
   children: React.ReactNode;
+  breadcrumbFilter?: (segments: string[]) => string[];
 }
 
-export function PageLayout({pageName, actionButton, children}: IProps) {
+export function PageLayout({pageName, actionButton, children, breadcrumbFilter}: IProps) {
   const pathname = usePathname();
 
-  const pathSegments = pathname.split("/").filter(Boolean);
+  const rawSegments = (pathname || "").split("/").filter(Boolean);
+  const pathSegments = breadcrumbFilter ? breadcrumbFilter(rawSegments) : rawSegments;
 
   return (
     <div className="flex w-full animate-appear flex-col gap-[20px] p-[25px] md:gap-[40px]">
