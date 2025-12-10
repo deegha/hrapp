@@ -91,3 +91,9 @@ export interface IUserSearchResult {
   lastName: string;
   email: string;
 }
+
+export interface IMyDetails {
+  firstName: string;
+  lastName: string;
+  employeeId: string;
+}

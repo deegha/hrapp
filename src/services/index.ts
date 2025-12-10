@@ -22,11 +22,4 @@ export {
   fetchUserBookedDates,
 } from "./leaveService";
 export {approvalService, approveRequest} from "./approvalService";
-export {
-  fetchLeaveTypes,
-  fetchLeavePolicies,
-  updateLeavePolicy,
-  createLeaveType,
-  deleteLeaveType,
-  fetchEmploymentTypes,
-} from "./organizationService";
+export * from "./organizationService";
