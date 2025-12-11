@@ -1,8 +1,29 @@
-import React, {useState, useCallback, useMemo, useEffect} from "react";
-import {GoogleMap, useJsApiLoader, Marker} from "@react-google-maps/api";
+import React, {useState, useCallback, useEffect, useMemo} from "react";
+import {GoogleMap, useJsApiLoader, Marker, Circle} from "@react-google-maps/api";
 import {saveTargetLocation} from "@/services";
 import {Button} from "@/components";
 import {useOfficeLocationSettings} from "@/hooks/useOfficeLocationSettings";
+
+const colorfulMarkerLabel = {
+  text: "My office", // The text you want to display (e.g., initials, short name)
+  color: "#FFFFFF", // The color of the label text (e.g., White)
+  fontSize: "14px", // The font size of the label
+  fontWeight: "bold", // The font weight
+};
+
+const circleOptions = {
+  strokeColor: "#3283F8",
+  strokeOpacity: 0.8,
+  strokeWeight: 2,
+  fillColor: "#3283F8",
+  fillOpacity: 0.35,
+  clickable: false,
+  draggable: false,
+  editable: false,
+  visible: true,
+  zIndex: 1,
+};
+
 interface Coordinates {
   lat: number;
   lng: number;
@@ -11,6 +32,7 @@ interface Coordinates {
 // --- Constants for Sri Lanka ---
 const SRI_LANKA_CENTER: Coordinates = {lat: 7.8731, lng: 80.7718};
 const INITIAL_ZOOM = 8;
+const DEFAULT_RADIUS_METERS = 40;
 
 // --- Map Styling and Options ---
 const containerStyle = {
@@ -30,17 +52,18 @@ const GOOGLE_MAPS_API_KEY =
 const GoogleTargetLocationSetter: React.FC = () => {
   const {locationSettings, isLoadingLocationSettings} = useOfficeLocationSettings();
   const [selectedLocation, setSelectedLocation] = useState<Coordinates>(SRI_LANKA_CENTER);
-  const [status, setStatus] = useState<"idle" | "saving" | "success" | "error">("idle");
+  const [status, setStatus] = useState<"idle" | "saving" | "success" | "error" | "loaded">("idle");
   const [currentZoom, setCurrentZoom] = useState<number>(INITIAL_ZOOM);
 
   useEffect(() => {
-    console.log(locationSettings, "<<< location settings");
     if (locationSettings) {
       setSelectedLocation({
         lat: locationSettings.centerLat,
         lng: locationSettings.centerLon,
       });
       setCurrentZoom(locationSettings.currentZoom || INITIAL_ZOOM);
+
+      setStatus("loaded");
     }
   }, [locationSettings]);
 
@@ -48,6 +71,16 @@ const GoogleTargetLocationSetter: React.FC = () => {
   const {isLoaded, loadError} = useJsApiLoader({
     googleMapsApiKey: GOOGLE_MAPS_API_KEY,
   });
+
+  const customMarkerIcon = useMemo(() => {
+    // Only execute this code if the Google Maps API script has loaded (isLoaded is true).
+    if (!isLoaded) return undefined; // window.google.maps.Size is now guaranteed to exist.
+
+    return {
+      url: "images/office-location-pin.png",
+      scaledSize: new window.google.maps.Size(80, 80),
+    };
+  }, [isLoaded]);
 
   // 2. Map Event Handler (Click)
   const onMapClick = useCallback((e: google.maps.MapMouseEvent) => {
@@ -84,6 +117,7 @@ const GoogleTargetLocationSetter: React.FC = () => {
   // 4. Status Messages
   const getStatusMessage = () => {
     if (status === "success") return "✅ Target location saved successfully!";
+    if (status === "loaded") return "✅ You already have a saved location.";
     if (status === "saving") return "⏳ Saving location...";
     if (status === "error") return "❌ Error saving location. Try again.";
     if (selectedLocation) return "Location selected. Click SAVE to confirm.";
@@ -104,15 +138,13 @@ const GoogleTargetLocationSetter: React.FC = () => {
     }
   }, []);
 
-  // 5. Render Logic
   if (loadError)
     return <div className="p-4 text-red-600">Error loading maps. Check your API key.</div>;
   if (!isLoaded) return <div className="p-4 text-gray-600">Loading map...</div>;
 
   return (
-    <div className="mx-auto max-w-3xl space-y-4 rounded-xl">
-      {/* Map Container */}
-      <div className="overflow-hidden rounded-lg border border-gray-300">
+    <div className="mx-auto max-w-3xl space-y-4 overflow-hidden rounded-xl">
+      <div className="max-w-[400px] overflow-hidden rounded-lg border border-gray-300">
         <GoogleMap
           mapContainerStyle={containerStyle}
           center={selectedLocation} // Center map on Sri Lanka
@@ -121,10 +153,20 @@ const GoogleTargetLocationSetter: React.FC = () => {
           onClick={onMapClick}
           onZoomChanged={onZoomChanged}
         >
+          {selectedLocation && (
+            <Circle
+              center={selectedLocation}
+              radius={DEFAULT_RADIUS_METERS} // Uses the radius state (e.g., 5000 meters)
+              options={circleOptions}
+            />
+          )}
           {/* Display Marker at selected location */}
           {selectedLocation && (
             <Marker
               position={selectedLocation}
+              icon={customMarkerIcon}
+              title="My Office"
+              label={colorfulMarkerLabel}
               // Google Maps uses lat, lng object directly for position
             />
           )}
@@ -154,11 +196,17 @@ const GoogleTargetLocationSetter: React.FC = () => {
       </div>
 
       <div className="flex justify-center">
-        <div>
-          <Button onClick={handleSave} disabled={!selectedLocation || status === "saving"}>
-            {getButtonText()}
-          </Button>
-        </div>
+        {status !== "loaded" ? (
+          <div>
+            <Button onClick={handleSave} disabled={!selectedLocation || status === "saving"}>
+              {getButtonText()}
+            </Button>
+          </div>
+        ) : (
+          <p className="text-sm text-textSecondary">
+            Click anywhere in the map if you want to choose a new location
+          </p>
+        )}
       </div>
     </div>
   );
