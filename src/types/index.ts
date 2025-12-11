@@ -4,14 +4,4 @@ export type {TCreateUser, TUserPermission} from "./user";
 export type {TApproval} from "./approval";
 export type {TUpdateUser} from "./user";
 export type {NavItem} from "./ui";
-export type {
-  TLeaveType,
-  TLeavePolicy,
-  TUpdateLeavePolicyPayload,
-  TCreateLeaveTypePayload,
-  TEmploymentType,
-  TCreateEmploymentTypePayload,
-  TDepartment,
-  TCreateDepartmentPayload,
-  TUpdateDepartmentPayload,
-} from "./organization";
+export type * from "./organization";

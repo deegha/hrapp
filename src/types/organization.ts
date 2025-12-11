@@ -66,4 +66,15 @@ export type TOrganizationLocationSettingsPayload = {
   centerLon: number;
   radiusMeters: number;
   officeName: string;
+  currentZoom: number;
+};
+
+export type TOrganizationLocationSettings = {
+  id: number;
+  organizationId: number;
+  officeName: string;
+  centerLat: string;
+  centerLon: string;
+  radiusMeters: number;
+  currentZoom: number;
 };

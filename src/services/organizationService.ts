@@ -11,6 +11,7 @@ import {
   TCreateDepartmentPayload,
   TUpdateDepartmentPayload,
   TOrganizationLocationSettingsPayload,
+  TOrganizationLocationSettings,
 } from "@/types/organization";
 
 export async function fetchLeaveTypes() {
@@ -115,16 +116,9 @@ export async function deleteDepartment(id: number) {
   });
 }
 
-export async function saveTargetLocation(coords: {lat: number; lng: number}) {
+export async function saveTargetLocation(coords: {lat: number; lng: number}, currentZoom?: number) {
   return await serviceHandler<
-    TResponse<{
-      id: number;
-      organizationId: number;
-      officeName: string;
-      centerLat: string;
-      centerLon: string;
-      radiusMeters: number;
-    }>,
+    TResponse<TOrganizationLocationSettings>,
     TOrganizationLocationSettingsPayload
   >({
     method: "POST",
@@ -133,8 +127,29 @@ export async function saveTargetLocation(coords: {lat: number; lng: number}) {
       centerLon: coords.lng,
       radiusMeters: 500,
       officeName: "Headquarters",
+      currentZoom: currentZoom || 7,
     },
     baseURL: process.env.NEXT_PUBLIC_API as string,
     resource: "organization/update-location",
   });
+}
+
+export async function fetchOrganizationLocationSettings() {
+  const response = await serviceHandler<TResponse<TOrganizationLocationSettings>>({
+    method: "GET",
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: "organization/office-location",
+  });
+
+  const data = {
+    ...response,
+    data: {
+      ...response.data,
+      centerLat: parseFloat(response.data.centerLat),
+      centerLon: parseFloat(response.data.centerLon),
+      currentZoom: response.data.currentZoom || 7,
+    },
+  };
+
+  return data;
 }

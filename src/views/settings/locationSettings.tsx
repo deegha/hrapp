@@ -1,8 +1,8 @@
-import React, {useState, useCallback, useMemo} from "react";
+import React, {useState, useCallback, useMemo, useEffect} from "react";
 import {GoogleMap, useJsApiLoader, Marker} from "@react-google-maps/api";
 import {saveTargetLocation} from "@/services";
 import {Button} from "@/components";
-
+import {useOfficeLocationSettings} from "@/hooks/useOfficeLocationSettings";
 interface Coordinates {
   lat: number;
   lng: number;
@@ -10,7 +10,7 @@ interface Coordinates {
 
 // --- Constants for Sri Lanka ---
 const SRI_LANKA_CENTER: Coordinates = {lat: 7.8731, lng: 80.7718};
-const INITIAL_ZOOM = 7;
+const INITIAL_ZOOM = 8;
 
 // --- Map Styling and Options ---
 const containerStyle = {
@@ -24,11 +24,25 @@ const mapOptions = {
 };
 
 // Replace 'YOUR_GOOGLE_MAPS_API_KEY' with your actual key
-const GOOGLE_MAPS_API_KEY = "AIzaSyDD21yNwqbKVIYP8820R84addUOXE-BbWo";
+const GOOGLE_MAPS_API_KEY =
+  process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "YOUR_GOOGLE_MAPS_API_KEY";
 
 const GoogleTargetLocationSetter: React.FC = () => {
-  const [selectedLocation, setSelectedLocation] = useState<Coordinates | null>(null);
+  const {locationSettings, isLoadingLocationSettings} = useOfficeLocationSettings();
+  const [selectedLocation, setSelectedLocation] = useState<Coordinates>(SRI_LANKA_CENTER);
   const [status, setStatus] = useState<"idle" | "saving" | "success" | "error">("idle");
+  const [currentZoom, setCurrentZoom] = useState<number>(INITIAL_ZOOM);
+
+  useEffect(() => {
+    console.log(locationSettings, "<<< location settings");
+    if (locationSettings) {
+      setSelectedLocation({
+        lat: locationSettings.centerLat,
+        lng: locationSettings.centerLon,
+      });
+      setCurrentZoom(locationSettings.currentZoom || INITIAL_ZOOM);
+    }
+  }, [locationSettings]);
 
   // 1. Hook to load the Google Maps API script
   const {isLoaded, loadError} = useJsApiLoader({
@@ -55,7 +69,7 @@ const GoogleTargetLocationSetter: React.FC = () => {
     }
     setStatus("saving");
     try {
-      const success = await saveTargetLocation(selectedLocation);
+      const success = await saveTargetLocation(selectedLocation, currentZoom);
       if (success) {
         setStatus("success");
       } else {
@@ -82,6 +96,14 @@ const GoogleTargetLocationSetter: React.FC = () => {
     return "Save Target Location";
   };
 
+  const onZoomChanged = useCallback(function (this: google.maps.Map) {
+    // The 'this' context inside onZoomChanged is the map instance itself.
+    const newZoom = this.getZoom();
+    if (newZoom !== undefined) {
+      setCurrentZoom(newZoom);
+    }
+  }, []);
+
   // 5. Render Logic
   if (loadError)
     return <div className="p-4 text-red-600">Error loading maps. Check your API key.</div>;
@@ -93,10 +115,11 @@ const GoogleTargetLocationSetter: React.FC = () => {
       <div className="overflow-hidden rounded-lg border border-gray-300">
         <GoogleMap
           mapContainerStyle={containerStyle}
-          center={SRI_LANKA_CENTER} // Center map on Sri Lanka
-          zoom={INITIAL_ZOOM}
+          center={selectedLocation} // Center map on Sri Lanka
+          zoom={currentZoom}
           options={mapOptions}
           onClick={onMapClick}
+          onZoomChanged={onZoomChanged}
         >
           {/* Display Marker at selected location */}
           {selectedLocation && (
@@ -124,8 +147,8 @@ const GoogleTargetLocationSetter: React.FC = () => {
 
         {selectedLocation && (
           <div className="text-center text-sm text-gray-600">
-            Selected: Lat: <span className="font-mono">{selectedLocation.lat.toFixed(6)}</span>,
-            Lng: <span className="font-mono">{selectedLocation.lng.toFixed(6)}</span>
+            Selected: Lat: <span className="font-mono">{selectedLocation.lat}</span>, Lng:{" "}
+            <span className="font-mono">{selectedLocation.lng}</span>
           </div>
         )}
       </div>
