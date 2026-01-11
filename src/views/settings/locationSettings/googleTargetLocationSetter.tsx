@@ -51,7 +51,7 @@ const GOOGLE_MAPS_API_KEY =
   process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "YOUR_GOOGLE_MAPS_API_KEY";
 
 const GoogleTargetLocationSetter: React.FC = () => {
-  const {locationSettings, isLoadingLocationSettings} = useOfficeLocationSettings();
+  const {locationSettings} = useOfficeLocationSettings();
   const [selectedLocation, setSelectedLocation] = useState<Coordinates>(SRI_LANKA_CENTER);
   const [status, setStatus] = useState<"idle" | "saving" | "success" | "error" | "loaded">("idle");
   const [currentZoom, setCurrentZoom] = useState<number>(INITIAL_ZOOM);

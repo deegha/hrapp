@@ -16,11 +16,7 @@ export function AttendanceModal({isOpen, onClose}: IAttendanceModal) {
   const {locationSettings} = useOfficeLocationSettings();
   const {showNotification} = useNotificationStore();
 
-  const {
-    data,
-    isLoading: loadingIsMarked,
-    mutate,
-  } = useSWR("attendance/isMarked", isAttendanceMarked);
+  const {data, mutate} = useSWR("attendance/isMarked", isAttendanceMarked);
 
   const attendanceMarker = data?.data;
 
