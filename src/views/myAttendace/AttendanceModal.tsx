@@ -1,19 +1,28 @@
 import {Button} from "@/components";
-import {useMyDetails} from "@/hooks/useMydetails";
+import {OFFICE_LOCATION_RADIUS_METERS} from "@/constants/configs";
 import {useOfficeLocationSettings} from "@/hooks/useOfficeLocationSettings";
 import moment from "moment";
 import {useState, useEffect} from "react";
-import QRCode from "react-qr-code";
+import {markAttendance, isAttendanceMarked} from "@/services";
+import useSWR from "swr";
+import {useNotificationStore} from "@/store/notificationStore";
 
-interface IAttendanceQRModal {
+interface IAttendanceModal {
   isOpen: boolean;
   onClose: () => void;
 }
 
-export function AttendanceQRModal({isOpen, onClose}: IAttendanceQRModal) {
+export function AttendanceModal({isOpen, onClose}: IAttendanceModal) {
   const {locationSettings} = useOfficeLocationSettings();
-  const details = useMyDetails();
-  const qrValue = "https://example.com";
+  const {showNotification} = useNotificationStore();
+
+  const {
+    data,
+    isLoading: loadingIsMarked,
+    mutate,
+  } = useSWR("attendance/isMarked", isAttendanceMarked);
+
+  const attendanceMarker = data?.data;
 
   function handleClose() {
     onClose();
@@ -22,6 +31,7 @@ export function AttendanceQRModal({isOpen, onClose}: IAttendanceQRModal) {
   const [userLocation, setUserLocation] = useState<{lat: number; lon: number} | null>(null);
   const [withinLocation, setWithinLocation] = useState<boolean | null>(null);
   const [distanceMeters, setDistanceMeters] = useState<number | null>(null);
+  const [locationError, setLocationError] = useState<boolean>(false);
 
   // Haversine formula to compute distance (in meters) between two lat/lon points
   function haversineDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
@@ -65,7 +75,7 @@ export function AttendanceQRModal({isOpen, onClose}: IAttendanceQRModal) {
       if (Number.isFinite(centerLat) && Number.isFinite(centerLon)) {
         const dist = haversineDistance(lat, lon, centerLat, centerLon);
         setDistanceMeters(dist);
-        setWithinLocation(dist <= 50); // 50 meters radius
+        setWithinLocation(dist <= OFFICE_LOCATION_RADIUS_METERS); // 50 meters radius
       } else {
         setWithinLocation(false);
       }
@@ -75,6 +85,7 @@ export function AttendanceQRModal({isOpen, onClose}: IAttendanceQRModal) {
       console.error("Geolocation error:", err);
       if (!mounted) return;
       setWithinLocation(false);
+      setLocationError(true);
     };
 
     navigator.geolocation.getCurrentPosition(success, error, {
@@ -91,38 +102,75 @@ export function AttendanceQRModal({isOpen, onClose}: IAttendanceQRModal) {
 
   const today = moment().format("DD, MM, YYYY");
 
+  async function handleMarkAttendance() {
+    if (attendanceMarker === "ATTENDANCE_MARKED") return;
+
+    await markAttendance({
+      punchTime: new Date().toISOString(),
+      type: attendanceMarker ? "CHECK_OUT" : "CHECK_IN",
+      latitude: userLocation?.lat,
+      longitude: userLocation?.lon,
+    });
+
+    showNotification({
+      message: attendanceMarker ? "Checked out successfully." : "Checked in successfully.",
+      type: "success",
+    });
+    mutate();
+    handleClose();
+  }
+
   if (!isOpen) return null;
   return (
     <div>
       <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/30 backdrop-blur-sm">
-        <div className="flex w-full max-w-md flex-col items-center gap-6 rounded-xl bg-white p-6 shadow-xl">
+        <div className="flex w-full max-w-md flex-col items-center gap-10 rounded-xl bg-white p-6 shadow-xl">
           <div className="flex flex-col items-center">
             <h2 className="mb-4 text-lg font-semibold text-gray-800">Mark your attendance</h2>
             <p className="text-sm text-textSecondary">Marking attendance for {today}</p>
           </div>
 
-          <div className="flex flex-col items-center gap-2 text-center">
-            {withinLocation === null ? (
-              <p className="text-sm text-textSecondary">Checking location…</p>
-            ) : withinLocation ? (
-              <>
-                <Button type="button" variant="primary" onClick={handleClose}>
-                  Mark my attendance
-                </Button>
-                <p className="text-sm font-semibold text-green-600">
-                  You are within {distanceMeters ? distanceMeters.toFixed(1) : "0"} m of office
-                </p>
-              </>
-            ) : (
-              <p className="text-sm font-semibold text-red-600">
-                You are outside the office by{" "}
-                {distanceMeters ? distanceMeters.toFixed(1) : "an unknown distance"} m
+          {locationError && (
+            <>
+              <p className="text-sm text-red-600">
+                Unable to retrieve your location. Please ensure location services are enabled.
               </p>
-            )}
-          </div>
+              <p>You can enable location from exclamation mark in the address bar </p>
+            </>
+          )}
+
+          {attendanceMarker === "ATTENDANCE_MARKED" ? (
+            <p className="text-sm font-semibold text-green-600">
+              You have already have marked your attendance today.
+            </p>
+          ) : (
+            <div className="flex flex-col items-center gap-2 text-center">
+              {withinLocation === null ? (
+                <p className="text-sm text-textSecondary">Checking location…</p>
+              ) : withinLocation ? (
+                <>
+                  <p className="text-sm font-semibold text-green-600">
+                    You are within {distanceMeters ? distanceMeters.toFixed(1) : "0"} m of office
+                  </p>
+                  <Button
+                    type="button"
+                    variant={attendanceMarker ? "secondary" : "primary"}
+                    onClick={handleMarkAttendance}
+                  >
+                    {attendanceMarker ? "Check out now" : "Check in now"}
+                  </Button>
+                </>
+              ) : (
+                <p className="text-sm font-semibold text-red-600">
+                  You are outside the office by{" "}
+                  {distanceMeters ? distanceMeters.toFixed(1) : "an unknown distance"} m
+                </p>
+              )}
+            </div>
+          )}
 
           <div>
-            <Button type="button" variant="secondary" onClick={handleClose}>
+            <Button type="button" variant="danger" onClick={handleClose}>
               Close modal
             </Button>
           </div>

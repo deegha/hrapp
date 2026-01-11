@@ -4,7 +4,7 @@ import {StatusTag} from "../statusTag/statusTag";
 interface IListItems {
   title: string | React.ReactNode;
   content: React.ReactNode;
-  status?: TGenericStatus;
+  status?: string | TGenericStatus;
   onClick?: () => void;
   actionArea?: React.ReactNode;
 }
@@ -19,9 +19,11 @@ export function ItemsList(props: IListItems) {
         <div className="text-sm font-semibold">{props.title}</div>
         <div className="flex gap-2 text-sm text-textSecondary">{props.content}</div>
       </div>
-      <div className="text-sm">
+
+      {/* Right side: status tag and any custom action area (aligned center) */}
+      <div className="flex items-center gap-3 text-sm">
         {props.status && <StatusTag status={props.status} />}
-        {props.actionArea && props.actionArea}
+        {props.actionArea && <div className="flex items-center gap-2">{props.actionArea}</div>}
       </div>
     </div>
   );

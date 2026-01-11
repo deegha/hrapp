@@ -23,3 +23,4 @@ export {
 } from "./leaveService";
 export {approvalService, approveRequest} from "./approvalService";
 export * from "./organizationService";
+export * from "./attendanceService";

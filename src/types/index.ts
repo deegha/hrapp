@@ -5,3 +5,4 @@ export type {TApproval} from "./approval";
 export type {TUpdateUser} from "./user";
 export type {NavItem} from "./ui";
 export type * from "./organization";
+export type * from "./attendance";

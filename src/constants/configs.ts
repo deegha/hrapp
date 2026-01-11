@@ -1,0 +1,2 @@
+export const OFFICE_LOCATION_RADIUS_METERS = 100;
+export const DEFAULT_MAP_ZOOM = 15;

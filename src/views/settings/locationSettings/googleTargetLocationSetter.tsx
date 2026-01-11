@@ -3,6 +3,7 @@ import {GoogleMap, useJsApiLoader, Marker, Circle} from "@react-google-maps/api"
 import {saveTargetLocation} from "@/services";
 import {Button} from "@/components";
 import {useOfficeLocationSettings} from "@/hooks/useOfficeLocationSettings";
+import {OFFICE_LOCATION_RADIUS_METERS} from "@/constants/configs";
 
 const colorfulMarkerLabel = {
   text: "My office", // The text you want to display (e.g., initials, short name)
@@ -32,7 +33,7 @@ interface Coordinates {
 // --- Constants for Sri Lanka ---
 const SRI_LANKA_CENTER: Coordinates = {lat: 7.8731, lng: 80.7718};
 const INITIAL_ZOOM = 8;
-const DEFAULT_RADIUS_METERS = 40;
+const DEFAULT_RADIUS_METERS = OFFICE_LOCATION_RADIUS_METERS;
 
 // --- Map Styling and Options ---
 const containerStyle = {

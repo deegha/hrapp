@@ -34,8 +34,10 @@ export const serviceHandler = async <TResponse, TBody = undefined>({
     body: body ? JSON.stringify(body) : undefined,
   });
 
+  console.log("here1");
   // Handle token expiration smoothly
   if (response.status === 401 && protectedRoute) {
+    console.log("here");
     // Clean up store and localStorage
     useAuthStore.getState().logout();
 
