@@ -35,3 +35,12 @@ export async function getAdminAttendanceSummery() {
     resource: `attendance/summary/employer`,
   });
 }
+
+export async function downloadAttendanceReport() {
+  return await serviceHandler<unknown>({
+    method: "GET",
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: `attendance/report`,
+    responseType: "blob",
+  });
+}

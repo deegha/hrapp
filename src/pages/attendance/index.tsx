@@ -1,12 +1,34 @@
 import React from "react";
 import {PageLayout, ItemsList, Button, Layout} from "@/components";
 import {useAttendanceSummery} from "@/hooks/attendance/useAttendanceSummery";
+import {downloadAttendanceReport} from "@/services/attendanceService";
 
 export function AttendancePage() {
   const {statCards, insightMessage, alerts, realTimeActivity} = useAttendanceSummery();
 
-  const handleDownloadReport = () => {
-    console.log("Downloading Monthly Attendance Report...");
+  const handleDownloadReport = async () => {
+    try {
+      console.log("Downloading Monthly Attendance Report...");
+      const blob = await downloadAttendanceReport();
+
+      // 2. Create a temporary URL for the binary data
+      const url = window.URL.createObjectURL(blob);
+
+      // 3. Create a hidden anchor element to trigger the download
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "Attendance_Report.xlsx"); // Name of the file
+
+      // 4. Append, click, and cleanup
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode?.removeChild(link);
+
+      // 5. Free up memory
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error downloading the report:", error);
+    }
   };
 
   return (

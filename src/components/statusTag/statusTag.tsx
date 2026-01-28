@@ -1,6 +1,6 @@
 import {TGenericStatus} from "@/types/";
 interface IProps {
-  status: TGenericStatus;
+  status: string | TGenericStatus;
 }
 
 export function StatusTag({status}: IProps) {
