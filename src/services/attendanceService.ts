@@ -36,11 +36,12 @@ export async function getAdminAttendanceSummery() {
   });
 }
 
-export async function downloadAttendanceReport() {
-  return await serviceHandler<unknown>({
-    method: "GET",
+export async function downloadAttendanceReport(date: Date) {
+  return await serviceHandler<unknown, {reportDate: Date}>({
+    method: "POST",
     baseURL: process.env.NEXT_PUBLIC_API as string,
     resource: `attendance/report`,
     responseType: "blob",
+    body: {reportDate: date},
   });
 }

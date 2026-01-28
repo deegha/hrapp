@@ -1,18 +1,20 @@
 import React from "react";
-import {PageLayout, ItemsList, Button, Layout} from "@/components";
+import {PageLayout, ItemsList, Button, Layout, SelectDropdown} from "@/components";
 import {useAttendanceSummery} from "@/hooks/attendance/useAttendanceSummery";
 import {downloadAttendanceReport} from "@/services/attendanceService";
+import {monthOptions} from "@/utils/generateMonthOptions";
 
 export function AttendancePage() {
   const {statCards, insightMessage, alerts, realTimeActivity} = useAttendanceSummery();
+  const [selectedData, setSelectedDate] = React.useState(monthOptions[0]);
 
   const handleDownloadReport = async () => {
     try {
       console.log("Downloading Monthly Attendance Report...");
-      const blob = await downloadAttendanceReport();
+      const blob = await downloadAttendanceReport(new Date(selectedData.id));
 
       // 2. Create a temporary URL for the binary data
-      const url = window.URL.createObjectURL(blob);
+      const url = window.URL.createObjectURL(blob as Blob);
 
       // 3. Create a hidden anchor element to trigger the download
       const link = document.createElement("a");
@@ -41,7 +43,15 @@ export function AttendancePage() {
               <h2 className="text-md font-semiBold text-textPrimary">Company Overview</h2>
               <p className="text-sm text-textSecondary">January 2026 Payroll Period</p>
             </div>
-            <div>
+            <div className="flex gap-5">
+              <div className="w-[400px]">
+                <SelectDropdown
+                  options={monthOptions}
+                  defaultValue={selectedData}
+                  onChange={(option) => setSelectedDate(option as (typeof monthOptions)[0])}
+                />
+              </div>
+
               <Button onClick={handleDownloadReport}>Download Monthly Report</Button>
             </div>
           </div>
