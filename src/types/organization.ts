@@ -60,3 +60,21 @@ export type TCreateDepartmentPayload = {
 export type TUpdateDepartmentPayload = {
   departmentName: string;
 };
+
+export type TOrganizationLocationSettingsPayload = {
+  centerLat: number;
+  centerLon: number;
+  radiusMeters: number;
+  officeName: string;
+  currentZoom: number;
+};
+
+export type TOrganizationLocationSettings = {
+  id: number;
+  organizationId: number;
+  officeName: string;
+  centerLat: string;
+  centerLon: string;
+  radiusMeters: number;
+  currentZoom: number;
+};

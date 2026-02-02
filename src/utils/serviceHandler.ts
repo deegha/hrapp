@@ -7,6 +7,7 @@ interface IFetchApi<TBody> {
   resource: string;
   body?: TBody;
   protectedRoute?: boolean;
+  responseType?: "json" | "blob";
 }
 
 export const serviceHandler = async <TResponse, TBody = undefined>({
@@ -15,6 +16,7 @@ export const serviceHandler = async <TResponse, TBody = undefined>({
   baseURL,
   resource,
   protectedRoute = true,
+  responseType = "json", // Default to json
 }: IFetchApi<TBody>): Promise<TResponse> => {
   const url = baseURL + resource;
 
@@ -28,6 +30,14 @@ export const serviceHandler = async <TResponse, TBody = undefined>({
       authorization: `Bearer ${getAuthToken()}`,
     };
   }
+
+  if (responseType === "blob") {
+    headers = {
+      ...headers,
+      Accept: "application/octet-stream",
+    };
+  }
+
   const response = await fetch(url, {
     headers,
     method,
@@ -36,21 +46,34 @@ export const serviceHandler = async <TResponse, TBody = undefined>({
 
   // Handle token expiration smoothly
   if (response.status === 401 && protectedRoute) {
-    // Clean up store and localStorage
     useAuthStore.getState().logout();
-
-    // Only redirect if not already on login page
     if (!window.location.pathname.includes("/login")) {
       window.location.href = "/login";
     }
     throw new Error("Session expired");
   }
 
+  // 1. If it's a blob, return it directly after checking for errors
+  if (responseType === "blob") {
+    if (!response.ok) {
+      // If the file download fails, the server might send a JSON error
+      // We try to parse it to show a meaningful error message
+      const errorText = await response.text();
+      try {
+        const errorJson = JSON.parse(errorText);
+        throw new Error(errorJson.data || "Failed to download file");
+      } catch {
+        throw new Error("Failed to download file");
+      }
+    }
+    return (await response.blob()) as unknown as TResponse;
+  }
+
+  // 2. Default JSON handling
   const data = await response.json();
 
-  // Check if response indicates an error
   if (data.error === true) {
-    throw data.data; // Throw the error message
+    throw data.data;
   }
 
   return data as TResponse;

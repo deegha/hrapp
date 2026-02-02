@@ -27,10 +27,14 @@ export function Layout({children}: IPrps) {
             type: "error",
             message: res.data,
           });
+          doLogout();
           logout();
           router.push("/login");
         }
-      } catch {}
+      } catch {
+        logout();
+        doLogout();
+      }
     };
 
     handleAuth();

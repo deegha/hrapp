@@ -27,3 +27,5 @@ export {Shimmer} from "./shimmer/shimmer";
 export {Autocomplete} from "./AutoComplete/autoComplete";
 export {EmploymentTypesShimmer} from "./shimmer/employmentTypesShimmer";
 export {ErrorDisplay} from "./error/errorDisplay";
+export {Tabs} from "./tabs/tabs";
+export {SelectDropdown} from "./selectDropdown/selectDropdown";

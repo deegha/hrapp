@@ -7,6 +7,7 @@ import {
   TAllUserDetails,
   TUpdateUser,
   IUserSearchResult,
+  IMyDetails,
 } from "@/types/user";
 import {TResponse, TGenericFilters, TApproval} from "@/types";
 import {TResponseWithPagination} from "@/types/api";
@@ -303,5 +304,13 @@ export async function requestUserUpdate(employeeId: number, user: TUpdateUser) {
     baseURL: process.env.NEXT_PUBLIC_API as string,
     resource: `user/${employeeId}/update-request`,
     body: user,
+  });
+}
+
+export async function fetchMyDetails() {
+  return serviceHandler<TResponse<IMyDetails>>({
+    method: "GET",
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: `user/my-details`,
   });
 }

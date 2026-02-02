@@ -10,6 +10,8 @@ import {
   UserMinus,
   Paperclip,
   Users,
+  UserCheck,
+  Settings,
 } from "react-feather";
 import useSWR from "swr";
 import {getNavigationItems} from "@/services/uiService";
@@ -23,6 +25,8 @@ const iconMap: Record<string, Icon> = {
   CheckSquare,
   Paperclip,
   Users,
+  UserCheck,
+  Settings,
 };
 
 export const Navigation = () => {

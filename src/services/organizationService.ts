@@ -10,6 +10,8 @@ import {
   TDepartment,
   TCreateDepartmentPayload,
   TUpdateDepartmentPayload,
+  TOrganizationLocationSettingsPayload,
+  TOrganizationLocationSettings,
 } from "@/types/organization";
 
 export async function fetchLeaveTypes() {
@@ -112,4 +114,42 @@ export async function deleteDepartment(id: number) {
     baseURL: process.env.NEXT_PUBLIC_API as string,
     resource: `organization/departments/${id}`,
   });
+}
+
+export async function saveTargetLocation(coords: {lat: number; lng: number}, currentZoom?: number) {
+  return await serviceHandler<
+    TResponse<TOrganizationLocationSettings>,
+    TOrganizationLocationSettingsPayload
+  >({
+    method: "POST",
+    body: {
+      centerLat: coords.lat,
+      centerLon: coords.lng,
+      radiusMeters: 500,
+      officeName: "Headquarters",
+      currentZoom: currentZoom || 7,
+    },
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: "organization/update-location",
+  });
+}
+
+export async function fetchOrganizationLocationSettings() {
+  const response = await serviceHandler<TResponse<TOrganizationLocationSettings>>({
+    method: "GET",
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: "organization/office-location",
+  });
+
+  const data = {
+    ...response,
+    data: {
+      ...response.data,
+      centerLat: parseFloat(response.data.centerLat),
+      centerLon: parseFloat(response.data.centerLon),
+      currentZoom: response.data.currentZoom || 7,
+    },
+  };
+
+  return data;
 }
