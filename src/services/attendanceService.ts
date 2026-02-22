@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import {IAttendance, TResponse, TResponseWithPagination, TWFHRequest} from "@/types";
+=======
+import {IAttendance, TResponse, TResponseWithPagination} from "@/types";
+>>>>>>> 51b54f53e13046d163b0f19226299bc6f58641bc
 import {serviceHandler} from "@/utils/serviceHandler";
 
 import {IAttendancePayload, IAttendanceSummary} from "@/types";
@@ -45,6 +49,7 @@ export async function downloadAttendanceReport(date: Date) {
     body: {reportDate: date},
   });
 }
+<<<<<<< HEAD
 
 export async function requestWFH(payload: {
   date: string;
@@ -75,3 +80,5 @@ export async function getMyWFHRequests() {
     resource: `attendance/wfh-requests/my`,
   });
 }
+=======
+>>>>>>> 51b54f53e13046d163b0f19226299bc6f58641bc

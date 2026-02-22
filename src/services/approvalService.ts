@@ -28,7 +28,11 @@ type TApprove = {
 };
 
 export function approveRequest(
+<<<<<<< HEAD
   type: "USER" | "LEAVEREQUEST" | "DEPARTMENT_ASSIGNMENT" | "USER_UPDATE" | "WFH_REQUEST",
+=======
+  type: "USER" | "LEAVEREQUEST" | "DEPARTMENT_ASSIGNMENT" | "USER_UPDATE",
+>>>>>>> 51b54f53e13046d163b0f19226299bc6f58641bc
   {approvalRequestId, itemId, approveReject, rejectedReason}: TApprove,
 ) {
   let resource: string;
@@ -58,6 +62,7 @@ export function approveRequest(
       approvalRequestId,
       approveReject,
     };
+<<<<<<< HEAD
   } else if (type === "WFH_REQUEST") {  // 👈 add this
     resource = `attendance/wfh-approval`;
     requestBody = {
@@ -65,6 +70,8 @@ export function approveRequest(
       itemId,
       approveReject,
     };
+=======
+>>>>>>> 51b54f53e13046d163b0f19226299bc6f58641bc
   } else {
     resource = `user-approval`;
   }
@@ -77,4 +84,8 @@ export function approveRequest(
   });
 
   return response;
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 51b54f53e13046d163b0f19226299bc6f58641bc
