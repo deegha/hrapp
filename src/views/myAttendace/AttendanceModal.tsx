@@ -3,7 +3,7 @@ import {OFFICE_LOCATION_RADIUS_METERS} from "@/constants/configs";
 import {useOfficeLocationSettings} from "@/hooks/useOfficeLocationSettings";
 import moment from "moment";
 import {useState, useEffect} from "react";
-import {markAttendance, isAttendanceMarked, requestWFH} from "@/services";
+import {markAttendance, isAttendanceMarked, requestWFH, getMyWFHRequests} from "@/services";
 import useSWR from "swr";
 import {useNotificationStore} from "@/store/notificationStore";
 
@@ -19,13 +19,27 @@ export function AttendanceModal({isOpen, onClose}: IAttendanceModal) {
   const {data, mutate} = useSWR("attendance/isMarked", isAttendanceMarked);
   const attendanceMarker = data?.data;
 
+  // 👇 fetch WFH requests to check for pending
+  const {data: wfhData, mutate: mutateWFH} = useSWR("myWFHRequests", getMyWFHRequests);
+  const hasPendingWFH = wfhData?.data?.some(
+    (wfh) =>
+      wfh.status === "PENDING" &&
+      moment(wfh.date).format("YYYY-MM-DD") === moment().format("YYYY-MM-DD"),
+  );
+
+  // 👇 check if WFH is approved for today
+  const hasApprovedWFH = wfhData?.data?.some(
+    (wfh) =>
+      wfh.status === "APPROVED" &&
+      moment(wfh.date).format("YYYY-MM-DD") === moment().format("YYYY-MM-DD"),
+  );
+
   const [userLocation, setUserLocation] = useState<{lat: number; lon: number} | null>(null);
   const [withinLocation, setWithinLocation] = useState<boolean | null>(null);
   const [distanceMeters, setDistanceMeters] = useState<number | null>(null);
   const [locationError, setLocationError] = useState<boolean>(false);
   const [wfhLoading, setWfhLoading] = useState(false);
 
-  // 👇 confirmation modal state
   const [showWFHConfirm, setShowWFHConfirm] = useState(false);
   const [wfhNote, setWfhNote] = useState("");
 
@@ -128,6 +142,7 @@ export function AttendanceModal({isOpen, onClose}: IAttendanceModal) {
       });
       setShowWFHConfirm(false);
       setWfhNote("");
+      mutateWFH(); // 👈 refresh WFH requests after submission
       handleClose();
     } catch {
       showNotification({
@@ -141,7 +156,7 @@ export function AttendanceModal({isOpen, onClose}: IAttendanceModal) {
 
   if (!isOpen) return null;
 
-  // 👇 WFH confirmation modal
+  // WFH confirmation modal
   if (showWFHConfirm) {
     return (
       <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/30 backdrop-blur-sm">
@@ -212,6 +227,28 @@ export function AttendanceModal({isOpen, onClose}: IAttendanceModal) {
             <p className="text-sm font-semibold text-green-600">
               You have already marked your attendance today.
             </p>
+          ) : // 👇 Pending WFH request — block all actions
+          hasPendingWFH ? (
+            <div className="flex flex-col items-center gap-3 text-center">
+              <div className="rounded-lg bg-yellow-50 p-4 text-sm text-yellow-800">
+                <p className="font-semibold">WFH Request Pending</p>
+                <p className="mt-1">
+                  You have a pending Work From Home request for today. Please wait for your manager
+                  to approve or reject it before marking attendance.
+                </p>
+              </div>
+            </div>
+          ) : // 👇 Approved WFH — show checkout option
+          hasApprovedWFH ? (
+            <div className="flex flex-col items-center gap-3 text-center">
+              <div className="rounded-lg bg-green-50 p-4 text-sm text-green-800">
+                <p className="font-semibold">Working From Home Today</p>
+                <p className="mt-1">Your WFH request has been approved.</p>
+              </div>
+              <Button type="button" variant="secondary" onClick={handleMarkAttendance}>
+                Check out now
+              </Button>
+            </div>
           ) : (
             <div className="flex flex-col items-center gap-2 text-center">
               {withinLocation === null ? (
@@ -230,7 +267,6 @@ export function AttendanceModal({isOpen, onClose}: IAttendanceModal) {
                   </Button>
                 </>
               ) : (
-                // 👇 Only show WFH button when outside office range
                 <div className="flex flex-col items-center gap-4">
                   <p className="text-sm font-semibold text-red-600">
                     You are outside the office by{" "}

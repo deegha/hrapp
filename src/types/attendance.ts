@@ -11,7 +11,15 @@ export interface IAttendance {
   date: string;
   checkInTime: Date | null;
   checkOutTime: Date | null;
-  attendance: "on_leave" | "full_day" | "no_pay" | "half_day" | "absent";
+  attendance:
+    | "full_day"
+    | "half_day"
+    | "on_paid_leave"
+    | "no_pay"
+    | "absent"
+    | "checked_in"
+    | "checked_out"
+    | "not_checked_out";
   isWFH?: boolean;
   location: {
     lat: number;
