@@ -1,10 +1,10 @@
-import { PageLayout, NoDataFoundComponent, ItemsList, Button, Pagination } from "@/components";
+import {PageLayout, NoDataFoundComponent, ItemsList, Button, Pagination} from "@/components";
 import moment from "moment";
-import { useState } from "react";
-import { AttendanceModal } from "./AttendanceModal";
-import { getMyAttendanceRecords, getMyWFHRequests } from "@/services/attendanceService";
+import {useState} from "react";
+import {AttendanceModal} from "./AttendanceModal";
+import {getMyAttendanceRecords, getMyWFHRequests} from "@/services/attendanceService";
 import useSWR from "swr";
-import { useRouter } from "next/router";
+import {useRouter} from "next/router";
 
 const ATTENDANCE = {
   ON_LEAVE: "on_leave",
@@ -21,10 +21,10 @@ export function MyAttendance() {
   const page = Number(router.query.page) || 1;
 
   const [isModalOpen, setIsCreateModalOpen] = useState(false);
-  const { data } = useSWR(`attendanceRecords-${page}-${limit}`, () =>
+  const {data} = useSWR(`attendanceRecords-${page}-${limit}`, () =>
     getMyAttendanceRecords(page, limit),
   );
-  const { data: wfhData } = useSWR("myWFHRequests", getMyWFHRequests);
+  const {data: wfhData} = useSWR("myWFHRequests", getMyWFHRequests);
 
   const attendanceItems = data?.data.data || [];
   const wfhItems = wfhData?.data || [];
@@ -49,32 +49,24 @@ export function MyAttendance() {
                   case ATTENDANCE.FULL_DAY:
                     return (
                       <span
-                        className={`block h-3 w-3 rounded-full ${attendance.isWFH ? "bg-blue-500" : "bg-green-500"}`}
+                        className={`block size-3 rounded-full ${attendance.isWFH ? "bg-blue-500" : "bg-green-500"}`}
                         aria-hidden
                       />
                     );
                   case ATTENDANCE.NO_PAY:
-                    return <span className="block h-3 w-3 rounded-full bg-gray-300" aria-hidden />;
+                    return <span className="block size-3 rounded-full bg-gray-300" aria-hidden />;
                   case ATTENDANCE.HALF_DAY:
-                    return (
-                      <span className="block h-3 w-3 rounded-full bg-gray-300" aria-hidden />
-                    );
+                    return <span className="block size-3 rounded-full bg-gray-300" aria-hidden />;
                   case ATTENDANCE.ON_LEAVE:
-                    return (
-                      <span className="block h-3 w-3 rounded-full bg-gray-300" aria-hidden />
-                    );
+                    return <span className="block size-3 rounded-full bg-gray-300" aria-hidden />;
                   case ATTENDANCE.ABSENT:
-                    return (
-                      <span className="block h-3 w-3 rounded-full bg-gray-300" aria-hidden />
-                    );
+                    return <span className="block size-3 rounded-full bg-gray-300" aria-hidden />;
                   case ATTENDANCE.CHECKED_IN:
-                    return <span className="block h-3 w-3 rounded-full bg-gray-300" aria-hidden />;
+                    return <span className="block size-3 rounded-full bg-gray-300" aria-hidden />;
                   case ATTENDANCE.NOT_CHECKED_OUT:
-                    return <span className="block h-3 w-3 rounded-full bg-gray-300" aria-hidden />;
+                    return <span className="block size-3 rounded-full bg-gray-300" aria-hidden />;
                   default:
-                    return (
-                      <span className="block h-3 w-3 rounded-full bg-gray-300" aria-hidden />
-                    );
+                    return <span className="block size-3 rounded-full bg-gray-300" aria-hidden />;
                 }
               };
 
@@ -118,14 +110,20 @@ export function MyAttendance() {
                         <div className="text-blue-700">
                           Working From Home — Checked in at{" "}
                           {attendance.checkInTime
-                            ? moment.utc(attendance.checkInTime).local().format("DD MMM YYYY, h:mm A")
+                            ? moment
+                                .utc(attendance.checkInTime)
+                                .local()
+                                .format("DD MMM YYYY, h:mm A")
                             : "Not recorded"}
                         </div>
                       ) : status === ATTENDANCE.CHECKED_IN ? (
                         <div className="text-gray-600">
                           Checked in at{" "}
                           {attendance.checkInTime
-                            ? moment.utc(attendance.checkInTime).local().format("DD MMM YYYY, h:mm A")
+                            ? moment
+                                .utc(attendance.checkInTime)
+                                .local()
+                                .format("DD MMM YYYY, h:mm A")
                             : "Not recorded"}{" "}
                           — Not yet checked out
                         </div>
@@ -133,7 +131,10 @@ export function MyAttendance() {
                         <div className="text-gray-600">
                           Checked in at{" "}
                           {attendance.checkInTime
-                            ? moment.utc(attendance.checkInTime).local().format("DD MMM YYYY, h:mm A")
+                            ? moment
+                                .utc(attendance.checkInTime)
+                                .local()
+                                .format("DD MMM YYYY, h:mm A")
                             : "Not recorded"}{" "}
                           — Did not check out
                         </div>
@@ -141,11 +142,17 @@ export function MyAttendance() {
                         <>
                           You have checked in{" "}
                           {attendance.checkInTime
-                            ? moment.utc(attendance.checkInTime).local().format("DD MMM YYYY, h:mm A")
+                            ? moment
+                                .utc(attendance.checkInTime)
+                                .local()
+                                .format("DD MMM YYYY, h:mm A")
                             : "Not recorded"}{" "}
                           and checked out at{" "}
                           {attendance.checkOutTime
-                            ? moment.utc(attendance.checkOutTime).local().format("DD MMM YYYY, h:mm A")
+                            ? moment
+                                .utc(attendance.checkOutTime)
+                                .local()
+                                .format("DD MMM YYYY, h:mm A")
                             : "Not recorded"}
                         </>
                       )}
@@ -168,12 +175,13 @@ export function MyAttendance() {
                 actionArea={
                   <div className="flex items-center gap-2">
                     <span
-                      className={`block h-3 w-3 rounded-full ${wfh.status === "APPROVED"
-                        ? "bg-green-500"
-                        : wfh.status === "REJECTED"
-                          ? "bg-red-500"
-                          : "bg-yellow-400"
-                        }`}
+                      className={`block size-3 rounded-full ${
+                        wfh.status === "APPROVED"
+                          ? "bg-green-500"
+                          : wfh.status === "REJECTED"
+                            ? "bg-red-500"
+                            : "bg-yellow-400"
+                      }`}
                     />
                     <span className="text-sm text-textSecondary">{wfh.status}</span>
                   </div>

@@ -9,7 +9,9 @@ import {useConfirmationModalStore} from "@/store/useConfirmationModalStore";
 
 type ApprovalAction = "APPROVED" | "REJECTED";
 
-function getComs(type: "USER" | "LEAVEREQUEST" | "DEPARTMENT_ASSIGNMENT" | "USER_UPDATE" | "WFH_REQUEST") {
+function getComs(
+  type: "USER" | "LEAVEREQUEST" | "DEPARTMENT_ASSIGNMENT" | "USER_UPDATE" | "WFH_REQUEST",
+) {
   if (type === "USER" || type === "USER_UPDATE")
     return {
       REJECTED: {
@@ -41,7 +43,7 @@ function getComs(type: "USER" | "LEAVEREQUEST" | "DEPARTMENT_ASSIGNMENT" | "USER
       },
     };
 
-    if (type === "WFH_REQUEST")
+  if (type === "WFH_REQUEST")
     return {
       REJECTED: {
         CONFIRMATION_MODAL: {

@@ -37,23 +37,23 @@ export function ApprovalDetailsWFH() {
         ))}
 
       <div className="flex flex-col gap-3">
-  <h2>WFH Request Details</h2>
-  <Detail label={"Date"} value={moment(wfhRequest?.date).format("YYYY-MM-DD")} />
-  <Detail label={"Status"} value={wfhRequest?.status} />
-  <Detail
-    label={"Requested On"}
-    value={moment(wfhRequest?.createdAt).format("YYYY-MM-DD HH:mm")}
-  />
-  {wfhRequest?.note && (
-    <Detail label={"Note"} value={wfhRequest.note} />  // 👈 add this
-  )}
-  {wfhRequest?.user && (
-    <Detail
-      label={"Requested By"}
-      value={`${wfhRequest.user.firstName} ${wfhRequest.user.lastName}`}
-    />
-  )}
-</div>
+        <h2>WFH Request Details</h2>
+        <Detail label={"Date"} value={moment(wfhRequest?.date).format("YYYY-MM-DD")} />
+        <Detail label={"Status"} value={wfhRequest?.status} />
+        <Detail
+          label={"Requested On"}
+          value={moment(wfhRequest?.createdAt).format("YYYY-MM-DD HH:mm")}
+        />
+        {wfhRequest?.note && (
+          <Detail label={"Note"} value={wfhRequest.note} /> // 👈 add this
+        )}
+        {wfhRequest?.user && (
+          <Detail
+            label={"Requested By"}
+            value={`${wfhRequest.user.firstName} ${wfhRequest.user.lastName}`}
+          />
+        )}
+      </div>
 
       {approval.status === "PENDING" && (
         <div className="flex w-full gap-3">

@@ -51,8 +51,14 @@ export function AttendanceModal({isOpen, onClose}: IAttendanceModal) {
     setDistanceMeters(null);
 
     if (!isOpen) return;
-    if (!locationSettings) { setWithinLocation(false); return; }
-    if (!navigator?.geolocation) { setWithinLocation(false); return; }
+    if (!locationSettings) {
+      setWithinLocation(false);
+      return;
+    }
+    if (!navigator?.geolocation) {
+      setWithinLocation(false);
+      return;
+    }
 
     const success = (pos: GeolocationPosition) => {
       if (!mounted) return;
@@ -83,7 +89,9 @@ export function AttendanceModal({isOpen, onClose}: IAttendanceModal) {
       maximumAge: 60000,
     });
 
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, [isOpen, locationSettings]);
 
   const today = moment().format("DD, MM, YYYY");
@@ -228,11 +236,7 @@ export function AttendanceModal({isOpen, onClose}: IAttendanceModal) {
                     You are outside the office by{" "}
                     {distanceMeters ? distanceMeters.toFixed(1) : "an unknown distance"} m
                   </p>
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    onClick={() => setShowWFHConfirm(true)}
-                  >
+                  <Button type="button" variant="secondary" onClick={() => setShowWFHConfirm(true)}>
                     Request Work From Home
                   </Button>
                 </div>

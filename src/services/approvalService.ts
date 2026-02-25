@@ -58,7 +58,7 @@ export function approveRequest(
       approvalRequestId,
       approveReject,
     };
-  } else if (type === "WFH_REQUEST") { 
+  } else if (type === "WFH_REQUEST") {
     resource = `attendance/wfh-approval`;
     requestBody = {
       approvalRequestId,

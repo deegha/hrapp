@@ -4,7 +4,7 @@ export type TWFHRequest = {
   managerId: number;
   date: string;
   status: string;
-  note?: string; 
+  note?: string;
   createdAt: string;
   updatedAt: string;
   user?: {

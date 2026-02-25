@@ -1,8 +1,8 @@
-import { Layout, PageLayout, NoDataFound, ItemsList, Drawer, Pagination } from "@/components";
+import {Layout, PageLayout, NoDataFound, ItemsList, Drawer, Pagination} from "@/components";
 import useSWR from "swr";
-import { approvalService } from "@/services/approvalService";
-import { usePagination } from "@/hooks/usePagination";
-import { useApprovalStore } from "@/store/approvalStore";
+import {approvalService} from "@/services/approvalService";
+import {usePagination} from "@/hooks/usePagination";
+import {useApprovalStore} from "@/store/approvalStore";
 import {
   ApprovalDetailsLeave,
   ApprovalDetailsUser,
@@ -13,10 +13,10 @@ import {
 import moment from "moment";
 
 export default function Home() {
-  const { activePage } = usePagination();
-  const { approval, setActiveApproval, unsetApproval } = useApprovalStore();
-  const { data: approvalResponse } = useSWR(`approval-service-${activePage}`, () =>
-    approvalService({ page: parseInt(activePage), limit: 10 }),
+  const {activePage} = usePagination();
+  const {approval, setActiveApproval, unsetApproval} = useApprovalStore();
+  const {data: approvalResponse} = useSWR(`approval-service-${activePage}`, () =>
+    approvalService({page: parseInt(activePage), limit: 10}),
   );
 
   if (!approvalResponse || approvalResponse?.data?.data?.length === 0)
@@ -48,8 +48,7 @@ export default function Home() {
                 status={app.status}
                 content={
                   <div>
-                    Created on{" "}
-                    {moment.utc(app.createdAt).local().format("YYYY-Do-MMMM : hh:mm A")}
+                    Created on {moment.utc(app.createdAt).local().format("YYYY-Do-MMMM : hh:mm A")}
                   </div>
                 }
                 onClick={() => setActiveApproval(app)}
