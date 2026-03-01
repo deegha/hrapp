@@ -171,35 +171,33 @@ export function MyAttendance() {
           </div>
         )}
 
-        {wfhItems.length > 0 && (
+        {wfhItems.filter((wfh) => wfh.status !== "APPROVED").length > 0 && (
           <div className="flex flex-col gap-3">
             <h2 className="text-sm font-semibold text-gray-700">WFH Requests</h2>
-            {wfhItems.map((wfh) => (
-              <ItemsList
-                key={wfh.id}
-                title={moment(wfh.date).format("DD MMM YYYY")}
-                actionArea={
-                  <div className="flex items-center gap-2">
-                    <span
-                      className={`block size-3 rounded-full ${
-                        wfh.status === "APPROVED"
-                          ? "bg-green-500"
-                          : wfh.status === "REJECTED"
-                            ? "bg-red-500"
-                            : "bg-yellow-400"
-                      }`}
-                    />
-                    <span className="text-sm text-textSecondary">{wfh.status}</span>
-                  </div>
-                }
-                content={
-                  <div>
-                    Work From Home — Requested on{" "}
-                    {moment(wfh.createdAt).format("DD MMM YYYY, h:mm A")}
-                  </div>
-                }
-              />
-            ))}
+            {wfhItems
+              .filter((wfh) => wfh.status !== "APPROVED")
+              .map((wfh) => (
+                <ItemsList
+                  key={wfh.id}
+                  title={moment(wfh.date).format("DD MMM YYYY")}
+                  actionArea={
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`block size-3 rounded-full ${
+                          wfh.status === "REJECTED" ? "bg-red-500" : "bg-yellow-400"
+                        }`}
+                      />
+                      <span className="text-sm text-textSecondary">{wfh.status}</span>
+                    </div>
+                  }
+                  content={
+                    <div>
+                      Work From Home — Requested on{" "}
+                      {moment(wfh.createdAt).format("DD MMM YYYY, h:mm A")}
+                    </div>
+                  }
+                />
+              ))}
           </div>
         )}
 
