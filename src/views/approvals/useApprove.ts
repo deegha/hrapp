@@ -9,7 +9,9 @@ import {useConfirmationModalStore} from "@/store/useConfirmationModalStore";
 
 type ApprovalAction = "APPROVED" | "REJECTED";
 
-function getComs(type: "USER" | "LEAVEREQUEST" | "DEPARTMENT_ASSIGNMENT" | "USER_UPDATE") {
+function getComs(
+  type: "USER" | "LEAVEREQUEST" | "DEPARTMENT_ASSIGNMENT" | "USER_UPDATE" | "WFH_REQUEST",
+) {
   if (type === "USER" || type === "USER_UPDATE")
     return {
       REJECTED: {
@@ -38,6 +40,22 @@ function getComs(type: "USER" | "LEAVEREQUEST" | "DEPARTMENT_ASSIGNMENT" | "USER
           type === "USER_UPDATE"
             ? "User update approved successfully"
             : "User approved successfully",
+      },
+    };
+
+  if (type === "WFH_REQUEST")
+    return {
+      REJECTED: {
+        CONFIRMATION_MODAL: {
+          TITLE: "Reject WFH request?",
+          DESCRIPTION: "Are you sure you want to reject this work from home request?",
+        },
+        ERROR: "Couldn't reject the WFH request",
+        SUCCESS: "WFH request rejected successfully",
+      },
+      APPROVED: {
+        ERROR: "Couldn't approve the WFH request",
+        SUCCESS: "WFH request approved successfully",
       },
     };
 

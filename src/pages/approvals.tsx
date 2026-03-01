@@ -8,6 +8,7 @@ import {
   ApprovalDetailsUser,
   ApprovalDetailsDepartment,
   ApprovalDetailsUserUpdate,
+  ApprovalDetailsWFH,
 } from "@/views/approvals";
 import moment from "moment";
 
@@ -31,6 +32,8 @@ export default function Home() {
             <ApprovalDetailsDepartment />
           ) : approval.type === "USER_UPDATE" ? (
             <ApprovalDetailsUserUpdate />
+          ) : approval.type === "WFH_REQUEST" ? (
+            <ApprovalDetailsWFH />
           ) : (
             <ApprovalDetailsUser />
           )}
@@ -40,11 +43,13 @@ export default function Home() {
           <div>
             {approvalResponse?.data?.data?.map((app) => (
               <ItemsList
-                key={`${app.createdAt}-p`}
+                key={`approval-${app.id}`}
                 title={app.title}
                 status={app.status}
                 content={
-                  <div>Created on {moment(app.createdAt).format("YYYY-Do-MMMM : hh:MM A")}</div>
+                  <div>
+                    Created on {moment.utc(app.createdAt).local().format("YYYY-Do-MMMM : hh:mm A")}
+                  </div>
                 }
                 onClick={() => setActiveApproval(app)}
               />

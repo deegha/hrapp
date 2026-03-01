@@ -1,4 +1,4 @@
-import {IAttendance, TResponse, TResponseWithPagination} from "@/types";
+import {IAttendance, TResponse, TResponseWithPagination, TWFHRequest} from "@/types";
 import {serviceHandler} from "@/utils/serviceHandler";
 
 import {IAttendancePayload, IAttendanceSummary} from "@/types";
@@ -43,5 +43,35 @@ export async function downloadAttendanceReport(date: Date) {
     resource: `attendance/report`,
     responseType: "blob",
     body: {reportDate: date},
+  });
+}
+
+export async function requestWFH(payload: {
+  date: string;
+  latitude?: number;
+  longitude?: number;
+  note: string;
+}) {
+  return await serviceHandler<TResponse<TWFHRequest>, typeof payload>({
+    method: "POST",
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: "attendance/wfh-request",
+    body: payload,
+  });
+}
+
+export async function fetchWFHRequest(id: string) {
+  return await serviceHandler<TResponse<TWFHRequest>>({
+    method: "GET",
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: `attendance/wfh-request/${id}`,
+  });
+}
+
+export async function getMyWFHRequests() {
+  return await serviceHandler<TResponse<TWFHRequest[]>>({
+    method: "GET",
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: `attendance/wfh-requests/my`,
   });
 }

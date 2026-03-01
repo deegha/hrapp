@@ -28,7 +28,7 @@ type TApprove = {
 };
 
 export function approveRequest(
-  type: "USER" | "LEAVEREQUEST" | "DEPARTMENT_ASSIGNMENT" | "USER_UPDATE",
+  type: "USER" | "LEAVEREQUEST" | "DEPARTMENT_ASSIGNMENT" | "USER_UPDATE" | "WFH_REQUEST",
   {approvalRequestId, itemId, approveReject, rejectedReason}: TApprove,
 ) {
   let resource: string;
@@ -56,6 +56,13 @@ export function approveRequest(
     resource = `user/approve-update`;
     requestBody = {
       approvalRequestId,
+      approveReject,
+    };
+  } else if (type === "WFH_REQUEST") {
+    resource = `attendance/wfh-approval`;
+    requestBody = {
+      approvalRequestId,
+      itemId,
       approveReject,
     };
   } else {
