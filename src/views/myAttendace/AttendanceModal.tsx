@@ -113,7 +113,7 @@ export function AttendanceModal({isOpen, onClose}: IAttendanceModal) {
   async function handleMarkAttendance() {
     if (attendanceMarker === "ATTENDANCE_MARKED") return;
     await markAttendance({
-      punchTime: new Date().toISOString(),
+      punchTime: Date.now(),
       type: attendanceMarker ? "CHECK_OUT" : "CHECK_IN",
       latitude: userLocation?.lat,
       longitude: userLocation?.lon,

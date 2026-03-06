@@ -1,7 +1,7 @@
 type AttendanceType = "CHECK_IN" | "CHECK_OUT";
 
 export interface IAttendancePayload {
-  punchTime: string;
+  punchTime: number;
   type: AttendanceType;
   latitude?: number;
   longitude?: number;
