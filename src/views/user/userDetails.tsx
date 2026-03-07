@@ -21,6 +21,7 @@ import {UserManagerSection} from "@/views/user/components/UserManagerSection";
 import {UserDocumentsSection} from "@/views/user/components/UserDocumentsSection";
 import {EmploymentTypePromotion} from "@/views/user/components/EmploymentTypePromotion";
 import {UserActivityLogs} from "@/views/user/components/UserActivityLogs";
+import {UserLeaveBalance} from "@/views/user/components/UserLeaveBalance";
 import {useRouter} from "next/router";
 
 export function UserDetails() {
@@ -124,6 +125,8 @@ export function UserDetails() {
         )}
         {user.Department && <Detail label={"Department"} value={user.Department.departmentName} />}
       </div>
+
+      <UserLeaveBalance employeeId={user.employeeId} />
 
       <UserManagerSection
         employeeId={user.employeeId}
