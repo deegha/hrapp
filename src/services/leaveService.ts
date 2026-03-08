@@ -19,6 +19,21 @@ type TCreateLeaveRequestPayload = {
   note?: string;
 };
 
+export type TLeaveTypeBalance = {
+  id: number;
+  name: string;
+  yearlyAllowance: number;
+  usedDays: number;
+  remainingDays: number;
+};
+
+export type TLeaveBalanceData = {
+  yearlyAllowance: number;
+  usedDays: number;
+  remainingDays: number;
+  leaveTypeBalances: Array<TLeaveTypeBalance>;
+};
+
 export async function createLeaveRequest(payload: TCreateLeaveRequestPayload) {
   return await serviceHandler<TCreateLeaveRequestResponse, TCreateLeaveRequestPayload>({
     method: "POST",
@@ -53,23 +68,18 @@ export async function fetchMyLeave(id: string) {
 }
 
 export async function fetchLeaveBalance() {
-  return await serviceHandler<
-    TResponse<{
-      yearlyAllowance: number;
-      usedDays: number;
-      remainingDays: number;
-      leaveTypeBalances: Array<{
-        id: number;
-        name: string;
-        yearlyAllowance: number;
-        usedDays: number;
-        remainingDays: number;
-      }>;
-    }>
-  >({
+  return await serviceHandler<TResponse<TLeaveBalanceData>>({
     method: "GET",
     baseURL: process.env.NEXT_PUBLIC_API as string,
     resource: "leave-balance",
+  });
+}
+
+export async function fetchUserLeaveBalance(employeeId: number) {
+  return await serviceHandler<TResponse<TLeaveBalanceData>>({
+    method: "GET",
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: `leave-balance/${employeeId}`,
   });
 }
 
