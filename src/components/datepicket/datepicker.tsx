@@ -9,15 +9,24 @@ interface BookedDate {
   leaveType: number;
 }
 
+interface HolidayDate {
+  date: string;
+  name: string;
+}
+
 interface IDatePickerProps {
   onRangeChange?: (range: {start: Date | null; end: Date | null}) => void;
+  onDateClick?: (date: Date) => void;
   bookedDates?: BookedDate[];
+  holidays?: HolidayDate[];
   selectedRange?: {start: Date | null; end: Date | null};
 }
 
 export const DatePicker: React.FC<IDatePickerProps> = ({
   onRangeChange,
+  onDateClick,
   bookedDates = [],
+  holidays = [],
   selectedRange = {start: null, end: null},
 }) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -57,14 +66,12 @@ export const DatePicker: React.FC<IDatePickerProps> = ({
       selectedRange.end &&
       selectedRange.start.getTime() === selectedRange.end.getTime()
     ) {
-      // Single day selected - check if clicking different date for range
       if (selectedRange.start.getTime() === selectedDate.getTime()) {
         newRange = selectedRange;
       } else {
         newRange = {start: selectedRange.start, end: selectedDate};
       }
     } else {
-      // Range exists - start new single day selection
       newRange = {start: selectedDate, end: selectedDate};
     }
 
@@ -86,18 +93,31 @@ export const DatePicker: React.FC<IDatePickerProps> = ({
     return bookedDate?.status || null;
   };
 
+  const getHolidayName = (date: Date): string | null => {
+    const dateString = date.toISOString().split("T")[0];
+    const holiday = holidays.find((h) => h.date.split("T")[0] === dateString);
+    return holiday?.name || null;
+  };
+
   const isDateBooked = (date: Date) => {
     return getDateStatus(date) !== null;
   };
 
+  const isHoliday = (date: Date) => {
+    return getHolidayName(date) !== null;
+  };
+
+  const isDateDisabled = (date: Date) => {
+    return isDateBooked(date) || isHoliday(date);
+  };
+
   const isInPreviewRange = (date: Date) => {
-    // Show preview only when single day selected and hovering over different date
     if (
       selectedRange.start &&
       selectedRange.end &&
       selectedRange.start.getTime() === selectedRange.end.getTime() &&
       hoverDate &&
-      !isDateBooked(date)
+      !isDateDisabled(date)
     ) {
       const selectedDate = selectedRange.start;
       const minDate = selectedDate < hoverDate ? selectedDate : hoverDate;
@@ -131,13 +151,16 @@ export const DatePicker: React.FC<IDatePickerProps> = ({
               (selectedRange.start && date.getTime() === selectedRange.start.getTime()) ||
               (selectedRange.end && date.getTime() === selectedRange.end.getTime());
             const dateStatus = getDateStatus(date);
-            const isBooked = isDateBooked(date);
+            const holidayName = getHolidayName(date);
+            const disabled = isDateDisabled(date);
 
             let buttonClass =
               "flex size-7 items-center justify-center rounded-full text-sm transition-colors lg:size-10 ";
 
             if (isSelected) {
               buttonClass += "bg-[#80CBC4] text-white";
+            } else if (holidayName) {
+              buttonClass += "bg-purple-200 text-purple-800 cursor-not-allowed";
             } else if (dateStatus === "APPROVED") {
               buttonClass += "bg-green-200 text-green-800 cursor-not-allowed";
             } else if (dateStatus === "PENDING") {
@@ -154,14 +177,17 @@ export const DatePicker: React.FC<IDatePickerProps> = ({
               <button
                 key={day}
                 className={buttonClass}
-                disabled={isBooked}
+                disabled={disabled}
+                title={holidayName || undefined}
                 onClick={(e: React.SyntheticEvent) => {
                   e.preventDefault();
-                  if (!isBooked) {
+                  if (onDateClick) {
+                    onDateClick(date);
+                  } else if (!disabled) {
                     handleDateClick(day, monthOffset);
                   }
                 }}
-                onMouseEnter={() => !isBooked && setHoverDate(date)}
+                onMouseEnter={() => !disabled && setHoverDate(date)}
                 onMouseLeave={() => setHoverDate(null)}
               >
                 {day}
