@@ -1,6 +1,7 @@
 import {Layout, PageLayout, Tabs} from "@/components";
 import React from "react";
 import {LocationSettings} from "@/views/settings/locationSettings/locationSettings";
+import {LeaveSettings} from "@/views/settings/leaveSettings/leaveSettings";
 
 export default function Settings() {
   return (
@@ -9,7 +10,7 @@ export default function Settings() {
         <Tabs
           tabs={[
             {label: "Location Settings", content: <LocationSettings />},
-            {label: "Employment Types", content: <div>second</div>},
+            {label: "Leave Settings", content: <LeaveSettings />},
           ]}
         />
       </PageLayout>

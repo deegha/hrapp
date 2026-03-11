@@ -14,6 +14,22 @@ import {
   TOrganizationLocationSettings,
 } from "@/types/organization";
 
+export type THoliday = {
+  id: number;
+  name: string;
+  date: string;
+  description: string | null;
+  type: string;
+  organizationId: number;
+  createdAt: string;
+};
+
+export type TCreateHolidayPayload = {
+  name: string;
+  date: string;
+  description?: string;
+};
+
 export async function fetchLeaveTypes() {
   return await serviceHandler<TResponse<TLeaveType[]>>({
     method: "GET",
@@ -152,4 +168,29 @@ export async function fetchOrganizationLocationSettings() {
   };
 
   return data;
+}
+
+export async function fetchHolidays() {
+  return await serviceHandler<TResponse<THoliday[]>>({
+    method: "GET",
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: "organization/holidays",
+  });
+}
+
+export async function createHoliday(holiday: TCreateHolidayPayload) {
+  return await serviceHandler<TResponse<THoliday>, TCreateHolidayPayload>({
+    method: "POST",
+    body: holiday,
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: "organization/holidays",
+  });
+}
+
+export async function deleteHoliday(id: number) {
+  return await serviceHandler<TResponse<{message: string}>>({
+    method: "DELETE",
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: `organization/holidays/${id}`,
+  });
 }

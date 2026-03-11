@@ -27,6 +27,7 @@ export function ApplyLeave() {
     leaveTypes,
     leaveBalance,
     bookedDates,
+    holidays,
     getSelectedLeaveTypeBalance,
     hasNoRemainingDays,
     coveringDate,
@@ -44,6 +45,7 @@ export function ApplyLeave() {
               <DatePicker
                 onRangeChange={(range) => setSelectedRange(range)}
                 bookedDates={bookedDates}
+                holidays={holidays}
                 selectedRange={selectedRange}
               />
 

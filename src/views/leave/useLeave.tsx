@@ -4,11 +4,15 @@ import {createLeaveRequest} from "@/services";
 import {useLeaveTypes} from "@/hooks/useLeaveTypes";
 import {useLeaveBalance} from "@/hooks/useLeaveBalance";
 import {useBookedDates} from "@/hooks/useBookedDates";
+import useSWR from "swr";
+import {fetchHolidays} from "@/services/organizationService";
 
 export function useLeave() {
   const {leaveTypes} = useLeaveTypes();
   const {leaveBalance} = useLeaveBalance();
   const {bookedDates, mutate: mutateBookedDates} = useBookedDates();
+  const {data: holidaysData} = useSWR("holidays", fetchHolidays);
+  const holidays = (holidaysData?.data || []).map((h) => ({date: h.date, name: h.name}));
 
   const [selectedRange, setSelectedRange] = useState<{
     start: Date | null;
@@ -199,6 +203,7 @@ export function useLeave() {
     leaveTypes,
     leaveBalance,
     bookedDates,
+    holidays,
     getSelectedLeaveTypeBalance,
     hasNoRemainingDays,
     coveringDate,
