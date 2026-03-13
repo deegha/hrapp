@@ -1,6 +1,6 @@
 import {StatusTag, Button, Detail} from "@/components";
 import {useConfirmationModalStore} from "@/store/useConfirmationModalStore";
-import {Trash, Edit} from "react-feather";
+import {Trash, Edit, Calendar} from "react-feather";
 import {
   deleteUser,
   fetchEmploymentTypes,
@@ -21,7 +21,6 @@ import {UserManagerSection} from "@/views/user/components/UserManagerSection";
 import {UserDocumentsSection} from "@/views/user/components/UserDocumentsSection";
 import {EmploymentTypePromotion} from "@/views/user/components/EmploymentTypePromotion";
 import {UserActivityLogs} from "@/views/user/components/UserActivityLogs";
-import {UserLeaveBalance} from "@/views/user/components/UserLeaveBalance";
 import {useRouter} from "next/router";
 
 export function UserDetails() {
@@ -126,7 +125,17 @@ export function UserDetails() {
         {user.Department && <Detail label={"Department"} value={user.Department.departmentName} />}
       </div>
 
-      <UserLeaveBalance employeeId={user.employeeId} />
+      {isAdmin && (
+        <Button
+          variant="secondary"
+          onClick={() => router.push(`/user-management/${user.employeeId}/attendance`)}
+        >
+          <div className="flex items-center gap-1">
+            <Calendar size={14} />
+            Attendance
+          </div>
+        </Button>
+      )}
 
       <UserManagerSection
         employeeId={user.employeeId}
