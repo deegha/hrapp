@@ -65,14 +65,10 @@ export default function UserAttendancePage() {
   function openEditModal(attendance: IAttendance) {
     setEditRecord(attendance);
     setEditCheckIn(
-      attendance.checkInTime
-        ? moment.utc(attendance.checkInTime).local().format("YYYY-MM-DDTHH:mm")
-        : "",
+      attendance.checkInTime ? moment.utc(attendance.checkInTime).local().format("HH:mm") : "",
     );
     setEditCheckOut(
-      attendance.checkOutTime
-        ? moment.utc(attendance.checkOutTime).local().format("YYYY-MM-DDTHH:mm")
-        : "",
+      attendance.checkOutTime ? moment.utc(attendance.checkOutTime).local().format("HH:mm") : "",
     );
   }
 
@@ -82,8 +78,12 @@ export default function UserAttendancePage() {
       setEditLoading(true);
       await updateUserAttendance(userId, {
         date: editRecord.date,
-        checkInTime: editCheckIn ? new Date(editCheckIn).toISOString() : undefined,
-        checkOutTime: editCheckOut ? new Date(editCheckOut).toISOString() : undefined,
+        checkInTime: editCheckIn
+          ? new Date(`${editRecord.date}T${editCheckIn}:00`).toISOString()
+          : undefined,
+        checkOutTime: editCheckOut
+          ? new Date(`${editRecord.date}T${editCheckOut}:00`).toISOString()
+          : undefined,
       });
       showNotification({type: "success", message: "Attendance updated successfully"});
       setEditRecord(null);
@@ -283,7 +283,7 @@ export default function UserAttendancePage() {
               <div className="flex flex-col gap-1">
                 <label className="text-sm font-medium text-gray-700">Check In Time</label>
                 <input
-                  type="datetime-local"
+                  type="time"
                   value={editCheckIn}
                   onChange={(e) => setEditCheckIn(e.target.value)}
                   className="rounded-lg border border-gray-300 p-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400"
@@ -293,7 +293,7 @@ export default function UserAttendancePage() {
               <div className="flex flex-col gap-1">
                 <label className="text-sm font-medium text-gray-700">Check Out Time</label>
                 <input
-                  type="datetime-local"
+                  type="time"
                   value={editCheckOut}
                   onChange={(e) => setEditCheckOut(e.target.value)}
                   className="rounded-lg border border-gray-300 p-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400"
