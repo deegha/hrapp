@@ -22,6 +22,7 @@ import {UserDocumentsSection} from "@/views/user/components/UserDocumentsSection
 import {EmploymentTypePromotion} from "@/views/user/components/EmploymentTypePromotion";
 import {UserActivityLogs} from "@/views/user/components/UserActivityLogs";
 import {useRouter} from "next/router";
+import {UserLeaveBalance} from "@/views/user/components/UserLeaveBalance";
 
 export function UserDetails() {
   const {openModal} = useConfirmationModalStore();
@@ -124,6 +125,8 @@ export function UserDetails() {
         )}
         {user.Department && <Detail label={"Department"} value={user.Department.departmentName} />}
       </div>
+
+      <UserLeaveBalance employeeId={user.employeeId} />
 
       {isAdmin && (
         <Button
