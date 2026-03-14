@@ -2,6 +2,7 @@ import {PageLayout, NoDataFoundComponent, ItemsList, Button, Pagination} from "@
 import moment from "moment";
 import {useState} from "react";
 import {AttendanceModal} from "./AttendanceModal";
+import {AttendanceDateFilter} from "./AttendanceDateFilter";
 import {getMyAttendanceRecords, getMyWFHRequests} from "@/services/attendanceService";
 import useSWR from "swr";
 import {useRouter} from "next/router";
@@ -22,14 +23,23 @@ export function MyAttendance() {
   const limit = Number(router.query.limit) || 10;
   const page = Number(router.query.page) || 1;
 
+  const [fromDate, setFromDate] = useState(moment().subtract(29, "days").format("YYYY-MM-DD"));
+  const [toDate, setToDate] = useState(moment().format("YYYY-MM-DD"));
+
   const [isModalOpen, setIsCreateModalOpen] = useState(false);
-  const {data} = useSWR(`attendanceRecords-${page}-${limit}`, () =>
-    getMyAttendanceRecords(page, limit),
+
+  const {data} = useSWR(`attendanceRecords-${page}-${limit}-${fromDate}-${toDate}`, () =>
+    getMyAttendanceRecords(page, limit, fromDate, toDate),
   );
   const {data: wfhData} = useSWR("myWFHRequests", getMyWFHRequests);
 
   const attendanceItems = data?.data.data || [];
   const wfhItems = wfhData?.data || [];
+
+  function handleDateChange(from: string, to: string) {
+    setFromDate(from);
+    setToDate(to);
+  }
 
   return (
     <PageLayout
@@ -37,6 +47,9 @@ export function MyAttendance() {
       actionButton={<Button onClick={() => setIsCreateModalOpen(true)}>Mark Attendance</Button>}
     >
       <div className="flex flex-col gap-5">
+        {/* 👇 Date filter */}
+        <AttendanceDateFilter fromDate={fromDate} toDate={toDate} onChange={handleDateChange} />
+
         {attendanceItems?.length === 0 ? (
           <div className="py-12">
             <NoDataFoundComponent />
@@ -205,12 +218,7 @@ export function MyAttendance() {
           <Pagination numberOfPage={data?.data.totalPages || 0} />
         )}
 
-        <AttendanceModal
-          isOpen={isModalOpen}
-          onClose={() => {
-            setIsCreateModalOpen(false);
-          }}
-        />
+        <AttendanceModal isOpen={isModalOpen} onClose={() => setIsCreateModalOpen(false)} />
       </div>
     </PageLayout>
   );

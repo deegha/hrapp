@@ -12,11 +12,23 @@ export async function markAttendance(payload: IAttendancePayload) {
   });
 }
 
-export async function getMyAttendanceRecords(page: number = 1, limit: number = 10) {
+export async function getMyAttendanceRecords(
+  page: number = 1,
+  limit: number = 10,
+  fromDate?: string,
+  toDate?: string,
+) {
+  const params = new URLSearchParams({
+    page: String(page),
+    limit: String(limit),
+    ...(fromDate && {fromDate}),
+    ...(toDate && {toDate}),
+  });
+
   return await serviceHandler<TResponseWithPagination<IAttendance[]>>({
     method: "GET",
     baseURL: process.env.NEXT_PUBLIC_API as string,
-    resource: `attendance/user${`?page=${page}&limit=${limit}`}`,
+    resource: `attendance/user?${params.toString()}`,
   });
 }
 
@@ -73,5 +85,38 @@ export async function getMyWFHRequests() {
     method: "GET",
     baseURL: process.env.NEXT_PUBLIC_API as string,
     resource: `attendance/wfh-requests/my`,
+  });
+}
+
+export async function getUserAttendanceById(
+  userId: number,
+  page: number = 1,
+  limit: number = 10,
+  fromDate?: string,
+  toDate?: string,
+) {
+  const params = new URLSearchParams({
+    page: String(page),
+    limit: String(limit),
+    ...(fromDate && {fromDate}),
+    ...(toDate && {toDate}),
+  });
+
+  return await serviceHandler<TResponseWithPagination<IAttendance[]>>({
+    method: "GET",
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: `attendance/user/by-id/${userId}?${params.toString()}`,
+  });
+}
+
+export async function updateUserAttendance(
+  userId: number,
+  payload: {date: string; checkInTime?: string; checkOutTime?: string},
+) {
+  return await serviceHandler<TResponse<{message: string}>, typeof payload>({
+    method: "PUT",
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: `attendance/user/by-id/${userId}/update`,
+    body: payload,
   });
 }
