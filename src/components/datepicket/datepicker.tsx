@@ -101,12 +101,11 @@ export const DatePicker: React.FC<IDatePickerProps> = ({
 
   const isDateBooked = (date: Date) => {
     const status = getDateStatus(date);
-
     if (status === "PENDING" || status === "APPROVED") {
-      return false;
+      return true;
     }
 
-    return true;
+    return false;
   };
 
   const isHoliday = (date: Date) => {
