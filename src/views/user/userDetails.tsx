@@ -24,6 +24,9 @@ import {UserActivityLogs} from "@/views/user/components/UserActivityLogs";
 import {useRouter} from "next/router";
 import {UserLeaveBalance} from "@/views/user/components/UserLeaveBalance";
 
+import {reactivateUser, permanentDeleteUser} from "@/services/userService";
+import {UserCheck, UserX} from "react-feather";
+
 export function UserDetails() {
   const {openModal} = useConfirmationModalStore();
   const {activePage} = usePagination();
@@ -96,6 +99,51 @@ export function UserDetails() {
   const isAdmin = userPermission === "ADMIN_USER" || userPermission === "SUPER_USER";
   const canEdit = isAdmin || userPermission === "ADMIN_USER_L2";
   const canUploadEmployeeDocs = isAdmin || userPermission === "ADMIN_USER_L2";
+
+  const handleReactivateUser = () => {
+    openModal({
+      title: "Reactivate user?",
+      description: "Are you sure you want to reactivate this user?",
+      onConfirm: async () => {
+        try {
+          const response = await reactivateUser(user.employeeId);
+          if (response.error) {
+            showNotification({
+              type: "error",
+              message: "Something went wrong when reactivating user",
+            });
+            return;
+          }
+          await refreshUserDetails();
+          showNotification({type: "success", message: "User reactivated successfully"});
+        } catch {
+          showNotification({type: "error", message: "Something went wrong when reactivating user"});
+        }
+      },
+    });
+  };
+
+  const handlePermanentDeleteUser = () => {
+    openModal({
+      title: "Permanently delete user?",
+      description:
+        "This action cannot be undone. All user data will be permanently removed from the database.",
+      onConfirm: async () => {
+        try {
+          const response = await permanentDeleteUser(user.employeeId);
+          if (response.error) {
+            showNotification({type: "error", message: "Something went wrong when deleting user"});
+            return;
+          }
+          mutate(`fetch-users${activePage}`);
+          showNotification({type: "success", message: "User permanently deleted"});
+          unsetUser();
+        } catch {
+          showNotification({type: "error", message: "Something went wrong when deleting user"});
+        }
+      },
+    });
+  };
 
   return (
     <div className="flex flex-col gap-10">
@@ -172,7 +220,7 @@ export function UserDetails() {
 
       <UserActivityLogs logs={user.activityLogs} />
       <div className="flex w-full gap-3">
-        {canEdit && (
+        {canEdit && user.UserStatus?.statusLabel !== "DELETED" && (
           <Button
             variant="secondary"
             onClick={() => router.push(`/user-management/${user.employeeId}/edit`)}
@@ -184,20 +232,43 @@ export function UserDetails() {
           </Button>
         )}
 
-        <EmploymentTypePromotion
-          employeeId={user.employeeId}
-          currentType={user.EmploymentType || null}
-          employmentTypes={employmentTypesData?.data}
-          userName={`${user.firstName} ${user.lastName}`}
-          userStatus={user.UserStatus?.statusLabel}
-          onPromoted={refreshUserDetails}
-        />
+        {user.UserStatus?.statusLabel !== "DELETED" && (
+          <EmploymentTypePromotion
+            employeeId={user.employeeId}
+            currentType={user.EmploymentType || null}
+            employmentTypes={employmentTypesData?.data}
+            userName={`${user.firstName} ${user.lastName}`}
+            userStatus={user.UserStatus?.statusLabel}
+            onPromoted={refreshUserDetails}
+          />
+        )}
 
+        {/* 👇 Soft delete — shown when not deleted */}
         {user.UserStatus?.statusLabel !== "DELETED" && (
           <Button variant="danger" onClick={handleDeleteUser}>
             <div className="flex items-center gap-1">
               <Trash size={14} />
               Delete
+            </div>
+          </Button>
+        )}
+
+        {/* 👇 Reactivate — any admin, shown when deleted */}
+        {user.UserStatus?.statusLabel === "DELETED" && (
+          <Button variant="secondary" onClick={handleReactivateUser}>
+            <div className="flex items-center gap-1">
+              <UserCheck size={14} />
+              Reactivate
+            </div>
+          </Button>
+        )}
+
+        {/* 👇 Permanent delete — L1 admin only, shown when deleted */}
+        {user.UserStatus?.statusLabel === "DELETED" && isAdmin && (
+          <Button variant="danger" onClick={handlePermanentDeleteUser}>
+            <div className="flex items-center gap-1">
+              <UserX size={14} />
+              Permanently Delete
             </div>
           </Button>
         )}

@@ -314,3 +314,19 @@ export async function fetchMyDetails() {
     resource: `user/my-details`,
   });
 }
+
+export async function reactivateUser(userId: number) {
+  return await serviceHandler<TResponse<unknown>>({
+    method: "PUT",
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: `user/${userId}/reactivate`,
+  });
+}
+
+export async function permanentDeleteUser(userId: number) {
+  return await serviceHandler<TResponse<unknown>>({
+    method: "DELETE",
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: `user/${userId}/permanent`,
+  });
+}
