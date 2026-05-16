@@ -16,6 +16,7 @@ const ATTENDANCE = {
   CHECKED_IN: "checked_in",
   CHECKED_OUT: "checked_out",
   NOT_CHECKED_OUT: "not_checked_out",
+  PENDING: "pending",
 };
 
 export function MyAttendance() {
@@ -77,29 +78,34 @@ export function MyAttendance() {
                     return <span className="block size-3 rounded-full bg-gray-500" aria-hidden />;
                   case ATTENDANCE.ABSENT:
                     return <span className="block size-3 rounded-full bg-gray-300" aria-hidden />;
+                  case ATTENDANCE.PENDING:
+                    return <span className="block size-3 rounded-full bg-purple-400" aria-hidden />;
                   default:
                     return <span className="block size-3 rounded-full bg-gray-300" aria-hidden />;
                 }
               };
 
+              const prefix = attendance.isWFH ? "Work Remote — " : "";
               const statusLabel = (() => {
                 switch (status) {
                   case ATTENDANCE.FULL_DAY:
-                    return "Full day";
+                    return `${prefix}Full day`;
+                  case ATTENDANCE.HALF_DAY:
+                    return `${prefix}Half day`;
+                  case ATTENDANCE.CHECKED_IN:
+                    return `${prefix}Checked In`;
+                  case ATTENDANCE.NOT_CHECKED_OUT:
+                    return `${prefix}Not Checked Out`;
                   case ATTENDANCE.CHECKED_OUT:
                     return "Checked Out";
-                  case ATTENDANCE.CHECKED_IN:
-                    return attendance.isWFH ? "WFH — Checked In" : "Checked In";
-                  case ATTENDANCE.NOT_CHECKED_OUT:
-                    return "Not Checked Out";
-                  case ATTENDANCE.HALF_DAY:
-                    return "Half day";
                   case ATTENDANCE.ON_LEAVE:
                     return "On leave";
                   case ATTENDANCE.NO_PAY:
                     return "No pay";
                   case ATTENDANCE.ABSENT:
                     return "Absent";
+                  case ATTENDANCE.PENDING:
+                    return "Pending Approval";
                   default:
                     return "Unknown";
                 }
@@ -117,28 +123,15 @@ export function MyAttendance() {
                   }
                   content={
                     <div>
-                      {status === ATTENDANCE.ON_LEAVE ? (
-                        <div className="text-teal-800">You have been on leave this day</div>
-                      ) : status === ATTENDANCE.CHECKED_OUT ? (
-                        <div className="text-green-700">
-                          Working From Home — Checked in at{" "}
-                          {attendance.checkInTime
-                            ? moment
-                                .utc(attendance.checkInTime)
-                                .local()
-                                .format("DD MMM YYYY, h:mm A")
-                            : "Not recorded"}{" "}
-                          and checked out at{" "}
-                          {attendance.checkOutTime
-                            ? moment
-                                .utc(attendance.checkOutTime)
-                                .local()
-                                .format("DD MMM YYYY, h:mm A")
-                            : "Not recorded"}
+                      {status === ATTENDANCE.PENDING ? (
+                        <div className="text-purple-700">
+                          Attendance approval pending — waiting for manager confirmation
                         </div>
+                      ) : status === ATTENDANCE.ON_LEAVE ? (
+                        <div className="text-teal-800">You have been on leave this day</div>
                       ) : status === ATTENDANCE.CHECKED_IN ? (
                         <div className="text-blue-600">
-                          {attendance.isWFH ? "Working From Home — " : ""}Checked in at{" "}
+                          {prefix}Checked in at{" "}
                           {attendance.checkInTime
                             ? moment
                                 .utc(attendance.checkInTime)
@@ -149,7 +142,7 @@ export function MyAttendance() {
                         </div>
                       ) : status === ATTENDANCE.NOT_CHECKED_OUT ? (
                         <div className="text-orange-600">
-                          Checked in at{" "}
+                          {prefix}Checked in at{" "}
                           {attendance.checkInTime
                             ? moment
                                 .utc(attendance.checkInTime)
@@ -158,9 +151,11 @@ export function MyAttendance() {
                             : "Not recorded"}{" "}
                           — Did not check out
                         </div>
-                      ) : (
-                        <>
-                          You have checked in{" "}
+                      ) : status === ATTENDANCE.FULL_DAY ||
+                        status === ATTENDANCE.HALF_DAY ||
+                        status === ATTENDANCE.CHECKED_OUT ? (
+                        <div className={attendance.isWFH ? "text-green-700" : ""}>
+                          {prefix}Checked in at{" "}
                           {attendance.checkInTime
                             ? moment
                                 .utc(attendance.checkInTime)
@@ -174,8 +169,8 @@ export function MyAttendance() {
                                 .local()
                                 .format("DD MMM YYYY, h:mm A")
                             : "Not recorded"}
-                        </>
-                      )}
+                        </div>
+                      ) : null}
                     </div>
                   }
                 />
@@ -186,31 +181,39 @@ export function MyAttendance() {
 
         {wfhItems.filter((wfh) => wfh.status !== "APPROVED").length > 0 && (
           <div className="flex flex-col gap-3">
-            <h2 className="text-sm font-semibold text-gray-700">WFH Requests</h2>
+            <h2 className="text-sm font-semibold text-gray-700">Pending Requests</h2>
             {wfhItems
               .filter((wfh) => wfh.status !== "APPROVED")
-              .map((wfh) => (
-                <ItemsList
-                  key={wfh.id}
-                  title={moment.utc(wfh.date).local().format("DD MMM YYYY")}
-                  actionArea={
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={`block size-3 rounded-full ${
-                          wfh.status === "REJECTED" ? "bg-red-500" : "bg-yellow-400"
-                        }`}
-                      />
-                      <span className="text-sm text-textSecondary">{wfh.status}</span>
-                    </div>
-                  }
-                  content={
-                    <div>
-                      Work From Home — Requested on{" "}
-                      {moment(wfh.createdAt).format("DD MMM YYYY, h:mm A")}
-                    </div>
-                  }
-                />
-              ))}
+              .map((wfh) => {
+                const isAttendanceApproval = wfh.requestType === "ATTENDANCE_APPROVAL";
+                const bulbColor =
+                  wfh.status === "REJECTED"
+                    ? "bg-red-500"
+                    : isAttendanceApproval
+                      ? "bg-purple-400"
+                      : "bg-yellow-400";
+                const label = isAttendanceApproval ? "Attendance Approval" : "Work Remote";
+                return (
+                  <ItemsList
+                    key={wfh.id}
+                    title={moment.utc(wfh.date).local().format("DD MMM YYYY")}
+                    actionArea={
+                      <div className="flex items-center gap-2">
+                        <span className={`block size-3 rounded-full ${bulbColor}`} />
+                        <span className="text-sm text-textSecondary">
+                          {label} — {wfh.status}
+                        </span>
+                      </div>
+                    }
+                    content={
+                      <div>
+                        {label} request — submitted on{" "}
+                        {moment(wfh.createdAt).format("DD MMM YYYY, h:mm A")}
+                      </div>
+                    }
+                  />
+                );
+              })}
           </div>
         )}
 

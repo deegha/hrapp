@@ -70,6 +70,7 @@ export async function requestWFH(payload: {
   latitude?: number;
   longitude?: number;
   note: string;
+  requestType?: "WORK_REMOTE" | "ATTENDANCE_APPROVAL";
 }) {
   return await serviceHandler<TResponse<TWFHRequest>, typeof payload>({
     method: "POST",

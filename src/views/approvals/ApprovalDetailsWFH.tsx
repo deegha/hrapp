@@ -37,7 +37,11 @@ export function ApprovalDetailsWFH() {
         ))}
 
       <div className="flex flex-col gap-3">
-        <h2>WFH Request Details</h2>
+        <h2>
+          {wfhRequest?.requestType === "ATTENDANCE_APPROVAL"
+            ? "Attendance Verification Request Details"
+            : "Work Remote Request Details"}
+        </h2>
         <Detail label={"Date"} value={moment(wfhRequest?.date).format("YYYY-MM-DD")} />
         <Detail label={"Status"} value={wfhRequest?.status} />
         <Detail

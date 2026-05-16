@@ -12,6 +12,8 @@ interface IAttendanceModal {
   onClose: () => void;
 }
 
+type RequestFlowType = "WORK_REMOTE" | "ATTENDANCE_APPROVAL";
+
 export function AttendanceModal({isOpen, onClose}: IAttendanceModal) {
   const {locationSettings, isLoadingLocationSettings} = useOfficeLocationSettings();
   const {showNotification} = useNotificationStore();
@@ -19,19 +21,29 @@ export function AttendanceModal({isOpen, onClose}: IAttendanceModal) {
   const {data, mutate} = useSWR("attendance/isMarked", isAttendanceMarked);
   const attendanceMarker = data?.data;
 
-  // 👇 fetch WFH requests to check for pending
   const {data: wfhData, mutate: mutateWFH} = useSWR("myWFHRequests", getMyWFHRequests);
-  const hasPendingWFH = wfhData?.data?.some(
+
+  const todayStr = moment().format("YYYY-MM-DD");
+
+  const hasPendingWorkRemote = wfhData?.data?.some(
     (wfh) =>
       wfh.status === "PENDING" &&
-      moment(wfh.date).format("YYYY-MM-DD") === moment().format("YYYY-MM-DD"),
+      wfh.requestType === "WORK_REMOTE" &&
+      moment(wfh.date).format("YYYY-MM-DD") === todayStr,
   );
 
-  // 👇 check if WFH is approved for today
-  const hasApprovedWFH = wfhData?.data?.some(
+  const hasPendingAttendanceApproval = wfhData?.data?.some(
+    (wfh) =>
+      wfh.status === "PENDING" &&
+      wfh.requestType === "ATTENDANCE_APPROVAL" &&
+      moment(wfh.date).format("YYYY-MM-DD") === todayStr,
+  );
+
+  const hasApprovedWorkRemote = wfhData?.data?.some(
     (wfh) =>
       wfh.status === "APPROVED" &&
-      moment(wfh.date).format("YYYY-MM-DD") === moment().format("YYYY-MM-DD"),
+      wfh.requestType === "WORK_REMOTE" &&
+      moment(wfh.date).format("YYYY-MM-DD") === todayStr,
   );
 
   const [userLocation, setUserLocation] = useState<{lat: number; lon: number} | null>(null);
@@ -40,10 +52,11 @@ export function AttendanceModal({isOpen, onClose}: IAttendanceModal) {
   const [locationError, setLocationError] = useState<boolean>(false);
   const [locationErrorCode, setLocationErrorCode] = useState<number | null>(null);
   const [locationRetry, setLocationRetry] = useState(0);
-  const [wfhLoading, setWfhLoading] = useState(false);
+  const [requestLoading, setRequestLoading] = useState(false);
 
-  const [showWFHConfirm, setShowWFHConfirm] = useState(false);
-  const [wfhNote, setWfhNote] = useState("");
+  const [showRequestConfirm, setShowRequestConfirm] = useState(false);
+  const [requestFlowType, setRequestFlowType] = useState<RequestFlowType>("WORK_REMOTE");
+  const [requestNote, setRequestNote] = useState("");
 
   function handleClose() {
     onClose();
@@ -56,6 +69,12 @@ export function AttendanceModal({isOpen, onClose}: IAttendanceModal) {
     setDistanceMeters(null);
     setUserLocation(null);
     setLocationRetry((n) => n + 1);
+  }
+
+  function openRequestFlow(type: RequestFlowType) {
+    setRequestFlowType(type);
+    setRequestNote("");
+    setShowRequestConfirm(true);
   }
 
   function haversineDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
@@ -138,45 +157,51 @@ export function AttendanceModal({isOpen, onClose}: IAttendanceModal) {
     handleClose();
   }
 
-  async function handleConfirmWFH() {
-    if (!wfhNote.trim()) return;
+  async function handleConfirmRequest() {
+    if (!requestNote.trim()) return;
     try {
-      setWfhLoading(true);
+      setRequestLoading(true);
       await requestWFH({
         date: new Date().toISOString(),
         latitude: userLocation?.lat,
         longitude: userLocation?.lon,
-        note: wfhNote,
+        note: requestNote,
+        requestType: requestFlowType,
       });
-      showNotification({
-        message: "Work from home request sent to your manager for approval.",
-        type: "success",
-      });
-      setShowWFHConfirm(false);
-      setWfhNote("");
-      mutateWFH(); // 👈 refresh WFH requests after submission
+      const successMsg =
+        requestFlowType === "ATTENDANCE_APPROVAL"
+          ? "Attendance request sent to your manager. Your attendance will show as pending until approved."
+          : "Work Remote request sent to your manager for approval.";
+      showNotification({message: successMsg, type: "success"});
+      setShowRequestConfirm(false);
+      setRequestNote("");
+      mutateWFH();
       handleClose();
     } catch {
-      showNotification({
-        message: "Failed to send WFH request. Please try again.",
-        type: "error",
-      });
+      showNotification({message: "Failed to send request. Please try again.", type: "error"});
     } finally {
-      setWfhLoading(false);
+      setRequestLoading(false);
     }
   }
 
   if (!isOpen) return null;
 
-  // WFH confirmation modal
-  if (showWFHConfirm) {
+  // Request confirmation modal (Work Remote OR Attendance Approval)
+  if (showRequestConfirm) {
+    const isAttendanceApproval = requestFlowType === "ATTENDANCE_APPROVAL";
     return (
       <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/30 backdrop-blur-sm">
         <div className="flex w-full max-w-md flex-col gap-6 rounded-xl bg-white p-6 shadow-xl">
-          <h2 className="text-lg font-semibold text-gray-800">Request Work From Home</h2>
-          <p className="text-sm text-textSecondary">
-            Please provide a reason for your WFH request.
-          </p>
+          <div>
+            <h2 className="text-lg font-semibold text-gray-800">
+              {isAttendanceApproval ? "Request Attendance Approval" : "Request Work Remote"}
+            </h2>
+            <p className="mt-1 text-sm text-textSecondary">
+              {isAttendanceApproval
+                ? "Your attendance will show as pending until your manager or admin approves it."
+                : "Your manager will be notified to approve your Work Remote request."}
+            </p>
+          </div>
 
           <div className="flex flex-col gap-2">
             <label className="text-sm font-medium text-gray-700">
@@ -185,9 +210,13 @@ export function AttendanceModal({isOpen, onClose}: IAttendanceModal) {
             <textarea
               className="w-full rounded-lg border border-gray-300 p-3 text-sm focus:border-blue-500 focus:outline-none"
               rows={4}
-              placeholder="Enter your reason for working from home..."
-              value={wfhNote}
-              onChange={(e) => setWfhNote(e.target.value)}
+              placeholder={
+                isAttendanceApproval
+                  ? "Explain why your location could not be verified..."
+                  : "Enter your reason for working remotely..."
+              }
+              value={requestNote}
+              onChange={(e) => setRequestNote(e.target.value)}
             />
           </div>
 
@@ -195,18 +224,18 @@ export function AttendanceModal({isOpen, onClose}: IAttendanceModal) {
             <Button
               type="button"
               variant="primary"
-              onClick={handleConfirmWFH}
-              disabled={!wfhNote.trim() || wfhLoading}
-              loading={wfhLoading}
+              onClick={handleConfirmRequest}
+              disabled={!requestNote.trim() || requestLoading}
+              loading={requestLoading}
             >
-              Confirm
+              Submit Request
             </Button>
             <Button
               type="button"
               variant="danger"
               onClick={() => {
-                setShowWFHConfirm(false);
-                setWfhNote("");
+                setShowRequestConfirm(false);
+                setRequestNote("");
               }}
             >
               Cancel
@@ -222,29 +251,51 @@ export function AttendanceModal({isOpen, onClose}: IAttendanceModal) {
       <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/30 backdrop-blur-sm">
         <div className="flex w-full max-w-md flex-col items-center gap-10 rounded-xl bg-white p-6 shadow-xl">
           <div className="flex flex-col items-center">
-            <h2 className="mb-4 text-lg font-semibold text-gray-800">Mark your attendance</h2>
-            <p className="text-sm text-textSecondary">Marking attendance for {today}</p>
+            <h2 className="mb-4 text-lg font-semibold text-gray-800">
+              {attendanceMarker === "ATTENDANCE_MARKED"
+                ? "Attendance Marked"
+                : attendanceMarker
+                  ? "Check Out"
+                  : "Check In"}
+            </h2>
+            <p className="text-sm text-textSecondary">
+              {attendanceMarker === "ATTENDANCE_MARKED"
+                ? `Attendance already recorded for ${today}`
+                : attendanceMarker
+                  ? `Checking out for ${today}`
+                  : `Checking in for ${today}`}
+            </p>
           </div>
 
           {attendanceMarker === "ATTENDANCE_MARKED" ? (
             <p className="text-sm font-semibold text-green-600">
               You have already marked your attendance today.
             </p>
-          ) : hasPendingWFH ? (
+          ) : hasPendingAttendanceApproval ? (
             <div className="flex flex-col items-center gap-3 text-center">
-              <div className="rounded-lg bg-yellow-50 p-4 text-sm text-yellow-800">
-                <p className="font-semibold">WFH Request Pending</p>
+              <div className="rounded-lg bg-purple-50 p-4 text-sm text-purple-800">
+                <p className="font-semibold">Attendance Approval Pending</p>
                 <p className="mt-1">
-                  You have a pending Work From Home request for today. Please wait for your manager
-                  to approve or reject it before marking attendance.
+                  Your attendance request is waiting for manager approval. Your attendance will be
+                  confirmed once approved.
                 </p>
               </div>
             </div>
-          ) : hasApprovedWFH ? (
+          ) : hasPendingWorkRemote ? (
+            <div className="flex flex-col items-center gap-3 text-center">
+              <div className="rounded-lg bg-yellow-50 p-4 text-sm text-yellow-800">
+                <p className="font-semibold">Work Remote Request Pending</p>
+                <p className="mt-1">
+                  You have a pending Work Remote request for today. Please wait for your manager to
+                  approve or reject it before marking attendance.
+                </p>
+              </div>
+            </div>
+          ) : hasApprovedWorkRemote ? (
             <div className="flex flex-col items-center gap-3 text-center">
               <div className="rounded-lg bg-green-50 p-4 text-sm text-green-800">
-                <p className="font-semibold">Working From Home Today</p>
-                <p className="mt-1">Your WFH request has been approved.</p>
+                <p className="font-semibold">Working Remotely Today</p>
+                <p className="mt-1">Your Work Remote request has been approved.</p>
               </div>
               <Button type="button" variant="secondary" onClick={handleMarkAttendance}>
                 Check out now
@@ -264,8 +315,9 @@ export function AttendanceModal({isOpen, onClose}: IAttendanceModal) {
                 <div className="rounded-lg bg-amber-50 p-4 text-sm text-amber-800">
                   <p className="font-semibold">Location signal unavailable</p>
                   <p className="mt-1">
-                    Your device couldn&apos;t get a GPS/WiFi fix right now. You can retry, or check
-                    in without location — your attendance will still be recorded.
+                    {attendanceMarker
+                      ? "Your device couldn't get a location fix. You can retry or check out without location."
+                      : "Your device couldn't get a location fix. You can retry, request attendance approval (pending until manager confirms), or request Work Remote."}
                   </p>
                 </div>
               )}
@@ -273,14 +325,29 @@ export function AttendanceModal({isOpen, onClose}: IAttendanceModal) {
                 <Button type="button" variant="primary" onClick={handleRetryLocation}>
                   Retry
                 </Button>
-                {locationErrorCode !== 1 && (
+                {locationErrorCode !== 1 && attendanceMarker && (
                   <Button type="button" variant="secondary" onClick={handleMarkAttendance}>
-                    {attendanceMarker ? "Check out without location" : "Check in without location"}
+                    Check out without location
                   </Button>
                 )}
-                <Button type="button" variant="secondary" onClick={() => setShowWFHConfirm(true)}>
-                  Request WFH instead
-                </Button>
+                {locationErrorCode !== 1 && !attendanceMarker && (
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={() => openRequestFlow("ATTENDANCE_APPROVAL")}
+                  >
+                    Request attendance approval
+                  </Button>
+                )}
+                {!attendanceMarker && (
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={() => openRequestFlow("WORK_REMOTE")}
+                  >
+                    Request Work Remote
+                  </Button>
+                )}
               </div>
             </div>
           ) : (
@@ -310,9 +377,19 @@ export function AttendanceModal({isOpen, onClose}: IAttendanceModal) {
                       away from the office.
                     </p>
                   </div>
-                  <Button type="button" variant="secondary" onClick={() => setShowWFHConfirm(true)}>
-                    Request Work From Home
-                  </Button>
+                  {attendanceMarker ? (
+                    <Button type="button" variant="secondary" onClick={handleMarkAttendance}>
+                      Check out anyway
+                    </Button>
+                  ) : (
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={() => openRequestFlow("WORK_REMOTE")}
+                    >
+                      Request Work Remote
+                    </Button>
+                  )}
                 </div>
               )}
             </div>

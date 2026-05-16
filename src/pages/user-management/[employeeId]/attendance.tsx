@@ -26,6 +26,7 @@ const ATTENDANCE = {
   CHECKED_IN: "checked_in",
   CHECKED_OUT: "checked_out",
   NOT_CHECKED_OUT: "not_checked_out",
+  PENDING: "pending",
 };
 
 export default function UserAttendancePage() {
@@ -131,29 +132,34 @@ export default function UserAttendancePage() {
         return <span className="block size-3 rounded-full bg-gray-500" aria-hidden />;
       case ATTENDANCE.ABSENT:
         return <span className="block size-3 rounded-full bg-gray-300" aria-hidden />;
+      case ATTENDANCE.PENDING:
+        return <span className="block size-3 rounded-full bg-purple-400" aria-hidden />;
       default:
         return <span className="block size-3 rounded-full bg-gray-300" aria-hidden />;
     }
   };
 
   const getStatusLabel = (status: string, isWFH?: boolean) => {
+    const prefix = isWFH ? "Work Remote — " : "";
     switch (status) {
       case ATTENDANCE.FULL_DAY:
-        return "Full day";
+        return `${prefix}Full day`;
+      case ATTENDANCE.HALF_DAY:
+        return `${prefix}Half day`;
+      case ATTENDANCE.CHECKED_IN:
+        return `${prefix}Checked In`;
+      case ATTENDANCE.NOT_CHECKED_OUT:
+        return `${prefix}Not Checked Out`;
       case ATTENDANCE.CHECKED_OUT:
         return "Checked Out";
-      case ATTENDANCE.CHECKED_IN:
-        return isWFH ? "WFH — Checked In" : "Checked In";
-      case ATTENDANCE.NOT_CHECKED_OUT:
-        return "Not Checked Out";
-      case ATTENDANCE.HALF_DAY:
-        return "Half day";
       case ATTENDANCE.ON_LEAVE:
         return "On leave";
       case ATTENDANCE.NO_PAY:
         return "No pay";
       case ATTENDANCE.ABSENT:
         return "Absent";
+      case ATTENDANCE.PENDING:
+        return "Pending Approval";
       default:
         return "Unknown";
     }

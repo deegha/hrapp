@@ -5,6 +5,7 @@ export type TWFHRequest = {
   date: string;
   status: string;
   note?: string;
+  requestType: "WORK_REMOTE" | "ATTENDANCE_APPROVAL";
   createdAt: string;
   updatedAt: string;
   user?: {

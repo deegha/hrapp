@@ -19,7 +19,8 @@ export interface IAttendance {
     | "absent"
     | "checked_in"
     | "checked_out"
-    | "not_checked_out";
+    | "not_checked_out"
+    | "pending";
   isWFH?: boolean;
   location: {
     lat: number;
