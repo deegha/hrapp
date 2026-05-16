@@ -284,35 +284,119 @@ export default function UserAttendancePage() {
         </div>
       </PageLayout>
       {editRecord && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/30 backdrop-blur-sm">
-          <div className="flex w-full max-w-md flex-col gap-6 rounded-xl bg-white p-6 shadow-xl">
-            <h2 className="text-lg font-semibold text-gray-800">
-              Edit Attendance — {moment(editRecord.date).format("DD MMM YYYY")}
-            </h2>
-
-            <div className="flex flex-col gap-4">
-              <div className="flex flex-col gap-1">
-                <label className="text-sm font-medium text-gray-700">Check In Time</label>
-                <input
-                  type="time"
-                  value={editCheckIn}
-                  onChange={(e) => setEditCheckIn(e.target.value)}
-                  className="rounded-lg border border-gray-300 p-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400"
-                />
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm"
+          onClick={(e) => e.target === e.currentTarget && setEditRecord(null)}
+        >
+          <div className="flex w-full max-w-md flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
+            {/* Header */}
+            <div className="flex items-start justify-between border-b border-gray-100 bg-gray-50 px-6 py-5">
+              <div>
+                <p className="mb-0.5 text-xs font-semibold uppercase tracking-wider text-gray-400">
+                  Editing attendance
+                </p>
+                <h2 className="text-xl font-bold text-gray-900">
+                  {moment(editRecord.date).format("dddd, DD MMM YYYY")}
+                </h2>
               </div>
-
-              <div className="flex flex-col gap-1">
-                <label className="text-sm font-medium text-gray-700">Check Out Time</label>
-                <input
-                  type="time"
-                  value={editCheckOut}
-                  onChange={(e) => setEditCheckOut(e.target.value)}
-                  className="rounded-lg border border-gray-300 p-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400"
-                />
-              </div>
+              <button
+                onClick={() => setEditRecord(null)}
+                className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-200 hover:text-gray-600"
+                aria-label="Close"
+              >
+                <svg className="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
             </div>
 
-            <div className="flex gap-3">
+            {/* Body */}
+            <div className="flex flex-col gap-5 p-6">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col gap-2">
+                  <label className="flex items-center gap-1.5 text-sm font-semibold text-gray-700">
+                    <svg
+                      className="size-4 text-green-500"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
+                      />
+                    </svg>
+                    Check In
+                  </label>
+                  <input
+                    type="time"
+                    value={editCheckIn}
+                    onChange={(e) => setEditCheckIn(e.target.value)}
+                    className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 transition-all focus:border-green-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-green-100"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <label className="flex items-center gap-1.5 text-sm font-semibold text-gray-700">
+                    <svg
+                      className="size-4 text-rose-400"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                      />
+                    </svg>
+                    Check Out
+                  </label>
+                  <input
+                    type="time"
+                    value={editCheckOut}
+                    onChange={(e) => setEditCheckOut(e.target.value)}
+                    className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 transition-all focus:border-rose-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-rose-100"
+                  />
+                </div>
+              </div>
+
+              <p className="flex items-center gap-1.5 text-xs text-gray-400">
+                <svg
+                  className="size-3.5 shrink-0"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                Times are in your local timezone ({Intl.DateTimeFormat().resolvedOptions().timeZone}
+                )
+              </p>
+            </div>
+
+            {/* Footer */}
+            <div className="flex items-center justify-end gap-3 border-t border-gray-100 bg-gray-50 px-6 py-4">
+              <button
+                type="button"
+                onClick={() => setEditRecord(null)}
+                className="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-600 transition-colors hover:border-gray-300 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
               <Button
                 type="button"
                 variant="primary"
@@ -321,9 +405,6 @@ export default function UserAttendancePage() {
                 loading={editLoading}
               >
                 Save Changes
-              </Button>
-              <Button type="button" variant="danger" onClick={() => setEditRecord(null)}>
-                Cancel
               </Button>
             </div>
           </div>

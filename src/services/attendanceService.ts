@@ -44,20 +44,24 @@ export async function isAttendanceMarked() {
 }
 
 export async function getAdminAttendanceSummery() {
+  const tz =
+    typeof window !== "undefined" ? Intl.DateTimeFormat().resolvedOptions().timeZone : "UTC";
   return await serviceHandler<TResponse<IAttendanceSummary>>({
     method: "GET",
     baseURL: process.env.NEXT_PUBLIC_API as string,
-    resource: `attendance/summary/employer`,
+    resource: `attendance/summary/employer?tz=${encodeURIComponent(tz)}`,
   });
 }
 
 export async function downloadAttendanceReport(date: Date) {
-  return await serviceHandler<unknown, {reportDate: Date}>({
+  const tz =
+    typeof window !== "undefined" ? Intl.DateTimeFormat().resolvedOptions().timeZone : "UTC";
+  return await serviceHandler<unknown, {reportDate: Date; timezone: string}>({
     method: "POST",
     baseURL: process.env.NEXT_PUBLIC_API as string,
     resource: `attendance/report`,
     responseType: "blob",
-    body: {reportDate: date},
+    body: {reportDate: date, timezone: tz},
   });
 }
 
