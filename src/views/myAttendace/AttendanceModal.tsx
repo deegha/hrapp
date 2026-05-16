@@ -13,7 +13,7 @@ interface IAttendanceModal {
 }
 
 export function AttendanceModal({isOpen, onClose}: IAttendanceModal) {
-  const {locationSettings} = useOfficeLocationSettings();
+  const {locationSettings, isLoadingLocationSettings} = useOfficeLocationSettings();
   const {showNotification} = useNotificationStore();
 
   const {data, mutate} = useSWR("attendance/isMarked", isAttendanceMarked);
@@ -38,6 +38,8 @@ export function AttendanceModal({isOpen, onClose}: IAttendanceModal) {
   const [withinLocation, setWithinLocation] = useState<boolean | null>(null);
   const [distanceMeters, setDistanceMeters] = useState<number | null>(null);
   const [locationError, setLocationError] = useState<boolean>(false);
+  const [locationErrorCode, setLocationErrorCode] = useState<number | null>(null);
+  const [locationRetry, setLocationRetry] = useState(0);
   const [wfhLoading, setWfhLoading] = useState(false);
 
   const [showWFHConfirm, setShowWFHConfirm] = useState(false);
@@ -45,6 +47,15 @@ export function AttendanceModal({isOpen, onClose}: IAttendanceModal) {
 
   function handleClose() {
     onClose();
+  }
+
+  function handleRetryLocation() {
+    setLocationError(false);
+    setLocationErrorCode(null);
+    setWithinLocation(null);
+    setDistanceMeters(null);
+    setUserLocation(null);
+    setLocationRetry((n) => n + 1);
   }
 
   function haversineDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
@@ -65,6 +76,7 @@ export function AttendanceModal({isOpen, onClose}: IAttendanceModal) {
     setDistanceMeters(null);
 
     if (!isOpen) return;
+    if (isLoadingLocationSettings) return;
     if (!locationSettings) {
       setWithinLocation(false);
       return;
@@ -91,10 +103,10 @@ export function AttendanceModal({isOpen, onClose}: IAttendanceModal) {
     };
 
     const error = (err: GeolocationPositionError) => {
-      console.error("Geolocation error:", err);
       if (!mounted) return;
       setWithinLocation(false);
       setLocationError(true);
+      setLocationErrorCode(err.code);
     };
 
     navigator.geolocation.getCurrentPosition(success, error, {
@@ -106,7 +118,7 @@ export function AttendanceModal({isOpen, onClose}: IAttendanceModal) {
     return () => {
       mounted = false;
     };
-  }, [isOpen, locationSettings]);
+  }, [isOpen, locationSettings, isLoadingLocationSettings, locationRetry]);
 
   const today = moment().format("DD, MM, YYYY");
 
@@ -214,21 +226,11 @@ export function AttendanceModal({isOpen, onClose}: IAttendanceModal) {
             <p className="text-sm text-textSecondary">Marking attendance for {today}</p>
           </div>
 
-          {locationError && (
-            <>
-              <p className="text-sm text-red-600">
-                Unable to retrieve your location. Please ensure location services are enabled.
-              </p>
-              <p>You can enable location from exclamation mark in the address bar</p>
-            </>
-          )}
-
           {attendanceMarker === "ATTENDANCE_MARKED" ? (
             <p className="text-sm font-semibold text-green-600">
               You have already marked your attendance today.
             </p>
-          ) : // 👇 Pending WFH request — block all actions
-          hasPendingWFH ? (
+          ) : hasPendingWFH ? (
             <div className="flex flex-col items-center gap-3 text-center">
               <div className="rounded-lg bg-yellow-50 p-4 text-sm text-yellow-800">
                 <p className="font-semibold">WFH Request Pending</p>
@@ -238,8 +240,7 @@ export function AttendanceModal({isOpen, onClose}: IAttendanceModal) {
                 </p>
               </div>
             </div>
-          ) : // 👇 Approved WFH — show checkout option
-          hasApprovedWFH ? (
+          ) : hasApprovedWFH ? (
             <div className="flex flex-col items-center gap-3 text-center">
               <div className="rounded-lg bg-green-50 p-4 text-sm text-green-800">
                 <p className="font-semibold">Working From Home Today</p>
@@ -249,14 +250,48 @@ export function AttendanceModal({isOpen, onClose}: IAttendanceModal) {
                 Check out now
               </Button>
             </div>
+          ) : locationError ? (
+            <div className="flex flex-col items-center gap-4 text-center">
+              {locationErrorCode === 1 ? (
+                <div className="rounded-lg bg-red-50 p-4 text-sm text-red-700">
+                  <p className="font-semibold">Location permission denied</p>
+                  <p className="mt-1">
+                    Click the location icon in the address bar and allow access for this site, then
+                    click Retry.
+                  </p>
+                </div>
+              ) : (
+                <div className="rounded-lg bg-amber-50 p-4 text-sm text-amber-800">
+                  <p className="font-semibold">Location signal unavailable</p>
+                  <p className="mt-1">
+                    Your device couldn&apos;t get a GPS/WiFi fix right now. You can retry, or check
+                    in without location — your attendance will still be recorded.
+                  </p>
+                </div>
+              )}
+              <div className="flex flex-wrap justify-center gap-3">
+                <Button type="button" variant="primary" onClick={handleRetryLocation}>
+                  Retry
+                </Button>
+                {locationErrorCode !== 1 && (
+                  <Button type="button" variant="secondary" onClick={handleMarkAttendance}>
+                    {attendanceMarker ? "Check out without location" : "Check in without location"}
+                  </Button>
+                )}
+                <Button type="button" variant="secondary" onClick={() => setShowWFHConfirm(true)}>
+                  Request WFH instead
+                </Button>
+              </div>
+            </div>
           ) : (
             <div className="flex flex-col items-center gap-2 text-center">
               {withinLocation === null ? (
-                <p className="text-sm text-textSecondary">Checking location…</p>
+                <p className="text-sm text-textSecondary">Checking your location…</p>
               ) : withinLocation ? (
                 <>
                   <p className="text-sm font-semibold text-green-600">
-                    You are within {distanceMeters ? distanceMeters.toFixed(1) : "0"} m of office
+                    You are within {distanceMeters ? distanceMeters.toFixed(1) : "0"} m of the
+                    office
                   </p>
                   <Button
                     type="button"
@@ -268,10 +303,13 @@ export function AttendanceModal({isOpen, onClose}: IAttendanceModal) {
                 </>
               ) : (
                 <div className="flex flex-col items-center gap-4">
-                  <p className="text-sm font-semibold text-red-600">
-                    You are outside the office by{" "}
-                    {distanceMeters ? distanceMeters.toFixed(1) : "an unknown distance"} m
-                  </p>
+                  <div className="rounded-lg bg-orange-50 p-4 text-sm text-orange-700">
+                    <p className="font-semibold">Outside office area</p>
+                    <p className="mt-1">
+                      You are {distanceMeters ? `${distanceMeters.toFixed(0)} m` : "some distance"}{" "}
+                      away from the office.
+                    </p>
+                  </div>
                   <Button type="button" variant="secondary" onClick={() => setShowWFHConfirm(true)}>
                     Request Work From Home
                   </Button>
