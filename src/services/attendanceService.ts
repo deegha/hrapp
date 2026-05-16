@@ -18,9 +18,12 @@ export async function getMyAttendanceRecords(
   fromDate?: string,
   toDate?: string,
 ) {
+  const tz =
+    typeof window !== "undefined" ? Intl.DateTimeFormat().resolvedOptions().timeZone : "UTC";
   const params = new URLSearchParams({
     page: String(page),
     limit: String(limit),
+    tz,
     ...(fromDate && {fromDate}),
     ...(toDate && {toDate}),
   });
@@ -95,9 +98,12 @@ export async function getUserAttendanceById(
   fromDate?: string,
   toDate?: string,
 ) {
+  const tz =
+    typeof window !== "undefined" ? Intl.DateTimeFormat().resolvedOptions().timeZone : "UTC";
   const params = new URLSearchParams({
     page: String(page),
     limit: String(limit),
+    tz,
     ...(fromDate && {fromDate}),
     ...(toDate && {toDate}),
   });
@@ -111,7 +117,7 @@ export async function getUserAttendanceById(
 
 export async function updateUserAttendance(
   userId: number,
-  payload: {date: string; checkInTime?: string; checkOutTime?: string},
+  payload: {date: string; checkInTime?: string; checkOutTime?: string; timezone: string},
 ) {
   return await serviceHandler<TResponse<{message: string}>, typeof payload>({
     method: "PUT",

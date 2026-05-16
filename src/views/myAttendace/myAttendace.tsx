@@ -62,21 +62,21 @@ export function MyAttendance() {
               const getBulb = (s: string) => {
                 switch (s) {
                   case ATTENDANCE.FULL_DAY:
-                    return <span className="block size-3 rounded-full bg-gray-500" aria-hidden />;
+                    return <span className="block size-3 rounded-full bg-green-500" aria-hidden />;
                   case ATTENDANCE.CHECKED_OUT:
-                    return <span className="block size-3 rounded-full bg-gray-500" aria-hidden />;
+                    return <span className="block size-3 rounded-full bg-green-500" aria-hidden />;
                   case ATTENDANCE.CHECKED_IN:
-                    return <span className="block size-3 rounded-full bg-gray-500" aria-hidden />;
+                    return <span className="block size-3 rounded-full bg-green-400" aria-hidden />;
                   case ATTENDANCE.NOT_CHECKED_OUT:
-                    return <span className="block size-3 rounded-full bg-gray-400" aria-hidden />;
+                    return <span className="block size-3 rounded-full bg-orange-400" aria-hidden />;
                   case ATTENDANCE.HALF_DAY:
-                    return <span className="block size-3 rounded-full bg-gray-400" aria-hidden />;
+                    return <span className="block size-3 rounded-full bg-yellow-400" aria-hidden />;
                   case ATTENDANCE.ON_LEAVE:
-                    return <span className="block size-3 rounded-full bg-gray-500" aria-hidden />;
+                    return <span className="block size-3 rounded-full bg-blue-400" aria-hidden />;
                   case ATTENDANCE.NO_PAY:
                     return <span className="block size-3 rounded-full bg-gray-500" aria-hidden />;
                   case ATTENDANCE.ABSENT:
-                    return <span className="block size-3 rounded-full bg-gray-400" aria-hidden />;
+                    return <span className="block size-3 rounded-full bg-gray-300" aria-hidden />;
                   default:
                     return <span className="block size-3 rounded-full bg-gray-300" aria-hidden />;
                 }
@@ -192,7 +192,7 @@ export function MyAttendance() {
               .map((wfh) => (
                 <ItemsList
                   key={wfh.id}
-                  title={moment(wfh.date).format("DD MMM YYYY")}
+                  title={moment.utc(wfh.date).local().format("DD MMM YYYY")}
                   actionArea={
                     <div className="flex items-center gap-2">
                       <span

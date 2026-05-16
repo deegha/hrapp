@@ -54,7 +54,9 @@ export default function UserAttendancePage() {
 
   const [editRecord, setEditRecord] = useState<IAttendance | null>(null);
   const [editCheckIn, setEditCheckIn] = useState("");
+  const [editCheckInLocalDate, setEditCheckInLocalDate] = useState("");
   const [editCheckOut, setEditCheckOut] = useState("");
+  const [editCheckOutLocalDate, setEditCheckOutLocalDate] = useState("");
   const [editLoading, setEditLoading] = useState(false);
 
   const swrKey =
@@ -64,25 +66,37 @@ export default function UserAttendancePage() {
 
   function openEditModal(attendance: IAttendance) {
     setEditRecord(attendance);
-    setEditCheckIn(
-      attendance.checkInTime ? moment.utc(attendance.checkInTime).local().format("HH:mm") : "",
-    );
-    setEditCheckOut(
-      attendance.checkOutTime ? moment.utc(attendance.checkOutTime).local().format("HH:mm") : "",
-    );
+    if (attendance.checkInTime) {
+      const localCheckIn = moment.utc(attendance.checkInTime).local();
+      setEditCheckInLocalDate(localCheckIn.format("YYYY-MM-DD"));
+      setEditCheckIn(localCheckIn.format("HH:mm"));
+    } else {
+      setEditCheckInLocalDate(attendance.date);
+      setEditCheckIn("");
+    }
+    if (attendance.checkOutTime) {
+      const localCheckOut = moment.utc(attendance.checkOutTime).local();
+      setEditCheckOutLocalDate(localCheckOut.format("YYYY-MM-DD"));
+      setEditCheckOut(localCheckOut.format("HH:mm"));
+    } else {
+      setEditCheckOutLocalDate(attendance.date);
+      setEditCheckOut("");
+    }
   }
 
   async function handleSaveEdit() {
     if (!editRecord || !userId) return;
     try {
       setEditLoading(true);
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       await updateUserAttendance(userId, {
         date: editRecord.date,
+        timezone,
         checkInTime: editCheckIn
-          ? new Date(`${editRecord.date}T${editCheckIn}:00`).toISOString()
+          ? moment(`${editCheckInLocalDate}T${editCheckIn}:00`).utc().toISOString()
           : undefined,
         checkOutTime: editCheckOut
-          ? new Date(`${editRecord.date}T${editCheckOut}:00`).toISOString()
+          ? moment(`${editCheckOutLocalDate}T${editCheckOut}:00`).utc().toISOString()
           : undefined,
       });
       showNotification({type: "success", message: "Attendance updated successfully"});
@@ -95,9 +109,6 @@ export default function UserAttendancePage() {
     }
   }
 
-  console.log("userId:", userId);
-  console.log("data:", data);
-
   if (!router.isReady) return null;
 
   const attendanceItems = data?.data.data || [];
@@ -105,21 +116,21 @@ export default function UserAttendancePage() {
   const getBulb = (s: string) => {
     switch (s) {
       case ATTENDANCE.FULL_DAY:
-        return <span className="block size-3 rounded-full bg-gray-500" aria-hidden />;
+        return <span className="block size-3 rounded-full bg-green-500" aria-hidden />;
       case ATTENDANCE.CHECKED_OUT:
-        return <span className="block size-3 rounded-full bg-gray-500" aria-hidden />;
+        return <span className="block size-3 rounded-full bg-green-500" aria-hidden />;
       case ATTENDANCE.CHECKED_IN:
-        return <span className="block size-3 rounded-full bg-gray-500" aria-hidden />;
+        return <span className="block size-3 rounded-full bg-green-400" aria-hidden />;
       case ATTENDANCE.NOT_CHECKED_OUT:
-        return <span className="block size-3 rounded-full bg-gray-400" aria-hidden />;
+        return <span className="block size-3 rounded-full bg-orange-400" aria-hidden />;
       case ATTENDANCE.HALF_DAY:
-        return <span className="block size-3 rounded-full bg-gray-400" aria-hidden />;
+        return <span className="block size-3 rounded-full bg-yellow-400" aria-hidden />;
       case ATTENDANCE.ON_LEAVE:
-        return <span className="block size-3 rounded-full bg-gray-500" aria-hidden />;
+        return <span className="block size-3 rounded-full bg-blue-400" aria-hidden />;
       case ATTENDANCE.NO_PAY:
         return <span className="block size-3 rounded-full bg-gray-500" aria-hidden />;
       case ATTENDANCE.ABSENT:
-        return <span className="block size-3 rounded-full bg-gray-400" aria-hidden />;
+        return <span className="block size-3 rounded-full bg-gray-300" aria-hidden />;
       default:
         return <span className="block size-3 rounded-full bg-gray-300" aria-hidden />;
     }
