@@ -139,7 +139,7 @@ export function AttendanceModal({isOpen, onClose}: IAttendanceModal) {
     };
   }, [isOpen, locationSettings, isLoadingLocationSettings, locationRetry]);
 
-  const today = moment().format("DD, MM, YYYY");
+  const today = moment().format("DD MMM YYYY");
 
   async function handleMarkAttendance() {
     if (attendanceMarker === "ATTENDANCE_MARKED") return;
@@ -194,12 +194,12 @@ export function AttendanceModal({isOpen, onClose}: IAttendanceModal) {
         <div className="flex w-full max-w-md flex-col gap-6 rounded-xl bg-white p-6 shadow-xl">
           <div>
             <h2 className="text-lg font-semibold text-gray-800">
-              {isAttendanceApproval ? "Request Attendance Approval" : "Request Work Remote"}
+              {isAttendanceApproval ? "Check In Without Location" : "Request Work Remote"}
             </h2>
             <p className="mt-1 text-sm text-textSecondary">
               {isAttendanceApproval
-                ? "Your attendance will show as pending until your manager or admin approves it."
-                : "Your manager will be notified to approve your Work Remote request."}
+                ? "Use this when you're physically at the office but your device can't get a GPS fix. Your manager will approve your check-in."
+                : "Use this when you're working from home or another location outside the office. Your manager will be notified to approve."}
             </p>
           </div>
 
@@ -212,7 +212,7 @@ export function AttendanceModal({isOpen, onClose}: IAttendanceModal) {
               rows={4}
               placeholder={
                 isAttendanceApproval
-                  ? "Explain why your location could not be verified..."
+                  ? "e.g. GPS not working, indoor office area, device issue..."
                   : "Enter your reason for working remotely..."
               }
               value={requestNote}
@@ -249,79 +249,104 @@ export function AttendanceModal({isOpen, onClose}: IAttendanceModal) {
   return (
     <div>
       <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/30 backdrop-blur-sm">
-        <div className="flex w-full max-w-md flex-col items-center gap-10 rounded-xl bg-white p-6 shadow-xl">
-          <div className="flex flex-col items-center">
-            <h2 className="mb-4 text-lg font-semibold text-gray-800">
+        <div className="flex w-full max-w-md flex-col gap-6 rounded-2xl bg-white p-8 shadow-2xl">
+          {/* Header */}
+          <div className="flex flex-col items-center gap-1 text-center">
+            <h2 className="text-2xl font-bold text-gray-800">
               {attendanceMarker === "ATTENDANCE_MARKED"
-                ? "Attendance Marked"
+                ? "Already Checked In"
                 : attendanceMarker
                   ? "Check Out"
                   : "Check In"}
             </h2>
-            <p className="text-sm text-textSecondary">
+            <p className="text-sm text-gray-400">
               {attendanceMarker === "ATTENDANCE_MARKED"
-                ? `Attendance already recorded for ${today}`
+                ? `Attendance recorded for ${today}`
                 : attendanceMarker
                   ? `Checking out for ${today}`
                   : `Checking in for ${today}`}
             </p>
           </div>
 
+          {/* Body */}
           {attendanceMarker === "ATTENDANCE_MARKED" ? (
-            <p className="text-sm font-semibold text-green-600">
-              You have already marked your attendance today.
-            </p>
-          ) : hasPendingAttendanceApproval ? (
-            <div className="flex flex-col items-center gap-3 text-center">
-              <div className="rounded-lg bg-purple-50 p-4 text-sm text-purple-800">
-                <p className="font-semibold">Attendance Approval Pending</p>
-                <p className="mt-1">
-                  Your attendance request is waiting for manager approval. Your attendance will be
-                  confirmed once approved.
+            <div className="flex flex-col items-center gap-4 text-center">
+              <div className="flex size-16 items-center justify-center rounded-full bg-green-100 text-3xl">
+                ✓
+              </div>
+              <div>
+                <p className="font-semibold text-gray-800">You&apos;re all set for today!</p>
+                <p className="mt-1 text-sm text-gray-500">
+                  Your attendance has already been recorded. No further action needed.
                 </p>
               </div>
+            </div>
+          ) : hasPendingAttendanceApproval ? (
+            <div className="rounded-xl border border-purple-200 bg-purple-50 p-4 text-center">
+              <p className="font-semibold text-purple-800">Check-in Request Pending</p>
+              <p className="mt-1 text-sm text-purple-700">
+                Your request to check in without location is waiting for your manager&apos;s
+                approval. Your attendance will be confirmed once approved.
+              </p>
             </div>
           ) : hasPendingWorkRemote ? (
-            <div className="flex flex-col items-center gap-3 text-center">
-              <div className="rounded-lg bg-yellow-50 p-4 text-sm text-yellow-800">
-                <p className="font-semibold">Work Remote Request Pending</p>
-                <p className="mt-1">
-                  You have a pending Work Remote request for today. Please wait for your manager to
-                  approve or reject it before marking attendance.
-                </p>
-              </div>
+            <div className="rounded-xl border border-yellow-200 bg-yellow-50 p-4 text-center">
+              <p className="font-semibold text-yellow-800">Work Remote Request Pending</p>
+              <p className="mt-1 text-sm text-yellow-700">
+                You have a pending request to work remotely today. Your attendance will be recorded
+                once your manager approves it.
+              </p>
             </div>
           ) : hasApprovedWorkRemote ? (
-            <div className="flex flex-col items-center gap-3 text-center">
-              <div className="rounded-lg bg-green-50 p-4 text-sm text-green-800">
-                <p className="font-semibold">Working Remotely Today</p>
-                <p className="mt-1">Your Work Remote request has been approved.</p>
+            <div className="flex flex-col items-center gap-4 text-center">
+              <div className="w-full rounded-xl border border-green-200 bg-green-50 p-4">
+                <p className="font-semibold text-green-800">Working Remotely Today</p>
+                <p className="mt-1 text-sm text-green-700">
+                  Your manager has approved your request to work remotely.
+                </p>
               </div>
               <Button type="button" variant="secondary" onClick={handleMarkAttendance}>
                 Check out now
               </Button>
             </div>
           ) : locationError ? (
-            <div className="flex flex-col items-center gap-4 text-center">
+            <div className="flex flex-col gap-4">
               {locationErrorCode === 1 ? (
-                <div className="rounded-lg bg-red-50 p-4 text-sm text-red-700">
-                  <p className="font-semibold">Location permission denied</p>
-                  <p className="mt-1">
-                    Click the location icon in the address bar and allow access for this site, then
-                    click Retry.
+                <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-center">
+                  <p className="font-semibold text-red-700">Location access blocked</p>
+                  <p className="mt-1 text-sm text-red-600">
+                    Allow location access in your browser settings, then tap Retry. Your location is
+                    needed to verify you&apos;re at the office.
                   </p>
                 </div>
               ) : (
-                <div className="rounded-lg bg-amber-50 p-4 text-sm text-amber-800">
-                  <p className="font-semibold">Location signal unavailable</p>
-                  <p className="mt-1">
-                    {attendanceMarker
-                      ? "Your device couldn't get a location fix. You can retry or check out without location."
-                      : "Your device couldn't get a location fix. You can retry, request attendance approval (pending until manager confirms), or request Work Remote."}
-                  </p>
-                </div>
+                <>
+                  <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-center">
+                    <p className="font-semibold text-amber-800">Can&apos;t detect your location</p>
+                    <p className="mt-1 text-sm text-amber-700">
+                      {attendanceMarker
+                        ? "Your device couldn't get a location fix. You can retry or check out without location."
+                        : "Your device couldn't confirm your location. Choose an option below based on where you are."}
+                    </p>
+                  </div>
+                  {!attendanceMarker && (
+                    <div className="flex flex-col gap-2 rounded-xl border border-gray-100 bg-gray-50 p-3 text-xs text-gray-500">
+                      <p>
+                        <span className="font-semibold text-gray-700">
+                          Check in without location
+                        </span>
+                        {" — "}You&apos;re physically at the office but your device can&apos;t get a
+                        GPS fix.
+                      </p>
+                      <p>
+                        <span className="font-semibold text-gray-700">Work from home</span>
+                        {" — "}You&apos;re working from outside the office today.
+                      </p>
+                    </div>
+                  )}
+                </>
               )}
-              <div className="flex flex-wrap justify-center gap-3">
+              <div className="flex flex-col gap-2">
                 <Button type="button" variant="primary" onClick={handleRetryLocation}>
                   Retry
                 </Button>
@@ -331,35 +356,35 @@ export function AttendanceModal({isOpen, onClose}: IAttendanceModal) {
                   </Button>
                 )}
                 {locationErrorCode !== 1 && !attendanceMarker && (
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    onClick={() => openRequestFlow("ATTENDANCE_APPROVAL")}
-                  >
-                    Request attendance approval
-                  </Button>
-                )}
-                {!attendanceMarker && (
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    onClick={() => openRequestFlow("WORK_REMOTE")}
-                  >
-                    Request Work Remote
-                  </Button>
+                  <>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={() => openRequestFlow("ATTENDANCE_APPROVAL")}
+                    >
+                      Check in without location
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={() => openRequestFlow("WORK_REMOTE")}
+                    >
+                      Work from home
+                    </Button>
+                  </>
                 )}
               </div>
             </div>
           ) : (
-            <div className="flex flex-col items-center gap-2 text-center">
+            <div className="flex flex-col items-center gap-4 text-center">
               {withinLocation === null ? (
-                <p className="text-sm text-textSecondary">Checking your location…</p>
+                <p className="text-sm text-gray-400">Detecting your location…</p>
               ) : withinLocation ? (
                 <>
-                  <p className="text-sm font-semibold text-green-600">
-                    You are within {distanceMeters ? distanceMeters.toFixed(1) : "0"} m of the
+                  <div className="w-full rounded-xl border border-green-200 bg-green-50 p-3 text-sm text-green-700">
+                    You are within {distanceMeters ? distanceMeters.toFixed(0) : "0"} m of the
                     office
-                  </p>
+                  </div>
                   <Button
                     type="button"
                     variant={attendanceMarker ? "secondary" : "primary"}
@@ -369,12 +394,13 @@ export function AttendanceModal({isOpen, onClose}: IAttendanceModal) {
                   </Button>
                 </>
               ) : (
-                <div className="flex flex-col items-center gap-4">
-                  <div className="rounded-lg bg-orange-50 p-4 text-sm text-orange-700">
-                    <p className="font-semibold">Outside office area</p>
-                    <p className="mt-1">
+                <div className="flex w-full flex-col items-center gap-4">
+                  <div className="w-full rounded-xl border border-orange-200 bg-orange-50 p-4 text-center">
+                    <p className="font-semibold text-orange-700">You&apos;re outside the office</p>
+                    <p className="mt-1 text-sm text-orange-600">
                       You are {distanceMeters ? `${distanceMeters.toFixed(0)} m` : "some distance"}{" "}
-                      away from the office.
+                      away. If you&apos;re working from home or another location, request Work
+                      Remote.
                     </p>
                   </div>
                   {attendanceMarker ? (
@@ -395,9 +421,10 @@ export function AttendanceModal({isOpen, onClose}: IAttendanceModal) {
             </div>
           )}
 
-          <div>
-            <Button type="button" variant="danger" onClick={handleClose}>
-              Close modal
+          {/* Footer */}
+          <div className="border-t border-gray-100 pt-4">
+            <Button type="button" variant="danger" onClick={handleClose} className="w-full">
+              Close
             </Button>
           </div>
         </div>
