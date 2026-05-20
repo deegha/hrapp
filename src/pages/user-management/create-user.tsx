@@ -1,4 +1,4 @@
-import {Layout, PageLayout, Button} from "@/components";
+import {Layout, PageLayout, Button, FormSelect} from "@/components";
 import {useForm, FormProvider} from "react-hook-form";
 import {FormInput} from "@/components";
 import {userSchema} from "@/utils/formvalidations/userSchema";
@@ -9,6 +9,12 @@ import {createUserService, assignManager} from "@/services";
 import {useNotificationStore} from "@/store/notificationStore";
 import {useState} from "react";
 import {IOption} from "@/types/ui";
+
+const GENDER_OPTIONS = [
+  {label: "Male", value: "MALE"},
+  {label: "Female", value: "FEMALE"},
+  {label: "Other", value: "OTHER"},
+];
 
 export default function CreateUser() {
   const {showNotification} = useNotificationStore();
@@ -58,6 +64,7 @@ export default function CreateUser() {
             <FormInput name="firstName" label="First Name" />
             <FormInput name="lastName" label="Last Name" />
             <FormInput name="email" label="Email" type="email" />
+            <FormSelect name="gender" label="Gender" options={GENDER_OPTIONS} />
 
             {/* <UserStatus /> */}
             <UserRole />

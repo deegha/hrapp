@@ -135,18 +135,27 @@ export function ApplyLeave() {
           <div className="flex flex-col gap-4">
             {leaveBalance?.leaveTypeBalances
               ?.filter((balance) => balance.name !== "Lieu Leave")
-              ?.map((balance) => (
-                <div
-                  key={balance.id}
-                  className="flex flex-col items-start justify-center rounded-md border border-border p-4"
-                >
-                  <p className="text-sm font-medium">{balance.name}</p>
-                  <p className="text-lg font-semibold">{balance.remainingDays}</p>
-                  <p className="text-xs text-gray-500">
-                    {balance.usedDays} used / {balance.yearlyAllowance} total
-                  </p>
-                </div>
-              ))}
+              ?.map((balance) => {
+                const isAccrual = balance.accrualType === "HALF_DAY_PER_MONTH";
+                const displayTotal = isAccrual ? balance.accruedAllowance : balance.yearlyAllowance;
+                return (
+                  <div
+                    key={balance.id}
+                    className="flex flex-col items-start justify-center rounded-md border border-border p-4"
+                  >
+                    <p className="text-sm font-medium">{balance.name}</p>
+                    <p className="text-lg font-semibold">{balance.remainingDays}</p>
+                    <p className="text-xs text-gray-500">
+                      {balance.usedDays} used / {displayTotal} {isAccrual ? "accrued" : "total"}
+                    </p>
+                    {isAccrual && (
+                      <p className="text-xs text-gray-400">
+                        {balance.yearlyAllowance} days annual entitlement
+                      </p>
+                    )}
+                  </div>
+                );
+              })}
 
             {leaveBalance && (
               <div className="bg-primary/5 flex flex-col items-start justify-center rounded-md border border-primary p-4">

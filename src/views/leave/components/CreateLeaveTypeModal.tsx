@@ -27,6 +27,7 @@ export const CreateLeaveTypeModal = ({
     daysPerYear: 10,
     accrualType: "ALL_FROM_DAY_1",
     canCarryForward: false,
+    applicableGender: "ALL",
     daysPerEmploymentType: {},
   });
 
@@ -40,13 +41,21 @@ export const CreateLeaveTypeModal = ({
 
   const carryForwardOptions = useMemo(
     () => [
-      {label: "Allowed", value: "true"},
       {label: "Not Allowed", value: "false"},
+      {label: "Allowed", value: "true"},
     ],
     [],
   );
 
-  // Initialize default days when modal opens or employment types change
+  const genderOptions = useMemo(
+    () => [
+      {label: "All Employees", value: "ALL"},
+      {label: "Female Only", value: "FEMALE"},
+      {label: "Male Only", value: "MALE"},
+    ],
+    [],
+  );
+
   useEffect(() => {
     if (!open) return;
     if (employmentTypes.length > 0) {
@@ -63,7 +72,6 @@ export const CreateLeaveTypeModal = ({
       showNotification({message: "Leave type created successfully!", type: "success"});
       onCreated?.();
       onClose();
-      // reset
       const defaults: Record<string, number> = {};
       employmentTypes.forEach((typeItem) => (defaults[typeItem.typeLabel] = 10));
       setForm({
@@ -71,6 +79,7 @@ export const CreateLeaveTypeModal = ({
         daysPerYear: 10,
         accrualType: "ALL_FROM_DAY_1",
         canCarryForward: false,
+        applicableGender: "ALL",
         daysPerEmploymentType: defaults,
       });
     } catch (error) {
@@ -89,17 +98,17 @@ export const CreateLeaveTypeModal = ({
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl"
+        className="flex max-h-[90vh] w-full max-w-md flex-col rounded-xl bg-white shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="mb-4 flex items-center justify-between">
+        <div className="flex items-center justify-between p-6 pb-4">
           <h2 className="text-lg font-semibold text-gray-800">Create New Leave Type</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <X size={20} />
           </button>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-4 overflow-y-auto px-6 pb-2">
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">Leave Type Name</label>
             <InputField
@@ -150,9 +159,23 @@ export const CreateLeaveTypeModal = ({
               }
             />
           </div>
+
+          <div>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Applicable To</label>
+            <PolicyDropdown
+              value={form.applicableGender}
+              options={genderOptions}
+              onChange={(value) =>
+                setForm((prev) => ({
+                  ...prev,
+                  applicableGender: value as "ALL" | "FEMALE" | "MALE",
+                }))
+              }
+            />
+          </div>
         </div>
 
-        <div className="mt-6 flex justify-end space-x-3">
+        <div className="flex justify-end space-x-3 border-t border-gray-100 p-6 pt-4">
           <Button onClick={onClose} variant="secondary" disabled={loading}>
             Cancel
           </Button>

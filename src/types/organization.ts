@@ -6,12 +6,15 @@ export type TLeaveType = {
   isLieuLeave?: boolean;
 };
 
+export type TApplicableGender = "ALL" | "FEMALE" | "MALE";
+
 export type TLeavePolicy = {
   id: number;
   name: string;
   daysPerYear: number;
   accrualType: "ALL_FROM_DAY_1" | "HALF_DAY_PER_MONTH";
   canCarryForward: boolean;
+  applicableGender: TApplicableGender;
   organizationId: number;
   daysPerEmploymentType?: Record<string, number>;
 };
@@ -22,6 +25,7 @@ export type TUpdateLeavePolicyPayload = {
   daysPerYear?: number;
   accrualType?: "ALL_FROM_DAY_1" | "HALF_DAY_PER_MONTH";
   canCarryForward?: boolean;
+  applicableGender?: TApplicableGender;
   daysPerEmploymentType?: Record<string, number>;
 };
 
@@ -30,6 +34,7 @@ export type TCreateLeaveTypePayload = {
   daysPerYear: number;
   accrualType: "ALL_FROM_DAY_1" | "HALF_DAY_PER_MONTH";
   canCarryForward: boolean;
+  applicableGender: TApplicableGender;
   daysPerEmploymentType?: Record<string, number>;
 };
 

@@ -1,4 +1,10 @@
 import {Layout, PageLayout, Button, Shimmer, FormInput, FormSelect} from "@/components";
+
+const GENDER_OPTIONS = [
+  {label: "Male", value: "MALE"},
+  {label: "Female", value: "FEMALE"},
+  {label: "Other", value: "OTHER"},
+];
 import {FormProvider, useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
 import {editUserSchema} from "@/utils/formvalidations/userSchema";
@@ -38,6 +44,7 @@ export default function EditUser() {
       firstName: userData.data.firstName,
       lastName: userData.data.lastName,
       email: userData.data.email,
+      gender: userData.data.gender ?? "OTHER",
       userLevel: userData.data.userLevel,
       employmentTypeId: userData.data.EmploymentType?.id,
     });
@@ -84,6 +91,7 @@ export default function EditUser() {
             <FormInput name="firstName" label="First Name" />
             <FormInput name="lastName" label="Last Name" />
             <FormInput name="email" label="Email" type="email" />
+            <FormSelect name="gender" label="Gender" options={GENDER_OPTIONS} />
             <FormSelect
               name="userLevel"
               label="User Level"

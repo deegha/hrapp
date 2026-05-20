@@ -22,7 +22,10 @@ type TCreateLeaveRequestPayload = {
 export type TLeaveTypeBalance = {
   id: number;
   name: string;
+  accrualType: "ALL_FROM_DAY_1" | "HALF_DAY_PER_MONTH";
+  applicableGender: "ALL" | "FEMALE" | "MALE";
   yearlyAllowance: number;
+  accruedAllowance: number;
   usedDays: number;
   remainingDays: number;
 };

@@ -21,24 +21,36 @@ export function UserLeaveBalance({employeeId}: UserLeaveBalanceProps) {
       )}
       {balance && (
         <>
-          {balance.leaveTypeBalances.map((type) => (
-            <div
-              key={type.id}
-              className="flex items-center justify-between rounded-md border border-gray-200 px-4 py-3"
-            >
-              <span className="text-sm font-medium">{type.name}</span>
-              <div className="flex items-center gap-4 text-sm">
-                <span className="text-textSecondary">
-                  {type.usedDays} / {type.yearlyAllowance} used
-                </span>
-                <span
-                  className={`font-semibold ${type.remainingDays < 0 ? "text-red-500" : "text-green-600"}`}
-                >
-                  {type.remainingDays} remaining
-                </span>
+          {balance.leaveTypeBalances.map((type) => {
+            const isAccrual = type.accrualType === "HALF_DAY_PER_MONTH";
+            const displayAllowance = isAccrual ? type.accruedAllowance : type.yearlyAllowance;
+
+            return (
+              <div
+                key={type.id}
+                className="flex items-center justify-between rounded-md border border-gray-200 px-4 py-3"
+              >
+                <div>
+                  <span className="text-sm font-medium">{type.name}</span>
+                  {isAccrual && (
+                    <p className="text-xs text-textSecondary">
+                      {type.accruedAllowance} of {type.yearlyAllowance} days accrued this year
+                    </p>
+                  )}
+                </div>
+                <div className="flex items-center gap-4 text-sm">
+                  <span className="text-textSecondary">
+                    {type.usedDays} / {displayAllowance} used
+                  </span>
+                  <span
+                    className={`font-semibold ${type.remainingDays < 0 ? "text-red-500" : "text-green-600"}`}
+                  >
+                    {type.remainingDays} remaining
+                  </span>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
           <div className="flex items-center justify-between rounded-md bg-gray-50 px-4 py-3">
             <span className="text-sm font-semibold">Total</span>
             <div className="flex items-center gap-4 text-sm">

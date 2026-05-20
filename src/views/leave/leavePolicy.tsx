@@ -2,11 +2,12 @@ import {Button, PageLayout, PolicySection, InputField} from "@/components";
 import {useState, useEffect, useMemo} from "react";
 import useSWR from "swr";
 import {fetchLeavePolicies, updateLeavePolicy, fetchEmploymentTypes} from "@/services";
-import {TLeavePolicy} from "@/types";
+import {TApplicableGender, TLeavePolicy} from "@/types";
 import {useNotificationStore} from "@/store/notificationStore";
 import {EntitlementsSection} from "./components/EntitlementsSection";
 import {AccrualSection} from "./components/AccrualSection";
 import {CarryForwardSection} from "./components/CarryForwardSection";
+import {GenderRestrictionSection} from "./components/GenderRestrictionSection";
 import {CreateLeaveTypeModal} from "./components/CreateLeaveTypeModal";
 import {DeleteLeaveTypeModal} from "./components/DeleteLeaveTypeModal";
 
@@ -17,17 +18,12 @@ export function LeavePolicies() {
   const [loading, setLoading] = useState(false);
   const {showNotification} = useNotificationStore();
 
-  // Local state for temporary changes during editing
   const [tempPolicies, setTempPolicies] = useState<TLeavePolicy[]>([]);
 
-  // Fetch employment types
   const {data: employmentTypesData} = useSWR("employment-types", fetchEmploymentTypes);
   const employmentTypes = useMemo(() => employmentTypesData?.data || [], [employmentTypesData]);
 
-  // Create leave type modal state
   const [showCreateModal, setShowCreateModal] = useState(false);
-
-  // Delete confirmation modal state
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteLeaveTypeId, setDeleteLeaveTypeId] = useState<number | null>(null);
 
@@ -104,7 +100,6 @@ export function LeavePolicies() {
     );
   }
 
-  // Use tempPolicies for display during edit mode
   const displayPolicies = edit ? tempPolicies : policies;
   const leaveApprovalWorkflow = [
     {
@@ -146,11 +141,18 @@ export function LeavePolicies() {
           policies={displayPolicies}
           onChange={(id, value) => handleLocalPolicyUpdate(id, "accrualType", value)}
         />
-
         <CarryForwardSection
           edit={edit}
           policies={displayPolicies}
           onChange={(id, value) => handleLocalPolicyUpdate(id, "canCarryForward", value)}
+        />
+        <GenderRestrictionSection
+          edit={edit}
+          policies={displayPolicies.map((p) => ({
+            ...p,
+            applicableGender: (p.applicableGender ?? "ALL") as TApplicableGender,
+          }))}
+          onChange={(id, value) => handleLocalPolicyUpdate(id, "applicableGender", value)}
         />
         <PolicySection edit={edit} title="Leave Approval Workflows" items={leaveApprovalWorkflow} />
         <PolicySection edit={edit} title="Restricted Leave Periods" items={restricted} />
@@ -176,7 +178,6 @@ export function LeavePolicies() {
           )}
         </div>
 
-        {/* Create Leave Type Modal */}
         <CreateLeaveTypeModal
           open={showCreateModal}
           onClose={() => setShowCreateModal(false)}
@@ -184,7 +185,6 @@ export function LeavePolicies() {
           onCreated={() => mutate()}
         />
 
-        {/* Delete Confirmation Modal */}
         <DeleteLeaveTypeModal
           open={showDeleteModal}
           onClose={() => setShowDeleteModal(false)}

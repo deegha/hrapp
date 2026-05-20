@@ -1,7 +1,10 @@
+export type TGender = "MALE" | "FEMALE" | "OTHER";
+
 export type TUser = {
   firstName: string;
   lastName: string;
   email: string;
+  gender: TGender;
   employeeId: number;
   organizationId: number;
   createdAt: string;
@@ -48,6 +51,7 @@ export type TCreateUser = {
   firstName: string;
   lastName: string;
   email: string;
+  gender: TGender;
   userRole: string;
   employmentTypeId: number;
 };
@@ -56,11 +60,13 @@ export type TUpdateUser = {
   firstName: string;
   lastName: string;
   email: string;
+  gender: TGender;
   userLevel?: string;
   employmentTypeId?: number;
 };
 
 export type TAllUserDetails = TUser & {
+  gender: TGender;
   userInformation: {
     id: number;
     salary: number;
