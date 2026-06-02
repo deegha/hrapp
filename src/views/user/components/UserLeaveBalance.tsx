@@ -6,7 +6,7 @@ interface UserLeaveBalanceProps {
 }
 
 export function UserLeaveBalance({employeeId}: UserLeaveBalanceProps) {
-  const {data, isLoading} = useSWR(employeeId ? `leave-balance-${employeeId}` : null, () =>
+  const {data, isLoading} = useSWR(employeeId ? `leave-balance` : null, () =>
     fetchUserLeaveBalance(employeeId),
   );
 
