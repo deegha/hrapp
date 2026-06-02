@@ -9,6 +9,7 @@ import {TUpdateUser} from "@/types";
 import {useNotificationStore} from "@/store/notificationStore";
 import {requestUserUpdate, updateUserByAdmin} from "@/services/userService";
 import {roles, RoleKey} from "@/utils/staticValues";
+import {User, Briefcase, Mail, Calendar} from "react-feather";
 
 export default function EditUser() {
   const router = useRouter();
@@ -40,6 +41,7 @@ export default function EditUser() {
       email: userData.data.email,
       userLevel: userData.data.userLevel,
       employmentTypeId: userData.data.EmploymentType?.id,
+      joinDate: userData.data.joinDate ? userData.data.joinDate.split("T")[0] : undefined,
     });
   }
 
@@ -76,35 +78,111 @@ export default function EditUser() {
     }
   };
 
+  const perm = permissionData?.data?.permission;
+  const isAdmin = perm === "ADMIN_USER" || perm === "SUPER_USER";
+
   return (
     <Layout>
-      <PageLayout pageName={`Edit User (EMP-${employeeId})`} breadcrumbFilter={breadcrumbFilter}>
+      <PageLayout pageName="Edit User" breadcrumbFilter={breadcrumbFilter}>
         <FormProvider {...methods}>
-          <form onSubmit={methods.handleSubmit(onSubmit)} className="flex max-w-2xl flex-col gap-5">
-            <FormInput name="firstName" label="First Name" />
-            <FormInput name="lastName" label="Last Name" />
-            <FormInput name="email" label="Email" type="email" />
-            <FormSelect
-              name="userLevel"
-              label="User Level"
-              options={Object.keys(roles).map((k) => ({
-                label: roles[k as RoleKey],
-                value: k,
-              }))}
-            />
-            <FormSelect
-              name="employmentTypeId"
-              label="Employment Type"
-              options={(employmentTypesData?.data || []).map(
-                (t: {id: number; typeLabel: string}) => ({
-                  label: t.typeLabel,
-                  value: t.id,
-                }),
+          <form onSubmit={methods.handleSubmit(onSubmit)} className="max-w-3xl space-y-6">
+            {/* Employee ID header */}
+            <div className="flex items-center gap-4 rounded-xl border border-border bg-white px-5 py-4 shadow-sm">
+              <div className="bg-primary/10 flex size-11 items-center justify-center rounded-full">
+                <User size={20} className="text-primary" />
+              </div>
+              <div>
+                <p className="text-xs text-textSecondary">Employee ID</p>
+                <p className="text-md font-semiBold text-textPrimary">EMP-{employeeId}</p>
+              </div>
+              {!isAdmin && (
+                <span className="bg-secondary/10 ml-auto rounded-full px-3 py-1 text-xs font-semibold text-secondary">
+                  Changes require approval
+                </span>
               )}
-            />
-            <Button type="submit" disabled={!methods.formState.isValid}>
-              Save Changes
-            </Button>
+            </div>
+
+            {/* Personal Information */}
+            <div className="overflow-hidden rounded-xl border border-border bg-white shadow-sm">
+              <div className="flex items-center gap-2 border-b border-border bg-background px-6 py-4">
+                <Mail size={15} className="text-primary" />
+                <h2 className="text-sm font-semiBold text-textPrimary">Personal Information</h2>
+              </div>
+              <div className="grid grid-cols-1 gap-5 p-6 sm:grid-cols-2">
+                <FormInput name="firstName" label="First Name" placeholder="Enter first name" />
+                <FormInput name="lastName" label="Last Name" placeholder="Enter last name" />
+                <div className="sm:col-span-2">
+                  <FormInput
+                    name="email"
+                    label="Email Address"
+                    type="email"
+                    placeholder="Enter email address"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Employment Details */}
+            <div className="overflow-hidden rounded-xl border border-border bg-white shadow-sm">
+              <div className="flex items-center gap-2 border-b border-border bg-background px-6 py-4">
+                <Briefcase size={15} className="text-primary" />
+                <h2 className="text-sm font-semiBold text-textPrimary">Employment Details</h2>
+              </div>
+              <div className="grid grid-cols-1 gap-5 p-6 sm:grid-cols-2">
+                <FormSelect
+                  name="userLevel"
+                  label="User Level"
+                  options={Object.keys(roles).map((k) => ({
+                    label: roles[k as RoleKey],
+                    value: k,
+                  }))}
+                />
+                <FormSelect
+                  name="employmentTypeId"
+                  label="Employment Type"
+                  options={(employmentTypesData?.data || []).map(
+                    (t: {id: number; typeLabel: string}) => ({
+                      label: t.typeLabel,
+                      value: t.id,
+                    }),
+                  )}
+                />
+                <div className="flex flex-col gap-1">
+                  <label
+                    htmlFor="joinDate"
+                    className="flex items-center gap-1.5 text-sm font-semibold text-textPrimary"
+                  >
+                    <Calendar size={13} className="text-primary" />
+                    Join Date
+                  </label>
+                  <input
+                    id="joinDate"
+                    type="date"
+                    {...methods.register("joinDate")}
+                    className="rounded-md border border-border bg-white p-2 text-sm text-textPrimary focus:outline-none focus:ring-2 focus:ring-primary"
+                  />
+                  {methods.formState.errors.joinDate && (
+                    <span className="text-xs font-semibold text-danger">
+                      {`${methods.formState.errors.joinDate.message}`}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center justify-end gap-3 pb-4">
+              <button
+                type="button"
+                onClick={() => router.back()}
+                className="rounded-md border border-border px-5 py-2 text-sm font-semibold text-textPrimary transition hover:bg-background"
+              >
+                Cancel
+              </button>
+              <Button type="submit" disabled={!methods.formState.isValid}>
+                {isAdmin ? "Save Changes" : "Request Update"}
+              </Button>
+            </div>
           </form>
         </FormProvider>
       </PageLayout>

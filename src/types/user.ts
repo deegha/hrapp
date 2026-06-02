@@ -50,6 +50,7 @@ export type TCreateUser = {
   email: string;
   userRole: string;
   employmentTypeId: number;
+  joinDate?: string;
 };
 
 export type TUpdateUser = {
@@ -58,9 +59,11 @@ export type TUpdateUser = {
   email: string;
   userLevel?: string;
   employmentTypeId?: number;
+  joinDate?: string;
 };
 
 export type TAllUserDetails = TUser & {
+  joinDate: string;
   userInformation: {
     id: number;
     salary: number;
