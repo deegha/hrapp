@@ -21,24 +21,27 @@ export function UserLeaveBalance({employeeId}: UserLeaveBalanceProps) {
       )}
       {balance && (
         <>
-          {balance.leaveTypeBalances.map((type) => (
-            <div
-              key={type.id}
-              className="flex items-center justify-between rounded-md border border-gray-200 px-4 py-3"
-            >
-              <span className="text-sm font-medium">{type.name}</span>
-              <div className="flex items-center gap-4 text-sm">
-                <span className="text-textSecondary">
-                  {type.usedDays} / {type.yearlyAllowance} used
-                </span>
-                <span
-                  className={`font-semibold ${type.remainingDays < 0 ? "text-red-500" : "text-green-600"}`}
+          {balance.leaveTypeBalances.map(
+            (type) =>
+              type.name !== "Lieu Leave" && (
+                <div
+                  key={type.id}
+                  className="flex items-center justify-between rounded-md border border-gray-200 px-4 py-3"
                 >
-                  {type.remainingDays} remaining
-                </span>
-              </div>
-            </div>
-          ))}
+                  <span className="text-sm font-medium">{type.name}</span>
+                  <div className="flex items-center gap-4 text-sm">
+                    <span className="text-textSecondary">
+                      {type.usedDays} / {type.yearlyAllowance} used
+                    </span>
+                    <span
+                      className={`font-semibold ${type.remainingDays < 0 ? "text-red-500" : "text-green-600"}`}
+                    >
+                      {type.remainingDays} remaining
+                    </span>
+                  </div>
+                </div>
+              ),
+          )}
           <div className="flex items-center justify-between rounded-md bg-gray-50 px-4 py-3">
             <span className="text-sm font-semibold">Total</span>
             <div className="flex items-center gap-4 text-sm">
