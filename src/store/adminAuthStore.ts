@@ -1,10 +1,11 @@
 import {create} from "zustand";
 
-type TOpsAdminUser = {
+export type TOpsAdminUser = {
+  id: number;
   firstName: string;
   lastName: string;
   email: string;
-  userRole: string;
+  userRole?: string;
 };
 
 interface AdminAuthState {

@@ -1,4 +1,5 @@
 export {InputField} from "./input/input";
+export {AdminLayout} from "./adminLayout/adminLayout";
 export {Button} from "./button/button";
 export {Layout} from "./layout/layout";
 export {Navigation} from "./navigation/navigation";
