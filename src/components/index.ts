@@ -34,3 +34,5 @@ export {FormBankSelect} from "./formBankSelect/formBankSelect";
 export {FormCurrencyInput} from "./formCurrencyInput/formCurrencyInput";
 export {FormAccountInput} from "./formAccountInput/formAccountInput";
 export {FormJobRoleSelect} from "./formJobRoleSelect/formJobRoleSelect";
+export {SalaryBreakdownPanel} from "./salaryBreakdown/SalaryBreakdownPanel";
+export {CompensationSection} from "./salaryBreakdown/CompensationSection";

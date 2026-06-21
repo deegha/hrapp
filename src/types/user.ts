@@ -54,6 +54,7 @@ export type TCreateUser = {
   joinDate?: string;
   jobRoleId?: number;
   salary?: number;
+  isFlatSalary?: boolean;
   nic?: string;
   epfNumber?: string;
   etfNumber?: string;
@@ -71,6 +72,7 @@ export type TUpdateUser = {
   joinDate?: string;
   jobRoleId?: number | null;
   salary?: number;
+  isFlatSalary?: boolean;
   nic?: string;
   epfNumber?: string;
   etfNumber?: string;
@@ -86,6 +88,7 @@ export type TAllUserDetails = TUser & {
   userInformation: {
     id: number;
     salary: number;
+    isFlatSalary: boolean;
     userId: number;
     nic?: string | null;
     epfNumber?: string | null;

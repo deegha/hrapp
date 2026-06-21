@@ -6,12 +6,14 @@ import {
   FormInput,
   FormSelect,
   FormBankSelect,
-  FormCurrencyInput,
   FormAccountInput,
   FormJobRoleSelect,
+  CompensationSection,
+  SalaryBreakdownPanel,
   StatusTag,
   DocumentUploader,
 } from "@/components";
+import {useSalaryBreakdown} from "@/hooks/useSalaryBreakdown";
 import {PendingDocumentSave} from "@/components/documentUpload/pendingDocumentSave";
 import {FormProvider, useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
@@ -44,7 +46,65 @@ import {
   FileText,
   Trash,
 } from "react-feather";
+import {TAllUserDetails} from "@/types/user";
 import {useState} from "react";
+
+function ReadCompensation({
+  user,
+  salaryRevealed,
+  setSalaryRevealed,
+}: {
+  user: TAllUserDetails;
+  salaryRevealed: boolean;
+  setSalaryRevealed: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
+  const salary = user.userInformation?.salary;
+  const isFlatSalary = user.userInformation?.isFlatSalary ?? false;
+  const {breakdown, isLoading} = useSalaryBreakdown(
+    salaryRevealed && !isFlatSalary ? salary : undefined,
+    isFlatSalary,
+  );
+
+  return (
+    <div className="overflow-hidden rounded-xl border border-border bg-white shadow-sm">
+      <div className="flex items-center gap-2 border-b border-border bg-background px-6 py-4">
+        <DollarSign size={15} className="text-primary" />
+        <h2 className="text-sm font-semiBold text-textPrimary">Compensation</h2>
+      </div>
+      <div className="px-6 pb-4">
+        <DetailRow
+          label="Gross Salary"
+          value={
+            salary !== undefined ? (
+              <span className="flex items-center gap-2">
+                <span className="font-mono tracking-widest">
+                  {salaryRevealed
+                    ? `LKR ${new Intl.NumberFormat("en-US").format(salary)}`
+                    : "LKR ••••••••"}
+                </span>
+                {isFlatSalary && (
+                  <span className="bg-primary/10 rounded-full px-2 py-0.5 text-xs text-primary">
+                    Flat
+                  </span>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setSalaryRevealed((v) => !v)}
+                  className="text-textSecondary transition hover:text-textPrimary"
+                >
+                  {salaryRevealed ? <EyeOff size={14} /> : <Eye size={14} />}
+                </button>
+              </span>
+            ) : null
+          }
+        />
+        {salaryRevealed && !isFlatSalary && (
+          <SalaryBreakdownPanel breakdown={breakdown} isLoading={isLoading} />
+        )}
+      </div>
+    </div>
+  );
+}
 
 const DetailRow = ({label, value}: {label: string; value: React.ReactNode}) => (
   <div className="flex items-start gap-5 border-t border-border py-3">
@@ -96,6 +156,7 @@ export default function UserDetails() {
       joinDate: user?.joinDate ? user.joinDate.split("T")[0] : undefined,
       jobRoleId: user?.jobRoleId ?? undefined,
       salary: info?.salary ?? undefined,
+      isFlatSalary: info?.isFlatSalary ?? false,
       nic: info?.nic ?? undefined,
       epfNumber: info?.epfNumber ?? undefined,
       etfNumber: info?.etfNumber ?? undefined,
@@ -314,17 +375,17 @@ export default function UserDetails() {
                   </div>
                 </div>
 
-                {/* Financial & Personal Details (admin only) */}
+                {/* Compensation (admin only) */}
+                {isAdmin && <CompensationSection />}
+
+                {/* Personal Details (admin only) */}
                 {isAdmin && (
                   <div className="rounded-xl border border-border bg-white shadow-sm">
                     <div className="flex items-center gap-2 border-b border-border bg-background px-6 py-4">
-                      <DollarSign size={15} className="text-primary" />
-                      <h2 className="text-sm font-semiBold text-textPrimary">
-                        Financial &amp; Personal Details
-                      </h2>
+                      <Calendar size={15} className="text-primary" />
+                      <h2 className="text-sm font-semiBold text-textPrimary">Personal Details</h2>
                     </div>
                     <div className="grid grid-cols-1 gap-5 p-6 sm:grid-cols-2">
-                      <FormCurrencyInput name="salary" label="Salary (LKR)" />
                       <FormInput name="nic" label="NIC Number" placeholder="Enter NIC number" />
                       <FormInput
                         name="epfNumber"
@@ -413,38 +474,23 @@ export default function UserDetails() {
                 </div>
               </div>
 
-              {/* Financial & Personal Details (admin only) */}
+              {/* Compensation read-mode (admin only) */}
+              {isAdmin && (
+                <ReadCompensation
+                  user={user}
+                  salaryRevealed={salaryRevealed}
+                  setSalaryRevealed={setSalaryRevealed}
+                />
+              )}
+
+              {/* Personal Details read-mode (admin only) */}
               {isAdmin && (
                 <div className="overflow-hidden rounded-xl border border-border bg-white shadow-sm">
                   <div className="flex items-center gap-2 border-b border-border bg-background px-6 py-4">
-                    <DollarSign size={15} className="text-primary" />
-                    <h2 className="text-sm font-semiBold text-textPrimary">
-                      Financial &amp; Personal Details
-                    </h2>
+                    <Calendar size={15} className="text-primary" />
+                    <h2 className="text-sm font-semiBold text-textPrimary">Personal Details</h2>
                   </div>
                   <div className="px-6 pb-3">
-                    <DetailRow
-                      label="Salary (LKR)"
-                      value={
-                        user.userInformation?.salary !== undefined ? (
-                          <span className="flex items-center gap-2">
-                            <span className="font-mono tracking-widest">
-                              {salaryRevealed
-                                ? `LKR ${new Intl.NumberFormat("en-US").format(user.userInformation.salary)}`
-                                : "LKR ••••••••"}
-                            </span>
-                            <button
-                              type="button"
-                              onClick={() => setSalaryRevealed((v) => !v)}
-                              className="text-textSecondary transition hover:text-textPrimary"
-                              title={salaryRevealed ? "Hide salary" : "Reveal salary"}
-                            >
-                              {salaryRevealed ? <EyeOff size={14} /> : <Eye size={14} />}
-                            </button>
-                          </span>
-                        ) : null
-                      }
-                    />
                     <DetailRow label="NIC Number" value={user.userInformation?.nic} />
                     <DetailRow label="EPF Number" value={user.userInformation?.epfNumber} />
                     <DetailRow label="ETF Number" value={user.userInformation?.etfNumber} />
