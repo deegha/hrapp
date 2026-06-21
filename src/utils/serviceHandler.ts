@@ -2,7 +2,7 @@ import {useAuthStore} from "@/store/authstore";
 import {getAuthToken} from "@/utils/getAuthToken";
 
 interface IFetchApi<TBody> {
-  method: "POST" | "GET" | "PUT" | "DELETE";
+  method: "POST" | "GET" | "PUT" | "DELETE" | "PATCH";
   baseURL: string;
   resource: string;
   body?: TBody;
