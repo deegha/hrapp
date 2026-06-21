@@ -104,7 +104,7 @@ export default function CreateUser() {
             </div>
 
             {/* Employment Details */}
-            <div className="overflow-hidden rounded-xl border border-border bg-white shadow-sm">
+            <div className="rounded-xl border border-border bg-white shadow-sm">
               <div className="flex items-center gap-2 border-b border-border bg-background px-6 py-4">
                 <Briefcase size={15} className="text-primary" />
                 <h2 className="text-sm font-semiBold text-textPrimary">Employment Details</h2>
