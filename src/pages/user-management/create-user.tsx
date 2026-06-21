@@ -4,9 +4,9 @@ import {
   Button,
   FormInput,
   FormBankSelect,
-  FormCurrencyInput,
   FormAccountInput,
   FormJobRoleSelect,
+  CompensationSection,
 } from "@/components";
 import {useForm, FormProvider} from "react-hook-form";
 import {userSchema} from "@/utils/formvalidations/userSchema";
@@ -19,7 +19,7 @@ import {useNotificationStore} from "@/store/notificationStore";
 import {useState} from "react";
 import {IOption} from "@/types/ui";
 import {useRouter} from "next/router";
-import {User, Briefcase, Users, Calendar, DollarSign} from "react-feather";
+import {User, Briefcase, Users, Calendar, CreditCard} from "react-feather";
 import useSWR from "swr";
 
 const todayISO = new Date().toISOString().split("T")[0];
@@ -148,16 +148,16 @@ export default function CreateUser() {
               </div>
             </div>
 
-            {/* Financial & Personal Details */}
+            {/* Compensation */}
+            <CompensationSection />
+
+            {/* Personal Details */}
             <div className="rounded-xl border border-border bg-white shadow-sm">
               <div className="flex items-center gap-2 border-b border-border bg-background px-6 py-4">
-                <DollarSign size={15} className="text-primary" />
-                <h2 className="text-sm font-semiBold text-textPrimary">
-                  Financial &amp; Personal Details
-                </h2>
+                <CreditCard size={15} className="text-primary" />
+                <h2 className="text-sm font-semiBold text-textPrimary">Personal Details</h2>
               </div>
               <div className="grid grid-cols-1 gap-5 p-6 sm:grid-cols-2">
-                <FormCurrencyInput name="salary" label="Salary (LKR)" />
                 <FormInput name="nic" label="NIC Number" placeholder="Enter NIC number" />
                 <FormInput name="epfNumber" label="EPF Number" placeholder="Enter EPF number" />
                 <FormInput name="etfNumber" label="ETF Number" placeholder="Enter ETF number" />

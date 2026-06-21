@@ -1,5 +1,6 @@
-import {PageLayout, Button, StatusTag, Shimmer} from "@/components";
+import {PageLayout, Button, StatusTag, Shimmer, SalaryBreakdownPanel} from "@/components";
 import {fetchUser} from "@/services";
+import {useSalaryBreakdown} from "@/hooks/useSalaryBreakdown";
 import {getAuthUser} from "@/utils/getAuthUser";
 import useSWR, {mutate} from "swr";
 import Link from "next/link";
@@ -30,6 +31,12 @@ export function UserProfile() {
   });
 
   const user = userData?.data;
+  const salary = user?.userInformation?.salary;
+  const isFlatSalary = user?.userInformation?.isFlatSalary ?? false;
+  const {breakdown, isLoading: breakdownLoading} = useSalaryBreakdown(
+    salaryRevealed && !isFlatSalary ? salary : undefined,
+    isFlatSalary,
+  );
 
   const userLevel = roles[user?.userLevel as keyof typeof roles] || user?.userLevel;
 
@@ -150,22 +157,28 @@ export function UserProfile() {
           )}
         </div>
 
+        {/* Compensation */}
         <div className="flex flex-col gap-5">
-          <h2 className="text-md font-bold">Financial &amp; Personal Details</h2>
+          <h2 className="text-md font-bold">Compensation</h2>
           {!user ? (
             <Shimmer />
           ) : (
             <div>
               <ProfileRow
-                label="Salary (LKR)"
+                label="Gross Salary"
                 value={
-                  user.userInformation?.salary !== undefined ? (
+                  salary !== undefined ? (
                     <span className="flex items-center gap-2">
                       <span className="font-mono tracking-widest">
                         {salaryRevealed
-                          ? `LKR ${new Intl.NumberFormat("en-US").format(user.userInformation.salary)}`
+                          ? `LKR ${new Intl.NumberFormat("en-US").format(salary)}`
                           : "LKR ••••••••"}
                       </span>
+                      {isFlatSalary && (
+                        <span className="bg-primary/10 rounded-full px-2 py-0.5 text-xs text-primary">
+                          Flat
+                        </span>
+                      )}
                       <button
                         type="button"
                         onClick={() => setSalaryRevealed((v) => !v)}
@@ -180,6 +193,20 @@ export function UserProfile() {
                   )
                 }
               />
+              {salaryRevealed && !isFlatSalary && (
+                <SalaryBreakdownPanel breakdown={breakdown} isLoading={breakdownLoading} />
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Personal Details */}
+        <div className="flex flex-col gap-5">
+          <h2 className="text-md font-bold">Personal Details</h2>
+          {!user ? (
+            <Shimmer />
+          ) : (
+            <div>
               <ProfileRow label="NIC Number" value={user.userInformation?.nic || "N/A"} />
               <ProfileRow label="EPF Number" value={user.userInformation?.epfNumber || "N/A"} />
               <ProfileRow label="ETF Number" value={user.userInformation?.etfNumber || "N/A"} />
