@@ -10,7 +10,7 @@ import {createMyDocument, deleteMyDocument, downloadMyDocument} from "@/services
 import {useNotificationStore} from "@/store/notificationStore";
 import {useConfirmationModalStore} from "@/store/useConfirmationModalStore";
 import {useState} from "react";
-import {Trash} from "react-feather";
+import {Trash, Eye, EyeOff} from "react-feather";
 
 export function UserProfile() {
   const {showNotification} = useNotificationStore();
@@ -18,6 +18,7 @@ export function UserProfile() {
   const [uploadingDocument, setUploadingDocument] = useState(false);
   const [documentTitle, setDocumentTitle] = useState("");
   const [pendingDocumentUrl, setPendingDocumentUrl] = useState("");
+  const [salaryRevealed, setSalaryRevealed] = useState(false);
   const [uploaderKey, setUploaderKey] = useState(0);
 
   const {data: userData} = useSWR(`fetch-auth-user`, async () => {
@@ -145,6 +146,61 @@ export function UserProfile() {
               />
 
               <ProfileRow label="Joined At" value={new Date(user.createdAt).toLocaleDateString()} />
+            </div>
+          )}
+        </div>
+
+        <div className="flex flex-col gap-5">
+          <h2 className="text-md font-bold">Financial &amp; Personal Details</h2>
+          {!user ? (
+            <Shimmer />
+          ) : (
+            <div>
+              <ProfileRow
+                label="Salary (LKR)"
+                value={
+                  user.userInformation?.salary !== undefined ? (
+                    <span className="flex items-center gap-2">
+                      <span className="font-mono tracking-widest">
+                        {salaryRevealed
+                          ? `LKR ${new Intl.NumberFormat("en-US").format(user.userInformation.salary)}`
+                          : "LKR ••••••••"}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setSalaryRevealed((v) => !v)}
+                        className="text-textSecondary transition hover:text-textPrimary"
+                        title={salaryRevealed ? "Hide salary" : "Reveal salary"}
+                      >
+                        {salaryRevealed ? <EyeOff size={14} /> : <Eye size={14} />}
+                      </button>
+                    </span>
+                  ) : (
+                    "N/A"
+                  )
+                }
+              />
+              <ProfileRow label="NIC Number" value={user.userInformation?.nic || "N/A"} />
+              <ProfileRow label="EPF Number" value={user.userInformation?.epfNumber || "N/A"} />
+              <ProfileRow label="ETF Number" value={user.userInformation?.etfNumber || "N/A"} />
+              <ProfileRow
+                label="Date of Birth"
+                value={
+                  user.userInformation?.dateOfBirth
+                    ? new Date(user.userInformation.dateOfBirth).toLocaleDateString()
+                    : "N/A"
+                }
+              />
+              <ProfileRow label="Bank" value={user.userInformation?.bank || "N/A"} />
+              <ProfileRow
+                label="Bank Account Number"
+                value={
+                  user.userInformation?.bankAccountNumber
+                    ? (user.userInformation.bankAccountNumber.match(/.{1,4}/g)?.join(" ") ??
+                      user.userInformation.bankAccountNumber)
+                    : "N/A"
+                }
+              />
             </div>
           )}
         </div>

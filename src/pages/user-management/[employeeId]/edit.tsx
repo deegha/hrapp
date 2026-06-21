@@ -1,4 +1,14 @@
-import {Layout, PageLayout, Button, Shimmer, FormInput, FormSelect} from "@/components";
+import {
+  Layout,
+  PageLayout,
+  Button,
+  Shimmer,
+  FormInput,
+  FormSelect,
+  FormBankSelect,
+  FormCurrencyInput,
+  FormAccountInput,
+} from "@/components";
 import {FormProvider, useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
 import {editUserSchema} from "@/utils/formvalidations/userSchema";
@@ -9,7 +19,7 @@ import {TUpdateUser} from "@/types";
 import {useNotificationStore} from "@/store/notificationStore";
 import {requestUserUpdate, updateUserByAdmin} from "@/services/userService";
 import {roles, RoleKey} from "@/utils/staticValues";
-import {User, Briefcase, Mail, Calendar} from "react-feather";
+import {User, Briefcase, Mail, Calendar, DollarSign} from "react-feather";
 
 export default function EditUser() {
   const router = useRouter();
@@ -35,6 +45,7 @@ export default function EditUser() {
     );
 
   if (!methods.getValues("firstName") && userData?.data) {
+    const info = userData.data.userInformation;
     methods.reset({
       firstName: userData.data.firstName,
       lastName: userData.data.lastName,
@@ -42,6 +53,15 @@ export default function EditUser() {
       userLevel: userData.data.userLevel,
       employmentTypeId: userData.data.EmploymentType?.id,
       joinDate: userData.data.joinDate ? userData.data.joinDate.split("T")[0] : undefined,
+      salary: info?.salary ?? undefined,
+      nic: info?.nic ?? undefined,
+      epfNumber: info?.epfNumber ?? undefined,
+      etfNumber: info?.etfNumber ?? undefined,
+      dateOfBirth: info?.dateOfBirth
+        ? new Date(info.dateOfBirth).toISOString().split("T")[0]
+        : undefined,
+      bankAccountNumber: info?.bankAccountNumber ?? undefined,
+      bank: info?.bank ?? undefined,
     });
   }
 
@@ -169,6 +189,43 @@ export default function EditUser() {
                 </div>
               </div>
             </div>
+
+            {/* Financial & Personal Details */}
+            {isAdmin && (
+              <div className="rounded-xl border border-border bg-white shadow-sm">
+                <div className="flex items-center gap-2 border-b border-border bg-background px-6 py-4">
+                  <DollarSign size={15} className="text-primary" />
+                  <h2 className="text-sm font-semiBold text-textPrimary">
+                    Financial &amp; Personal Details
+                  </h2>
+                </div>
+                <div className="grid grid-cols-1 gap-5 p-6 sm:grid-cols-2">
+                  <FormCurrencyInput name="salary" label="Salary (LKR)" />
+                  <FormInput name="nic" label="NIC Number" placeholder="Enter NIC number" />
+                  <FormInput name="epfNumber" label="EPF Number" placeholder="Enter EPF number" />
+                  <FormInput name="etfNumber" label="ETF Number" placeholder="Enter ETF number" />
+                  <div className="flex flex-col gap-1">
+                    <label
+                      htmlFor="dateOfBirth"
+                      className="flex items-center gap-1.5 text-sm font-semibold text-textPrimary"
+                    >
+                      <Calendar size={13} className="text-primary" />
+                      Date of Birth
+                    </label>
+                    <input
+                      id="dateOfBirth"
+                      type="date"
+                      {...methods.register("dateOfBirth")}
+                      className="rounded-md border border-border bg-white p-2 text-sm text-textPrimary focus:outline-none focus:ring-2 focus:ring-primary"
+                    />
+                  </div>
+                  <FormAccountInput name="bankAccountNumber" label="Bank Account Number" />
+                  <div className="sm:col-span-2">
+                    <FormBankSelect name="bank" label="Bank" />
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Actions */}
             <div className="flex items-center justify-end gap-3 pb-4">

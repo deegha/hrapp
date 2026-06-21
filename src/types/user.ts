@@ -51,6 +51,13 @@ export type TCreateUser = {
   userRole: string;
   employmentTypeId: number;
   joinDate?: string;
+  salary?: number;
+  nic?: string;
+  epfNumber?: string;
+  etfNumber?: string;
+  dateOfBirth?: string;
+  bankAccountNumber?: string;
+  bank?: string;
 };
 
 export type TUpdateUser = {
@@ -60,6 +67,13 @@ export type TUpdateUser = {
   userLevel?: string;
   employmentTypeId?: number;
   joinDate?: string;
+  salary?: number;
+  nic?: string;
+  epfNumber?: string;
+  etfNumber?: string;
+  dateOfBirth?: string;
+  bankAccountNumber?: string;
+  bank?: string;
 };
 
 export type TAllUserDetails = TUser & {
@@ -68,6 +82,12 @@ export type TAllUserDetails = TUser & {
     id: number;
     salary: number;
     userId: number;
+    nic?: string | null;
+    epfNumber?: string | null;
+    etfNumber?: string | null;
+    dateOfBirth?: string | null;
+    bankAccountNumber?: string | null;
+    bank?: string | null;
   } | null;
   documents?: {
     id: number;

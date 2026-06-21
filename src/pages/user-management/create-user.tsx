@@ -1,6 +1,13 @@
-import {Layout, PageLayout, Button} from "@/components";
+import {
+  Layout,
+  PageLayout,
+  Button,
+  FormInput,
+  FormBankSelect,
+  FormCurrencyInput,
+  FormAccountInput,
+} from "@/components";
 import {useForm, FormProvider} from "react-hook-form";
-import {FormInput} from "@/components";
 import {userSchema} from "@/utils/formvalidations/userSchema";
 import {yupResolver} from "@hookform/resolvers/yup";
 import {UserRole, EmploymentType, UserManager} from "@/views/";
@@ -10,7 +17,7 @@ import {useNotificationStore} from "@/store/notificationStore";
 import {useState} from "react";
 import {IOption} from "@/types/ui";
 import {useRouter} from "next/router";
-import {User, Briefcase, Users, Calendar} from "react-feather";
+import {User, Briefcase, Users, Calendar, DollarSign} from "react-feather";
 
 const todayISO = new Date().toISOString().split("T")[0];
 
@@ -131,6 +138,41 @@ export default function CreateUser() {
               </div>
               <div className="p-6">
                 <UserManager assignManager={setManager} selectedManager={manager} />
+              </div>
+            </div>
+
+            {/* Financial & Personal Details */}
+            <div className="rounded-xl border border-border bg-white shadow-sm">
+              <div className="flex items-center gap-2 border-b border-border bg-background px-6 py-4">
+                <DollarSign size={15} className="text-primary" />
+                <h2 className="text-sm font-semiBold text-textPrimary">
+                  Financial &amp; Personal Details
+                </h2>
+              </div>
+              <div className="grid grid-cols-1 gap-5 p-6 sm:grid-cols-2">
+                <FormCurrencyInput name="salary" label="Salary (LKR)" />
+                <FormInput name="nic" label="NIC Number" placeholder="Enter NIC number" />
+                <FormInput name="epfNumber" label="EPF Number" placeholder="Enter EPF number" />
+                <FormInput name="etfNumber" label="ETF Number" placeholder="Enter ETF number" />
+                <div className="flex flex-col gap-1">
+                  <label
+                    htmlFor="dateOfBirth"
+                    className="flex items-center gap-1.5 text-sm font-semibold text-textPrimary"
+                  >
+                    <Calendar size={13} className="text-primary" />
+                    Date of Birth
+                  </label>
+                  <input
+                    id="dateOfBirth"
+                    type="date"
+                    {...methods.register("dateOfBirth")}
+                    className="rounded-md border border-border bg-white p-2 text-sm text-textPrimary focus:outline-none focus:ring-2 focus:ring-primary"
+                  />
+                </div>
+                <FormAccountInput name="bankAccountNumber" label="Bank Account Number" />
+                <div className="sm:col-span-2">
+                  <FormBankSelect name="bank" label="Bank" />
+                </div>
               </div>
             </div>
 
