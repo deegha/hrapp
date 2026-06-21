@@ -27,6 +27,7 @@ export function Users({users}: IUsers) {
             <>
               <span>EMPID: {user.employeeId}</span>
               <span>{user.email}</span>
+              {user.JobRole && <span>{user.JobRole.title}</span>}
               {user.EmploymentType && <span>Type: {user.EmploymentType.typeLabel}</span>}
               {user.Department && <span>Department: {user.Department.departmentName}</span>}
               {user.manager && (

@@ -8,6 +8,7 @@ import {
   FormBankSelect,
   FormCurrencyInput,
   FormAccountInput,
+  FormJobRoleSelect,
   StatusTag,
   DocumentUploader,
 } from "@/components";
@@ -25,6 +26,7 @@ import {
   deleteUserDocument,
   downloadEmployeeDocument,
 } from "@/services/userService";
+import {fetchJobRoles} from "@/services/organizationService";
 import {TUpdateUser} from "@/types";
 import {useNotificationStore} from "@/store/notificationStore";
 import {useConfirmationModalStore} from "@/store/useConfirmationModalStore";
@@ -73,9 +75,13 @@ export default function UserDetails() {
   );
   const {data: permissionData} = useSWR("my-permissions", fetchMyPermissions);
   const {data: employmentTypesData} = useSWR("fetch-employment-types", fetchEmploymentTypes);
+  const {data: jobRolesData} = useSWR("job-roles", fetchJobRoles);
 
   const perm = permissionData?.data?.permission;
   const isAdmin = perm === "ADMIN_USER" || perm === "SUPER_USER";
+  const isAdminOrL2 = ["ADMIN_USER", "SUPER_USER", "ADMIN_USER_L2"].includes(perm ?? "");
+
+  const jobRoles = jobRolesData?.data ?? [];
 
   const user = userData?.data;
 
@@ -88,6 +94,7 @@ export default function UserDetails() {
       userLevel: user?.userLevel,
       employmentTypeId: user?.EmploymentType?.id,
       joinDate: user?.joinDate ? user.joinDate.split("T")[0] : undefined,
+      jobRoleId: user?.jobRoleId ?? undefined,
       salary: info?.salary ?? undefined,
       nic: info?.nic ?? undefined,
       epfNumber: info?.epfNumber ?? undefined,
@@ -301,6 +308,9 @@ export default function UserDetails() {
                         className="rounded-md border border-border bg-white p-2 text-sm text-textPrimary focus:outline-none focus:ring-2 focus:ring-primary"
                       />
                     </div>
+                    {isAdminOrL2 && jobRoles.length > 0 && (
+                      <FormJobRoleSelect name="jobRoleId" jobRoles={jobRoles} />
+                    )}
                   </div>
                 </div>
 
@@ -399,6 +409,7 @@ export default function UserDetails() {
                     label="Join Date"
                     value={user.joinDate ? new Date(user.joinDate).toLocaleDateString() : null}
                   />
+                  {user.JobRole && <DetailRow label="Job Title" value={user.JobRole.title} />}
                 </div>
               </div>
 

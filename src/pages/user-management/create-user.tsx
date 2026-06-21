@@ -6,6 +6,7 @@ import {
   FormBankSelect,
   FormCurrencyInput,
   FormAccountInput,
+  FormJobRoleSelect,
 } from "@/components";
 import {useForm, FormProvider} from "react-hook-form";
 import {userSchema} from "@/utils/formvalidations/userSchema";
@@ -13,11 +14,13 @@ import {yupResolver} from "@hookform/resolvers/yup";
 import {UserRole, EmploymentType, UserManager} from "@/views/";
 import {TCreateUser} from "@/types/";
 import {createUserService, assignManager} from "@/services";
+import {fetchJobRoles} from "@/services/organizationService";
 import {useNotificationStore} from "@/store/notificationStore";
 import {useState} from "react";
 import {IOption} from "@/types/ui";
 import {useRouter} from "next/router";
 import {User, Briefcase, Users, Calendar, DollarSign} from "react-feather";
+import useSWR from "swr";
 
 const todayISO = new Date().toISOString().split("T")[0];
 
@@ -30,6 +33,9 @@ export default function CreateUser() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [manager, setManager] = useState<IOption>();
+
+  const {data: jobRolesData} = useSWR("job-roles", fetchJobRoles);
+  const jobRoles = jobRolesData?.data ?? [];
 
   const onSubmit = async (data: TCreateUser) => {
     try {
@@ -127,6 +133,7 @@ export default function CreateUser() {
                     className="rounded-md border border-border bg-white p-2 text-sm text-textPrimary focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
+                {jobRoles.length > 0 && <FormJobRoleSelect name="jobRoleId" jobRoles={jobRoles} />}
               </div>
             </div>
 

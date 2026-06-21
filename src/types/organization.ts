@@ -61,6 +61,25 @@ export type TUpdateDepartmentPayload = {
   departmentName: string;
 };
 
+export type TJobRole = {
+  id: number;
+  title: string;
+  description?: string | null;
+  organizationId: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type TCreateJobRolePayload = {
+  title: string;
+  description?: string;
+};
+
+export type TUpdateJobRolePayload = {
+  title: string;
+  description?: string;
+};
+
 export type TOrganizationLocationSettingsPayload = {
   centerLat: number;
   centerLon: number;

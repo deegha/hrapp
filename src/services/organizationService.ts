@@ -12,6 +12,9 @@ import {
   TUpdateDepartmentPayload,
   TOrganizationLocationSettingsPayload,
   TOrganizationLocationSettings,
+  TJobRole,
+  TCreateJobRolePayload,
+  TUpdateJobRolePayload,
 } from "@/types/organization";
 
 export type THoliday = {
@@ -129,6 +132,40 @@ export async function deleteDepartment(id: number) {
     method: "DELETE",
     baseURL: process.env.NEXT_PUBLIC_API as string,
     resource: `organization/departments/${id}`,
+  });
+}
+
+export async function fetchJobRoles() {
+  return await serviceHandler<TResponse<TJobRole[]>>({
+    method: "GET",
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: "organization/job-roles",
+  });
+}
+
+export async function createJobRole(payload: TCreateJobRolePayload) {
+  return await serviceHandler<TResponse<TJobRole>, TCreateJobRolePayload>({
+    method: "POST",
+    body: payload,
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: "organization/job-roles",
+  });
+}
+
+export async function updateJobRole(id: number, payload: TUpdateJobRolePayload) {
+  return await serviceHandler<TResponse<TJobRole>, TUpdateJobRolePayload>({
+    method: "PUT",
+    body: payload,
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: `organization/job-roles/${id}`,
+  });
+}
+
+export async function deleteJobRole(id: number) {
+  return await serviceHandler<TResponse<{message: string}>>({
+    method: "DELETE",
+    baseURL: process.env.NEXT_PUBLIC_API as string,
+    resource: `organization/job-roles/${id}`,
   });
 }
 

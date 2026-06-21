@@ -33,3 +33,4 @@ export {SelectDropdown} from "./selectDropdown/selectDropdown";
 export {FormBankSelect} from "./formBankSelect/formBankSelect";
 export {FormCurrencyInput} from "./formCurrencyInput/formCurrencyInput";
 export {FormAccountInput} from "./formAccountInput/formAccountInput";
+export {FormJobRoleSelect} from "./formJobRoleSelect/formJobRoleSelect";

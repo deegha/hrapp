@@ -25,6 +25,7 @@ export type TUser = {
     lastName: string;
     email: string;
   };
+  JobRole?: {id: number; title: string} | null;
   activityLogs?: {
     id: number;
     createdAt: string;
@@ -51,6 +52,7 @@ export type TCreateUser = {
   userRole: string;
   employmentTypeId: number;
   joinDate?: string;
+  jobRoleId?: number;
   salary?: number;
   nic?: string;
   epfNumber?: string;
@@ -67,6 +69,7 @@ export type TUpdateUser = {
   userLevel?: string;
   employmentTypeId?: number;
   joinDate?: string;
+  jobRoleId?: number | null;
   salary?: number;
   nic?: string;
   epfNumber?: string;
@@ -78,6 +81,8 @@ export type TUpdateUser = {
 
 export type TAllUserDetails = TUser & {
   joinDate: string;
+  jobRoleId?: number | null;
+  JobRole?: {id: number; title: string; description?: string | null} | null;
   userInformation: {
     id: number;
     salary: number;
