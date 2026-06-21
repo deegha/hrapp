@@ -145,7 +145,7 @@ const GoogleTargetLocationSetter: React.FC = () => {
 
   return (
     <div className="mx-auto max-w-3xl space-y-4 overflow-hidden rounded-xl">
-      <div className="max-w-[400px] overflow-hidden rounded-lg border border-gray-300">
+      <div className="overflow-hidden rounded-lg border border-gray-300">
         <GoogleMap
           mapContainerStyle={containerStyle}
           center={selectedLocation} // Center map on Sri Lanka

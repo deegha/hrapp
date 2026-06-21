@@ -79,10 +79,10 @@ export function UserHome() {
 
   return (
     <PageLayout pageName="Home">
-      <div className="mx-auto max-w-4xl">
+      <div className="">
         <div className="mb-6">
           {isAdmin ? (
-            <p className="max-w-[250px] text-sm text-textSecondary">
+            <p className="text-sm text-textSecondary">
               Get a complete overview of your leave balance, upcoming time off, pending approvals,
               and <br />
               team leave schedule—all in one place. Stay informed and manage your time off
