@@ -1,6 +1,6 @@
 import {Navigation} from "@/components";
 import {useRouter} from "next/router";
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import {checkAuthServiceCall, logOutServiceCall} from "@/services/";
 import {useAuthStore} from "@/store/authstore";
 import {LogOut, Menu, X} from "react-feather";
@@ -17,6 +17,16 @@ export function Layout({children}: IPrps) {
   const {showNotification} = useNotificationStore();
   const [showMenu, setShowMenu] = useState(false);
 
+  const doLogout = useCallback(async () => {
+    try {
+      await logOutServiceCall();
+    } catch {
+      // Continue logout even if API fails
+    }
+    logout();
+    router.push("/login");
+  }, [logout, router]);
+
   useEffect(() => {
     const handleAuth = async () => {
       try {
@@ -28,29 +38,14 @@ export function Layout({children}: IPrps) {
             message: res.data,
           });
           doLogout();
-          logout();
-          router.push("/login");
         }
       } catch {
-        logout();
         doLogout();
       }
     };
 
     handleAuth();
-  }, [logout, router, showNotification]);
-
-  async function doLogout() {
-    try {
-      await logOutServiceCall();
-    } catch {
-      // Continue logout even if API fails
-    }
-    logout();
-    router.push("/login");
-  }
-
-  console.log(showMenu, "showMenu");
+  }, [doLogout, showNotification]);
 
   return (
     <div className="flex h-screen w-full flex-col md:flex-row">

@@ -1,15 +1,12 @@
 import {StatusTag, Button, Detail} from "@/components";
-import {useConfirmationModalStore} from "@/store/useConfirmationModalStore";
-import {Trash, Edit, Calendar} from "react-feather";
+import {Info, Calendar} from "react-feather";
 import {
-  deleteUser,
   fetchEmploymentTypes,
   fetchUserPendingApprovals,
   fetchMyPermissions,
 } from "@/services/userService";
 import {fetchDepartments} from "@/services/organizationService";
 import {usePagination} from "@/hooks/usePagination";
-import {useNotificationStore} from "@/store/notificationStore";
 import {mutate} from "swr";
 import {useUserStore} from "@/store/useUserStore";
 import useSWR from "swr";
@@ -25,10 +22,8 @@ import {useRouter} from "next/router";
 import {UserLeaveBalance} from "@/views/user/components/UserLeaveBalance";
 
 export function UserDetails() {
-  const {openModal} = useConfirmationModalStore();
   const {activePage} = usePagination();
-  const {showNotification} = useNotificationStore();
-  const {unsetUser, user, setActiveUser} = useUserStore();
+  const {user, setActiveUser} = useUserStore();
   const router = useRouter();
 
   const {data: employmentTypesData} = useSWR("fetch-employment-types", fetchEmploymentTypes);
@@ -45,37 +40,6 @@ export function UserDetails() {
     removeDepartment,
     canRemoveDepartment,
   } = useDepartmentAssignment();
-
-  const handleDeleteUser = () => {
-    openModal({
-      title: "Delete user ?",
-      description: "Are you sure you want to delete this user",
-      onConfirm: async () => {
-        try {
-          const response = await deleteUser(user.employeeId);
-          if (response.error) {
-            showNotification({
-              type: "error",
-              message: "Something went wrong when deleting user",
-            });
-            return;
-          }
-
-          mutate(`fetch-users${activePage}`);
-          showNotification({
-            type: "success",
-            message: "Successfully deleted user",
-          });
-          unsetUser();
-        } catch {
-          showNotification({
-            type: "error",
-            message: "Something went wrong when deleting user",
-          });
-        }
-      },
-    });
-  };
 
   const refreshUserDetails = async () => {
     await setActiveUser(user.employeeId.toString());
@@ -175,11 +139,11 @@ export function UserDetails() {
         {canEdit && (
           <Button
             variant="secondary"
-            onClick={() => router.push(`/user-management/${user.employeeId}/edit`)}
+            onClick={() => router.push(`/user-management/${user.employeeId}/employeeProfile`)}
           >
             <div className="flex items-center gap-1">
-              <Edit size={14} />
-              Edit
+              <Info size={14} />
+              Employee Profile
             </div>
           </Button>
         )}
@@ -192,15 +156,6 @@ export function UserDetails() {
           userStatus={user.UserStatus?.statusLabel}
           onPromoted={refreshUserDetails}
         />
-
-        {user.UserStatus?.statusLabel !== "DELETED" && (
-          <Button variant="danger" onClick={handleDeleteUser}>
-            <div className="flex items-center gap-1">
-              <Trash size={14} />
-              Delete
-            </div>
-          </Button>
-        )}
       </div>
     </div>
   );

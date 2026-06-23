@@ -9,6 +9,7 @@ import {
   ApprovalDetailsDepartment,
   ApprovalDetailsUserUpdate,
   ApprovalDetailsWFH,
+  ApprovalDetailsPayroll,
 } from "@/views/approvals";
 import moment from "moment";
 
@@ -34,6 +35,8 @@ export default function Home() {
             <ApprovalDetailsUserUpdate />
           ) : approval.type === "WFH_REQUEST" ? (
             <ApprovalDetailsWFH />
+          ) : approval.type === "PAYROLL" ? (
+            <ApprovalDetailsPayroll />
           ) : (
             <ApprovalDetailsUser />
           )}

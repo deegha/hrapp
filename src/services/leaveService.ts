@@ -22,7 +22,9 @@ type TCreateLeaveRequestPayload = {
 export type TLeaveTypeBalance = {
   id: number;
   name: string;
-  yearlyAllowance: number;
+  baseAllowance: number; // policy-based allowance before adjustments
+  netAdjustment: number; // sum of all admin credit/debit adjustments
+  yearlyAllowance: number; // baseAllowance + netAdjustment
   usedDays: number;
   remainingDays: number;
 };

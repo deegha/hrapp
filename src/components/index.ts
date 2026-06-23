@@ -36,3 +36,4 @@ export {FormAccountInput} from "./formAccountInput/formAccountInput";
 export {FormJobRoleSelect} from "./formJobRoleSelect/formJobRoleSelect";
 export {SalaryBreakdownPanel} from "./salaryBreakdown/SalaryBreakdownPanel";
 export {CompensationSection} from "./salaryBreakdown/CompensationSection";
+export {LeaveAdjustModal} from "./LeaveAdjustModal";

@@ -175,3 +175,29 @@ export type TChangePasswordPayload = {currentPassword: string; newPassword: stri
 export async function changeAdminPassword(payload: TChangePasswordPayload) {
   return adminFetch<TApiResponse<string>>("admin/me/password", "PUT", payload);
 }
+
+export type TOrgFeatures = {
+  isAttendanceEnabled: boolean;
+  isGeofenceRequired: boolean;
+  isQrCodeCheckEnabled: boolean;
+  isSelfieVerificationEnabled: boolean;
+  isAdvanceLeaveEnabled: boolean;
+  isTimeOffRequestsEnabled: boolean;
+};
+
+export type TAdminOrganizationFeatures = {
+  error: boolean;
+  data: {features: TOrgFeatures};
+};
+
+export async function fetchAdminOrgFeatures(orgId: number) {
+  return adminFetch<TAdminOrganizationFeatures>(`admin/organizations/${orgId}/features`);
+}
+
+export async function updateAdminOrgFeatures(orgId: number, payload: Partial<TOrgFeatures>) {
+  return adminFetch<TAdminOrganizationFeatures>(
+    `admin/organizations/${orgId}/features`,
+    "PUT",
+    payload,
+  );
+}

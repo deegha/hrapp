@@ -12,6 +12,7 @@ import {
   SalaryBreakdownPanel,
   StatusTag,
   DocumentUploader,
+  LeaveAdjustModal,
 } from "@/components";
 import {useSalaryBreakdown} from "@/hooks/useSalaryBreakdown";
 import {PendingDocumentSave} from "@/components/documentUpload/pendingDocumentSave";
@@ -27,8 +28,11 @@ import {
   addUserDocument,
   deleteUserDocument,
   downloadEmployeeDocument,
+  deleteUser,
 } from "@/services/userService";
 import {fetchJobRoles} from "@/services/organizationService";
+import {fetchLeaveAdjustments, createLeaveAdjustment} from "@/services/leaveAdjustmentService";
+import {TCreateLeaveAdjustmentPayload} from "@/types/leaveAdjustment";
 import {TUpdateUser} from "@/types";
 import {useNotificationStore} from "@/store/notificationStore";
 import {useConfirmationModalStore} from "@/store/useConfirmationModalStore";
@@ -45,6 +49,8 @@ import {
   EyeOff,
   FileText,
   Trash,
+  PlusCircle,
+  MinusCircle,
 } from "react-feather";
 import {TAllUserDetails} from "@/types/user";
 import {useState} from "react";
@@ -127,6 +133,8 @@ export default function UserDetails() {
   const [documentTitle, setDocumentTitle] = useState("");
   const [pendingDocumentUrl, setPendingDocumentUrl] = useState("");
   const [uploaderKey, setUploaderKey] = useState(0);
+  // null = closed, 0 = open (no pre-selection), >0 = open with specific leave type pre-selected
+  const [adjustModalLeaveTypeId, setAdjustModalLeaveTypeId] = useState<number | null>(null);
 
   const methods = useForm<TUpdateUser>({resolver: yupResolver(editUserSchema)});
 
@@ -140,6 +148,13 @@ export default function UserDetails() {
   const perm = permissionData?.data?.permission;
   const isAdmin = perm === "ADMIN_USER" || perm === "SUPER_USER";
   const isAdminOrL2 = ["ADMIN_USER", "SUPER_USER", "ADMIN_USER_L2"].includes(perm ?? "");
+
+  const empId = employeeId ? parseInt(employeeId, 10) : null;
+
+  const {data: leaveAdjData, mutate: mutateAdjustments} = useSWR(
+    empId && isAdminOrL2 ? `leave-adjustments-${empId}` : null,
+    () => fetchLeaveAdjustments(empId!),
+  );
 
   const jobRoles = jobRolesData?.data ?? [];
 
@@ -255,15 +270,48 @@ export default function UserDetails() {
     });
   };
 
+  const handleLeaveAdjust = async (payload: TCreateLeaveAdjustmentPayload) => {
+    if (!empId) return;
+    const resp = await createLeaveAdjustment(empId, payload);
+    if (resp.error) throw new Error("Failed to save adjustment");
+    await mutateAdjustments();
+    showNotification({
+      type: "success",
+      message: `Leave ${payload.type === "CREDIT" ? "credited" : "debited"} successfully`,
+    });
+  };
+
   const breadcrumbFilter = (segments: string[]) =>
     segments.filter(
-      (seg, idx, arr) => !(arr[idx - 1] === "user-management" && arr[idx + 1] === "edit"),
+      (seg, idx, arr) =>
+        !(arr[idx - 1] === "user-management" && arr[idx + 1] === "employeeProfile"),
     );
+
+  const handleDeleteUser = () => {
+    if (!employeeId) return;
+    openModal({
+      title: "Delete employee?",
+      description: `Are you sure you want to permanently delete ${user?.firstName} ${user?.lastName}? This action cannot be undone.`,
+      onConfirm: async () => {
+        try {
+          const resp = await deleteUser(parseInt(employeeId, 10));
+          if (resp.error) {
+            showNotification({type: "error", message: "Failed to delete employee"});
+            return;
+          }
+          showNotification({type: "success", message: "Employee deleted successfully"});
+          router.push("/user-management");
+        } catch {
+          showNotification({type: "error", message: "Failed to delete employee"});
+        }
+      },
+    });
+  };
 
   if (!user) {
     return (
       <Layout>
-        <PageLayout pageName="User Details">
+        <PageLayout pageName="Employee Profile">
           <Shimmer />
         </PageLayout>
       </Layout>
@@ -271,10 +319,9 @@ export default function UserDetails() {
   }
 
   const userLevelLabel = roles[user.userLevel as RoleKey] || user.userLevel;
-
   return (
     <Layout>
-      <PageLayout pageName="User Details" breadcrumbFilter={breadcrumbFilter}>
+      <PageLayout pageName="Employee Profile" breadcrumbFilter={breadcrumbFilter}>
         <div className="max-w-3xl space-y-6">
           {/* Header */}
           <div className="flex items-center gap-4 rounded-xl border border-border bg-white px-5 py-4 shadow-sm">
@@ -595,8 +642,130 @@ export default function UserDetails() {
               </div>
             </>
           )}
+
+          {/* Leave Balance — always visible to admin & L2 admin */}
+          {isAdminOrL2 && leaveAdjData?.data && (
+            <div className="overflow-hidden rounded-xl border border-border bg-white shadow-sm">
+              <div className="flex items-center justify-between border-b border-border bg-background px-6 py-4">
+                <div className="flex items-center gap-2">
+                  <Calendar size={15} className="text-primary" />
+                  <h2 className="text-sm font-semiBold text-textPrimary">Leave Balance</h2>
+                </div>
+                <button
+                  onClick={() =>
+                    setAdjustModalLeaveTypeId(leaveAdjData.data.balances[0]?.leaveTypeId ?? 0)
+                  }
+                  className="flex items-center gap-1.5 rounded-lg border border-border bg-white px-3 py-1.5 text-xs font-medium text-textPrimary shadow-sm transition hover:shadow-md"
+                >
+                  <PlusCircle size={13} />
+                  Adjust
+                </button>
+              </div>
+
+              {/* Balance rows */}
+              <div className="divide-y divide-border">
+                {leaveAdjData.data.balances.map((b) => (
+                  <div key={b.leaveTypeId} className="flex items-center justify-between px-6 py-3">
+                    <div>
+                      <p className="text-sm font-medium text-textPrimary">{b.label}</p>
+                      <p className="mt-0.5 text-xs text-textSecondary">
+                        {b.credited} credited · {b.taken} taken
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span
+                        className={`text-sm font-semibold ${b.balance < 0 ? "text-red-500" : "text-green-600"}`}
+                      >
+                        {b.balance > 0 ? "+" : ""}
+                        {b.balance} day{b.balance !== 1 ? "s" : ""}
+                      </span>
+                      <button
+                        onClick={() => setAdjustModalLeaveTypeId(b.leaveTypeId)}
+                        className="flex items-center gap-1 rounded-lg border border-border px-2.5 py-1 text-xs text-textSecondary transition hover:border-primary hover:text-primary"
+                      >
+                        <PlusCircle size={11} />
+                        Adjust
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Adjustment history */}
+              {leaveAdjData.data.adjustments.length > 0 && (
+                <div className="border-t border-border">
+                  <p className="px-6 pt-4 text-xs font-semibold uppercase tracking-wider text-textSecondary">
+                    Adjustment History
+                  </p>
+                  <div className="divide-y divide-border">
+                    {leaveAdjData.data.adjustments.map((adj) => (
+                      <div key={adj.id} className="flex items-start gap-3 px-6 py-3">
+                        <div
+                          className={`mt-0.5 shrink-0 rounded-full p-1 ${adj.amount > 0 ? "bg-green-100 text-green-600" : "bg-red-100 text-red-500"}`}
+                        >
+                          {adj.amount > 0 ? <PlusCircle size={12} /> : <MinusCircle size={12} />}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm text-textPrimary">
+                            <span className="font-semibold">
+                              {adj.amount > 0 ? "+" : ""}
+                              {adj.amount} day{Math.abs(adj.amount) !== 1 ? "s" : ""}
+                            </span>{" "}
+                            · {adj.leaveType.leaveTypeLabel}
+                          </p>
+                          <p className="mt-0.5 text-xs text-textSecondary">{adj.reason}</p>
+                          <p className="mt-0.5 text-xs text-textSecondary">
+                            By {adj.createdBy.firstName} {adj.createdBy.lastName} ·{" "}
+                            {new Date(adj.createdAt).toLocaleDateString("en-US", {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            })}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {leaveAdjData.data.adjustments.length === 0 &&
+                leaveAdjData.data.balances.every((b) => b.credited === 0) && (
+                  <p className="px-6 py-4 text-sm text-textSecondary">
+                    No leave adjustments yet. Use Adjust to credit or debit days.
+                  </p>
+                )}
+            </div>
+          )}
         </div>
+
+        {/* Delete employee — admin only, at the very bottom */}
+        {isAdmin && user.UserStatus?.statusLabel !== "DELETED" && (
+          <div className="max-w-3xl pt-6">
+            <div className="rounded-xl border border-red-200 bg-red-50 p-5">
+              <h3 className="mb-1 text-sm font-semibold text-red-700">Danger Zone</h3>
+              <p className="mb-4 text-sm text-red-600">
+                Permanently delete this employee and all associated data. This cannot be undone.
+              </p>
+              <Button variant="danger" onClick={handleDeleteUser}>
+                <div className="flex items-center gap-2">
+                  <Trash size={14} />
+                  Delete Employee
+                </div>
+              </Button>
+            </div>
+          </div>
+        )}
       </PageLayout>
+
+      {adjustModalLeaveTypeId !== null && leaveAdjData?.data && (
+        <LeaveAdjustModal
+          balances={leaveAdjData.data.balances}
+          prefillLeaveTypeId={adjustModalLeaveTypeId > 0 ? adjustModalLeaveTypeId : undefined}
+          onClose={() => setAdjustModalLeaveTypeId(null)}
+          onSubmit={handleLeaveAdjust}
+        />
+      )}
     </Layout>
   );
 }
