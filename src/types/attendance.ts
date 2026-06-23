@@ -20,8 +20,11 @@ export interface IAttendance {
     | "checked_in"
     | "checked_out"
     | "not_checked_out"
-    | "pending";
+    | "pending"
+    | "weekend"
+    | "holiday";
   isWFH?: boolean;
+  holidayName?: string;
   location: {
     lat: number;
     lon: number;

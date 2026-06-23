@@ -17,6 +17,8 @@ const ATTENDANCE = {
   CHECKED_OUT: "checked_out",
   NOT_CHECKED_OUT: "not_checked_out",
   PENDING: "pending",
+  WEEKEND: "weekend",
+  HOLIDAY: "holiday",
 };
 
 export function MyAttendance() {
@@ -63,7 +65,6 @@ export function MyAttendance() {
               const getBulb = (s: string) => {
                 switch (s) {
                   case ATTENDANCE.FULL_DAY:
-                    return <span className="block size-3 rounded-full bg-green-500" aria-hidden />;
                   case ATTENDANCE.CHECKED_OUT:
                     return <span className="block size-3 rounded-full bg-green-500" aria-hidden />;
                   case ATTENDANCE.CHECKED_IN:
@@ -76,10 +77,12 @@ export function MyAttendance() {
                     return <span className="block size-3 rounded-full bg-blue-400" aria-hidden />;
                   case ATTENDANCE.NO_PAY:
                     return <span className="block size-3 rounded-full bg-gray-500" aria-hidden />;
-                  case ATTENDANCE.ABSENT:
-                    return <span className="block size-3 rounded-full bg-gray-300" aria-hidden />;
                   case ATTENDANCE.PENDING:
                     return <span className="block size-3 rounded-full bg-purple-400" aria-hidden />;
+                  case ATTENDANCE.WEEKEND:
+                    return <span className="block size-3 rounded-full bg-slate-300" aria-hidden />;
+                  case ATTENDANCE.HOLIDAY:
+                    return <span className="block size-3 rounded-full bg-amber-400" aria-hidden />;
                   default:
                     return <span className="block size-3 rounded-full bg-gray-300" aria-hidden />;
                 }
@@ -106,6 +109,10 @@ export function MyAttendance() {
                     return "Absent";
                   case ATTENDANCE.PENDING:
                     return "Pending Approval";
+                  case ATTENDANCE.WEEKEND:
+                    return "Weekend";
+                  case ATTENDANCE.HOLIDAY:
+                    return attendance.holidayName ?? "Public Holiday";
                   default:
                     return "Unknown";
                 }
@@ -123,7 +130,13 @@ export function MyAttendance() {
                   }
                   content={
                     <div>
-                      {status === ATTENDANCE.PENDING ? (
+                      {status === ATTENDANCE.WEEKEND ? (
+                        <div className="text-slate-400">Non-working day</div>
+                      ) : status === ATTENDANCE.HOLIDAY ? (
+                        <div className="text-amber-600">
+                          Public holiday — {attendance.holidayName}
+                        </div>
+                      ) : status === ATTENDANCE.PENDING ? (
                         <div className="text-purple-700">
                           Attendance approval pending — waiting for manager confirmation
                         </div>

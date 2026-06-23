@@ -27,6 +27,8 @@ const ATTENDANCE = {
   CHECKED_OUT: "checked_out",
   NOT_CHECKED_OUT: "not_checked_out",
   PENDING: "pending",
+  WEEKEND: "weekend",
+  HOLIDAY: "holiday",
 };
 
 export default function UserAttendancePage() {
@@ -117,7 +119,6 @@ export default function UserAttendancePage() {
   const getBulb = (s: string) => {
     switch (s) {
       case ATTENDANCE.FULL_DAY:
-        return <span className="block size-3 rounded-full bg-green-500" aria-hidden />;
       case ATTENDANCE.CHECKED_OUT:
         return <span className="block size-3 rounded-full bg-green-500" aria-hidden />;
       case ATTENDANCE.CHECKED_IN:
@@ -130,16 +131,20 @@ export default function UserAttendancePage() {
         return <span className="block size-3 rounded-full bg-blue-400" aria-hidden />;
       case ATTENDANCE.NO_PAY:
         return <span className="block size-3 rounded-full bg-gray-500" aria-hidden />;
-      case ATTENDANCE.ABSENT:
-        return <span className="block size-3 rounded-full bg-gray-300" aria-hidden />;
       case ATTENDANCE.PENDING:
         return <span className="block size-3 rounded-full bg-purple-400" aria-hidden />;
+      case ATTENDANCE.WEEKEND:
+        return <span className="block size-3 rounded-full bg-slate-300" aria-hidden />;
+      case ATTENDANCE.HOLIDAY:
+        return <span className="block size-3 rounded-full bg-amber-400" aria-hidden />;
       default:
         return <span className="block size-3 rounded-full bg-gray-300" aria-hidden />;
     }
   };
 
-  const getStatusLabel = (status: string, isWFH?: boolean) => {
+  const getStatusLabel = (status: string, holidayName?: string, isWFH?: boolean) => {
+    if (status === ATTENDANCE.WEEKEND) return "Weekend";
+    if (status === ATTENDANCE.HOLIDAY) return holidayName ?? "Public Holiday";
     const prefix = isWFH ? "Work Remote — " : "";
     switch (status) {
       case ATTENDANCE.FULL_DAY:
@@ -201,21 +206,30 @@ export default function UserAttendancePage() {
                       <div className="flex items-center gap-2" aria-hidden>
                         {getBulb(status)}
                         <span className="text-sm text-textSecondary">
-                          {getStatusLabel(status, attendance.isWFH)}
+                          {getStatusLabel(status, attendance.holidayName, attendance.isWFH)}
                         </span>
-                        {isL1Admin && status !== ATTENDANCE.ON_LEAVE && (
-                          <button
-                            onClick={() => openEditModal(attendance)}
-                            className="ml-2 rounded-md border border-gray-300 bg-white px-2 py-1 text-xs font-medium text-gray-600 shadow-sm hover:bg-gray-50 hover:text-gray-900 active:bg-gray-100"
-                          >
-                            Edit
-                          </button>
-                        )}
+                        {isL1Admin &&
+                          status !== ATTENDANCE.ON_LEAVE &&
+                          status !== ATTENDANCE.WEEKEND &&
+                          status !== ATTENDANCE.HOLIDAY && (
+                            <button
+                              onClick={() => openEditModal(attendance)}
+                              className="ml-2 rounded-md border border-gray-300 bg-white px-2 py-1 text-xs font-medium text-gray-600 shadow-sm hover:bg-gray-50 hover:text-gray-900 active:bg-gray-100"
+                            >
+                              Edit
+                            </button>
+                          )}
                       </div>
                     }
                     content={
                       <div>
-                        {status === ATTENDANCE.ON_LEAVE ? (
+                        {status === ATTENDANCE.WEEKEND ? (
+                          <div className="text-slate-400">Non-working day</div>
+                        ) : status === ATTENDANCE.HOLIDAY ? (
+                          <div className="text-amber-600">
+                            Public holiday — {attendance.holidayName}
+                          </div>
+                        ) : status === ATTENDANCE.ON_LEAVE ? (
                           <div className="text-teal-800">On leave this day</div>
                         ) : status === ATTENDANCE.CHECKED_OUT ? (
                           <div className="text-green-700">

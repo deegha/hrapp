@@ -515,7 +515,20 @@ export default function UserDetails() {
                   <DetailRow label="Employment Type" value={user.EmploymentType?.typeLabel} />
                   <DetailRow
                     label="Join Date"
-                    value={user.joinDate ? new Date(user.joinDate).toLocaleDateString() : null}
+                    value={
+                      user.joinDate ? (
+                        <span className="flex items-baseline gap-2">
+                          <span>
+                            {new Date(user.joinDate).toLocaleDateString("en-GB", {
+                              day: "2-digit",
+                              month: "short",
+                              year: "numeric",
+                            })}
+                          </span>
+                          <span className="text-xs text-textSecondary">DD MMM YYYY</span>
+                        </span>
+                      ) : null
+                    }
                   />
                   {user.JobRole && <DetailRow label="Job Title" value={user.JobRole.title} />}
                 </div>
