@@ -1,4 +1,5 @@
 import moment from "moment";
+import {Calendar} from "react-feather";
 
 interface IAttendanceDateFilter {
   fromDate: string;
@@ -7,9 +8,9 @@ interface IAttendanceDateFilter {
 }
 
 const PRESETS = [
-  {label: "Last 30 days", days: 30},
-  {label: "Last 60 days", days: 60},
-  {label: "Last 90 days", days: 90},
+  {label: "30 days", days: 30},
+  {label: "60 days", days: 60},
+  {label: "90 days", days: 90},
 ];
 
 export function AttendanceDateFilter({fromDate, toDate, onChange}: IAttendanceDateFilter) {
@@ -22,9 +23,12 @@ export function AttendanceDateFilter({fromDate, toDate, onChange}: IAttendanceDa
   )?.days;
 
   return (
-    <div className="flex flex-wrap items-center gap-3">
-      {/* Preset buttons */}
-      <div className="flex gap-2">
+    <div className="flex flex-wrap items-center gap-3 rounded-xl border border-border bg-white px-4 py-3 shadow-sm">
+      {/* Preset pills */}
+      <div className="flex items-center gap-1.5">
+        <span className="mr-1 text-xs font-semibold uppercase tracking-wide text-textSecondary">
+          Range
+        </span>
         {PRESETS.map((preset) => (
           <button
             key={preset.days}
@@ -37,10 +41,10 @@ export function AttendanceDateFilter({fromDate, toDate, onChange}: IAttendanceDa
                 moment().format("YYYY-MM-DD"),
               )
             }
-            className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+            className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
               activePreset === preset.days
-                ? "bg-gray-900 text-gray-600 hover:bg-gray-200"
-                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                ? "bg-primary text-white shadow-sm"
+                : "bg-background text-textSecondary hover:bg-gray-200 hover:text-textPrimary"
             }`}
           >
             {preset.label}
@@ -49,26 +53,39 @@ export function AttendanceDateFilter({fromDate, toDate, onChange}: IAttendanceDa
       </div>
 
       {/* Divider */}
-      <span className="text-xs text-gray-300">|</span>
+      <div className="h-6 w-px bg-border" />
 
       {/* Custom date range */}
       <div className="flex items-center gap-2">
-        <input
-          type="date"
-          value={fromDate}
-          max={toDate}
-          onChange={(e) => onChange(e.target.value, toDate)}
-          className="rounded-lg border border-gray-200 px-2 py-1.5 text-xs text-gray-700 focus:outline-none focus:ring-1 focus:ring-gray-400"
-        />
-        <span className="text-xs text-gray-400">to</span>
-        <input
-          type="date"
-          value={toDate}
-          min={fromDate}
-          max={moment().format("YYYY-MM-DD")}
-          onChange={(e) => onChange(fromDate, e.target.value)}
-          className="rounded-lg border border-gray-200 px-2 py-1.5 text-xs text-gray-700 focus:outline-none focus:ring-1 focus:ring-gray-400"
-        />
+        <Calendar size={14} className="shrink-0 text-textSecondary" />
+        <div className="flex items-center gap-2">
+          <div className="flex flex-col">
+            <label className="mb-0.5 text-xs font-semibold uppercase tracking-wide text-textSecondary">
+              From
+            </label>
+            <input
+              type="date"
+              value={fromDate}
+              max={toDate}
+              onChange={(e) => onChange(e.target.value, toDate)}
+              className="rounded-lg border border-border bg-background px-2.5 py-1.5 text-xs font-medium text-textPrimary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+            />
+          </div>
+          <span className="mt-3 text-xs font-medium text-textSecondary">→</span>
+          <div className="flex flex-col">
+            <label className="mb-0.5 text-xs font-semibold uppercase tracking-wide text-textSecondary">
+              To
+            </label>
+            <input
+              type="date"
+              value={toDate}
+              min={fromDate}
+              max={moment().format("YYYY-MM-DD")}
+              onChange={(e) => onChange(fromDate, e.target.value)}
+              className="rounded-lg border border-border bg-background px-2.5 py-1.5 text-xs font-medium text-textPrimary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
