@@ -106,4 +106,5 @@ export type TPreflightResult = {
     lastName: string;
     employeeId: number | null;
   }[];
+  blockedByApprovedPayroll?: {periodStart: string; periodEnd: string};
 };

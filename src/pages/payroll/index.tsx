@@ -144,12 +144,12 @@ export default function PayrollPage() {
                     </div>
                   </div>
                 </Link>
-                {p.status !== "APPROVED" && (
+                {(p.status !== "APPROVED" || process.env.NODE_ENV === "development") && (
                   <button
                     onClick={() => setConfirmDeleteId(p.id)}
                     disabled={deletingId === p.id}
-                    className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-border bg-white text-textSecondary shadow-sm transition hover:border-red-300 hover:bg-red-50 hover:text-red-500"
-                    title="Delete payroll"
+                    className={`flex size-10 shrink-0 items-center justify-center rounded-xl border bg-white shadow-sm transition ${p.status === "APPROVED" ? "border-dashed border-red-300 text-red-300 hover:bg-red-50 hover:text-red-500" : "border-border text-textSecondary hover:border-red-300 hover:bg-red-50 hover:text-red-500"}`}
+                    title={p.status === "APPROVED" ? "Delete (dev only)" : "Delete payroll"}
                   >
                     <Trash2 size={15} />
                   </button>
@@ -221,7 +221,11 @@ export default function PayrollPage() {
                     <div className="flex flex-col gap-3">
                       <div className="flex items-start gap-2 rounded-lg bg-yellow-50 p-3 text-sm text-yellow-800">
                         <AlertTriangle size={16} className="mt-0.5 shrink-0" />
-                        <p>Please resolve the following issues before running payroll.</p>
+                        <p>
+                          {preflight.blockedByApprovedPayroll
+                            ? `A payroll for ${new Date(preflight.blockedByApprovedPayroll.periodStart).toLocaleDateString("en-US", {month: "long", year: "numeric"})} is already approved. You cannot run another payroll for an overlapping period.`
+                            : "Please resolve the following issues before running payroll."}
+                        </p>
                       </div>
 
                       {preflight.unapprovedLeaves.length > 0 && (

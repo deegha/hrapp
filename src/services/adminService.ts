@@ -96,10 +96,20 @@ export type TAdminUser = {
   manager: {id: number; firstName: string; lastName: string; email: string} | null;
 };
 
+export type TOrgFeatures = {
+  isAttendanceEnabled: boolean;
+  isGeofenceRequired: boolean;
+  isQrCodeCheckEnabled: boolean;
+  isSelfieVerificationEnabled: boolean;
+  isAdvanceLeaveEnabled: boolean;
+  isTimeOffRequestsEnabled: boolean;
+};
+
 export type TAdminOrganizationDetail = {
   error: boolean;
   data: {
     organization: {id: number; organizationName: string};
+    features: TOrgFeatures;
     users: TAdminUser[];
   };
 };
@@ -110,6 +120,14 @@ export async function fetchAdminOrganizations() {
 
 export async function fetchAdminOrganizationUsers(orgId: number) {
   return adminFetch<TAdminOrganizationDetail>(`admin/organizations/${orgId}/users`);
+}
+
+export async function updateAdminOrgFeatures(orgId: number, features: Partial<TOrgFeatures>) {
+  return adminFetch<{error: boolean; data: TOrgFeatures}>(
+    `admin/organizations/${orgId}/features`,
+    "PUT",
+    features,
+  );
 }
 
 export type TInternalUser = {

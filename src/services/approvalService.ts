@@ -28,7 +28,13 @@ type TApprove = {
 };
 
 export function approveRequest(
-  type: "USER" | "LEAVEREQUEST" | "DEPARTMENT_ASSIGNMENT" | "USER_UPDATE" | "WFH_REQUEST",
+  type:
+    | "USER"
+    | "LEAVEREQUEST"
+    | "DEPARTMENT_ASSIGNMENT"
+    | "USER_UPDATE"
+    | "WFH_REQUEST"
+    | "PAYROLL",
   {approvalRequestId, itemId, approveReject, rejectedReason}: TApprove,
 ) {
   let resource: string;
