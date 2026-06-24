@@ -10,6 +10,8 @@ interface Props {
   onSubmit: (payload: TCreateLeaveAdjustmentPayload) => Promise<void>;
 }
 
+const defaultExpiry = () => `${new Date().getFullYear()}-12-31`;
+
 export function LeaveAdjustModal({balances, prefillLeaveTypeId, onClose, onSubmit}: Props) {
   const [type, setType] = useState<"CREDIT" | "DEBIT">("CREDIT");
   const [leaveTypeId, setLeaveTypeId] = useState<number>(
@@ -17,6 +19,7 @@ export function LeaveAdjustModal({balances, prefillLeaveTypeId, onClose, onSubmi
   );
   const [days, setDays] = useState<string>("1");
   const [reason, setReason] = useState("");
+  const [expiresAt, setExpiresAt] = useState<string>(defaultExpiry());
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
@@ -29,7 +32,7 @@ export function LeaveAdjustModal({balances, prefillLeaveTypeId, onClose, onSubmi
     setError("");
     setSubmitting(true);
     try {
-      await onSubmit({leaveTypeId, days: daysNum, type, reason: reason.trim()});
+      await onSubmit({leaveTypeId, days: daysNum, type, reason: reason.trim(), expiresAt});
       onClose();
     } catch {
       setError("Failed to save adjustment. Please try again.");
@@ -134,6 +137,30 @@ export function LeaveAdjustModal({balances, prefillLeaveTypeId, onClose, onSubmi
               rows={3}
               className="resize-none rounded-lg border border-border bg-white px-3 py-2 text-sm text-textPrimary placeholder:text-textSecondary focus:outline-none focus:ring-2 focus:ring-primary"
             />
+          </div>
+
+          {/* Expiry date */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-semibold text-textPrimary">Expires On</label>
+            <div className="flex items-center gap-2">
+              <input
+                type="date"
+                value={expiresAt}
+                min={new Date().toISOString().split("T")[0]}
+                onChange={(e) => setExpiresAt(e.target.value)}
+                className="flex-1 rounded-lg border border-border bg-white px-3 py-2 text-sm text-textPrimary focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+              <button
+                type="button"
+                onClick={() => setExpiresAt(defaultExpiry())}
+                className="shrink-0 rounded-lg border border-border px-3 py-2 text-xs font-medium text-textSecondary hover:bg-background"
+              >
+                End of year
+              </button>
+            </div>
+            <p className="text-xs text-textSecondary">
+              After this date the adjustment will no longer count toward the balance.
+            </p>
           </div>
 
           {/* Preview */}

@@ -32,7 +32,8 @@ import {
 } from "@/services/userService";
 import {fetchJobRoles} from "@/services/organizationService";
 import {fetchLeaveAdjustments, createLeaveAdjustment} from "@/services/leaveAdjustmentService";
-import {TCreateLeaveAdjustmentPayload} from "@/types/leaveAdjustment";
+import {fetchUserLeaveBalance} from "@/services/leaveService";
+import {TCreateLeaveAdjustmentPayload, TLeaveBalance} from "@/types/leaveAdjustment";
 import {TUpdateUser} from "@/types";
 import {useNotificationStore} from "@/store/notificationStore";
 import {useConfirmationModalStore} from "@/store/useConfirmationModalStore";
@@ -135,6 +136,8 @@ export default function UserDetails() {
   const [uploaderKey, setUploaderKey] = useState(0);
   // null = closed, 0 = open (no pre-selection), >0 = open with specific leave type pre-selected
   const [adjustModalLeaveTypeId, setAdjustModalLeaveTypeId] = useState<number | null>(null);
+  const [historyPage, setHistoryPage] = useState(0);
+  const HISTORY_PAGE_SIZE = 5;
 
   const methods = useForm<TUpdateUser>({resolver: yupResolver(editUserSchema)});
 
@@ -154,6 +157,11 @@ export default function UserDetails() {
   const {data: leaveAdjData, mutate: mutateAdjustments} = useSWR(
     empId && isAdminOrL2 ? `leave-adjustments-${empId}` : null,
     () => fetchLeaveAdjustments(empId!),
+  );
+
+  const {data: leaveBalanceData, mutate: mutateLeaveBalance} = useSWR(
+    empId && isAdminOrL2 ? `leave-balance-emp-${empId}` : null,
+    () => fetchUserLeaveBalance(empId!),
   );
 
   const jobRoles = jobRolesData?.data ?? [];
@@ -274,7 +282,8 @@ export default function UserDetails() {
     if (!empId) return;
     const resp = await createLeaveAdjustment(empId, payload);
     if (resp.error) throw new Error("Failed to save adjustment");
-    await mutateAdjustments();
+    await Promise.all([mutateAdjustments(), mutateLeaveBalance()]);
+    setHistoryPage(0);
     showNotification({
       type: "success",
       message: `Leave ${payload.type === "CREDIT" ? "credited" : "debited"} successfully`,
@@ -657,7 +666,7 @@ export default function UserDetails() {
           )}
 
           {/* Leave Balance — always visible to admin & L2 admin */}
-          {isAdminOrL2 && leaveAdjData?.data && (
+          {isAdminOrL2 && leaveBalanceData?.data && (
             <div className="overflow-hidden rounded-xl border border-border bg-white shadow-sm">
               <div className="flex items-center justify-between border-b border-border bg-background px-6 py-4">
                 <div className="flex items-center gap-2">
@@ -665,9 +674,10 @@ export default function UserDetails() {
                   <h2 className="text-sm font-semiBold text-textPrimary">Leave Balance</h2>
                 </div>
                 <button
-                  onClick={() =>
-                    setAdjustModalLeaveTypeId(leaveAdjData.data.balances[0]?.leaveTypeId ?? 0)
-                  }
+                  onClick={() => {
+                    const first = leaveBalanceData.data.leaveTypeBalances[0];
+                    setAdjustModalLeaveTypeId(first?.id ?? 0);
+                  }}
                   className="flex items-center gap-1.5 rounded-lg border border-border bg-white px-3 py-1.5 text-xs font-medium text-textPrimary shadow-sm transition hover:shadow-md"
                 >
                   <PlusCircle size={13} />
@@ -677,23 +687,36 @@ export default function UserDetails() {
 
               {/* Balance rows */}
               <div className="divide-y divide-border">
-                {leaveAdjData.data.balances.map((b) => (
-                  <div key={b.leaveTypeId} className="flex items-center justify-between px-6 py-3">
+                {leaveBalanceData.data.leaveTypeBalances.map((b) => (
+                  <div key={b.id} className="flex items-center justify-between px-6 py-3">
                     <div>
-                      <p className="text-sm font-medium text-textPrimary">{b.label}</p>
+                      <p className="text-sm font-medium text-textPrimary">{b.name}</p>
                       <p className="mt-0.5 text-xs text-textSecondary">
-                        {b.credited} credited · {b.taken} taken
+                        {b.netAdjustment !== 0 ? (
+                          <>
+                            {b.baseAllowance} base{" "}
+                            <span
+                              className={b.netAdjustment > 0 ? "text-green-600" : "text-red-500"}
+                            >
+                              {b.netAdjustment > 0 ? `+${b.netAdjustment}` : b.netAdjustment} adj
+                            </span>{" "}
+                            · {b.usedDays} taken
+                          </>
+                        ) : (
+                          <>
+                            {b.yearlyAllowance} allowance · {b.usedDays} taken
+                          </>
+                        )}
                       </p>
                     </div>
                     <div className="flex items-center gap-3">
                       <span
-                        className={`text-sm font-semibold ${b.balance < 0 ? "text-red-500" : "text-green-600"}`}
+                        className={`text-sm font-semibold ${b.remainingDays < 0 ? "text-red-500" : "text-green-600"}`}
                       >
-                        {b.balance > 0 ? "+" : ""}
-                        {b.balance} day{b.balance !== 1 ? "s" : ""}
+                        {b.remainingDays} day{b.remainingDays !== 1 ? "s" : ""} left
                       </span>
                       <button
-                        onClick={() => setAdjustModalLeaveTypeId(b.leaveTypeId)}
+                        onClick={() => setAdjustModalLeaveTypeId(b.id)}
                         className="flex items-center gap-1 rounded-lg border border-border px-2.5 py-1 text-xs text-textSecondary transition hover:border-primary hover:text-primary"
                       >
                         <PlusCircle size={11} />
@@ -705,49 +728,107 @@ export default function UserDetails() {
               </div>
 
               {/* Adjustment history */}
-              {leaveAdjData.data.adjustments.length > 0 && (
-                <div className="border-t border-border">
-                  <p className="px-6 pt-4 text-xs font-semibold uppercase tracking-wider text-textSecondary">
-                    Adjustment History
-                  </p>
-                  <div className="divide-y divide-border">
-                    {leaveAdjData.data.adjustments.map((adj) => (
-                      <div key={adj.id} className="flex items-start gap-3 px-6 py-3">
-                        <div
-                          className={`mt-0.5 shrink-0 rounded-full p-1 ${adj.amount > 0 ? "bg-green-100 text-green-600" : "bg-red-100 text-red-500"}`}
-                        >
-                          {adj.amount > 0 ? <PlusCircle size={12} /> : <MinusCircle size={12} />}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-sm text-textPrimary">
-                            <span className="font-semibold">
-                              {adj.amount > 0 ? "+" : ""}
-                              {adj.amount} day{Math.abs(adj.amount) !== 1 ? "s" : ""}
-                            </span>{" "}
-                            · {adj.leaveType.leaveTypeLabel}
-                          </p>
-                          <p className="mt-0.5 text-xs text-textSecondary">{adj.reason}</p>
-                          <p className="mt-0.5 text-xs text-textSecondary">
-                            By {adj.createdBy.firstName} {adj.createdBy.lastName} ·{" "}
-                            {new Date(adj.createdAt).toLocaleDateString("en-US", {
-                              day: "numeric",
-                              month: "short",
-                              year: "numeric",
-                            })}
-                          </p>
-                        </div>
+              {leaveAdjData?.data &&
+                leaveAdjData.data.adjustments.length > 0 &&
+                (() => {
+                  const allAdj = leaveAdjData.data.adjustments;
+                  const totalPages = Math.ceil(allAdj.length / HISTORY_PAGE_SIZE);
+                  const pageAdj = allAdj.slice(
+                    historyPage * HISTORY_PAGE_SIZE,
+                    (historyPage + 1) * HISTORY_PAGE_SIZE,
+                  );
+                  return (
+                    <div className="border-t border-border">
+                      <div className="flex items-center justify-between px-6 pb-1 pt-4">
+                        <p className="text-xs font-semibold uppercase tracking-wider text-textSecondary">
+                          Adjustment History
+                        </p>
+                        {totalPages > 1 && (
+                          <div className="flex items-center gap-1">
+                            <button
+                              onClick={() => setHistoryPage((p) => Math.max(0, p - 1))}
+                              disabled={historyPage === 0}
+                              className="rounded px-2 py-0.5 text-xs text-textSecondary transition hover:bg-background disabled:opacity-30"
+                            >
+                              ‹ Prev
+                            </button>
+                            <span className="text-xs text-textSecondary">
+                              {historyPage + 1} / {totalPages}
+                            </span>
+                            <button
+                              onClick={() => setHistoryPage((p) => Math.min(totalPages - 1, p + 1))}
+                              disabled={historyPage === totalPages - 1}
+                              className="rounded px-2 py-0.5 text-xs text-textSecondary transition hover:bg-background disabled:opacity-30"
+                            >
+                              Next ›
+                            </button>
+                          </div>
+                        )}
                       </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {leaveAdjData.data.adjustments.length === 0 &&
-                leaveAdjData.data.balances.every((b) => b.credited === 0) && (
-                  <p className="px-6 py-4 text-sm text-textSecondary">
-                    No leave adjustments yet. Use Adjust to credit or debit days.
-                  </p>
-                )}
+                      <div className="divide-y divide-border">
+                        {pageAdj.map((adj) => (
+                          <div key={adj.id} className="flex items-start gap-3 px-6 py-3">
+                            <div
+                              className={`mt-0.5 shrink-0 rounded-full p-1 ${adj.amount > 0 ? "bg-green-100 text-green-600" : "bg-red-100 text-red-500"}`}
+                            >
+                              {adj.amount > 0 ? (
+                                <PlusCircle size={12} />
+                              ) : (
+                                <MinusCircle size={12} />
+                              )}
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-sm text-textPrimary">
+                                <span className="font-semibold">
+                                  {adj.amount > 0 ? "+" : ""}
+                                  {adj.amount} day{Math.abs(adj.amount) !== 1 ? "s" : ""}
+                                </span>{" "}
+                                · {adj.leaveType.leaveTypeLabel}
+                              </p>
+                              <p className="mt-0.5 text-xs text-textSecondary">{adj.reason}</p>
+                              <p className="mt-0.5 text-xs text-textSecondary">
+                                By {adj.createdBy.firstName} {adj.createdBy.lastName} ·{" "}
+                                {new Date(adj.createdAt).toLocaleDateString("en-US", {
+                                  day: "numeric",
+                                  month: "short",
+                                  year: "numeric",
+                                })}
+                                {adj.expiresAt && (
+                                  <>
+                                    {" "}
+                                    · expires{" "}
+                                    {new Date(adj.expiresAt).toLocaleDateString("en-US", {
+                                      day: "numeric",
+                                      month: "short",
+                                      year: "numeric",
+                                    })}
+                                  </>
+                                )}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      {totalPages > 1 && (
+                        <div className="flex justify-center gap-1 border-t border-border px-6 py-3">
+                          {Array.from({length: totalPages}, (_, i) => (
+                            <button
+                              key={i}
+                              onClick={() => setHistoryPage(i)}
+                              className={`size-6 rounded text-xs transition ${
+                                i === historyPage
+                                  ? "bg-primary text-white"
+                                  : "text-textSecondary hover:bg-background"
+                              }`}
+                            >
+                              {i + 1}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
             </div>
           )}
         </div>
@@ -771,9 +852,17 @@ export default function UserDetails() {
         )}
       </PageLayout>
 
-      {adjustModalLeaveTypeId !== null && leaveAdjData?.data && (
+      {adjustModalLeaveTypeId !== null && leaveBalanceData?.data && (
         <LeaveAdjustModal
-          balances={leaveAdjData.data.balances}
+          balances={leaveBalanceData.data.leaveTypeBalances.map(
+            (b): TLeaveBalance => ({
+              leaveTypeId: b.id,
+              label: b.name,
+              credited: b.yearlyAllowance,
+              taken: b.usedDays,
+              balance: b.remainingDays,
+            }),
+          )}
           prefillLeaveTypeId={adjustModalLeaveTypeId > 0 ? adjustModalLeaveTypeId : undefined}
           onClose={() => setAdjustModalLeaveTypeId(null)}
           onSubmit={handleLeaveAdjust}
