@@ -6,6 +6,7 @@ export type TLeaveAdjustment = {
   reason: string;
   createdById: number;
   createdAt: string;
+  expiresAt: string | null;
   leaveType: {id: number; leaveTypeLabel: string};
   createdBy: {id: number; firstName: string; lastName: string};
 };
@@ -28,4 +29,5 @@ export type TCreateLeaveAdjustmentPayload = {
   days: number;
   type: "CREDIT" | "DEBIT";
   reason: string;
+  expiresAt?: string; // ISO date string, undefined = never expires
 };
